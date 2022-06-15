@@ -1,10 +1,10 @@
 ## BE-02-Woowa
 
-### Stack
-spring-data-jpa spring-boot maven junit h2
+### Tech
+<img src="https://img.shields.io/badge/Spring boot-6DB33F?style=flat-square&logo=Spring boot&logoColor=white"/> <img src="https://img.shields.io/badge/Maven-C71A36?style=flat-square&logo=ApacheMaven&logoColor=white"/> <img src="https://img.shields.io/badge/Junit-25A162?style=flat-square&logo=Junit5&logoColor=white"/> 
 
 ### Tool
-mural gather slack github-issues notion
+<img src="https://img.shields.io/badge/Notion-FFFFFF?style=flat-square&logo=Notion&logoColor=black"/> <img src="https://img.shields.io/badge/Github-000000?style=flat-square&logo=Github&logoColor=white"/> <img src="https://img.shields.io/badge/Slack-4A154B?style=flat-square&logo=Slack&logoColor=white"/> <img src="https://img.shields.io/badge/Amazon S3-E34F26?style=flat-square&logo=Amazon S3&logoColor=white"/>
 
 ### Team
 |Project Owner|Scrum Master|Developer|Developer|Mentor|
