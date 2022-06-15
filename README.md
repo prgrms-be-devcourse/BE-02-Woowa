@@ -9,7 +9,7 @@
 ### Team
 |Project Owner|Scrum Master|Developer|Developer|Mentor|
 |--|--|--|--|--|
-|[최현웅]()|[문정현]()|[정해민](https://github.com/haemin-jeong)|[최지훈](https://github.com/chlwlgns524)|[흑구](https://github.com/WooSungHwan)|
+|[최현웅](https://github.com/choi1204)|[문정현](https://github.com/y005)|[정해민](https://github.com/haemin-jeong)|[최지훈](https://github.com/chlwlgns524)|[흑구](https://github.com/WooSungHwan)|
 
 
 ## Project Description
