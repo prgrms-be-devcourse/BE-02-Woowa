@@ -1,7 +1,5 @@
 ## BE-02-Woowa
 
-배달의 민족 서비스 클론 코딩 프로젝트입니다.
-
 ### Stack
 spring-data-jpa spring-boot maven junit h2
 
