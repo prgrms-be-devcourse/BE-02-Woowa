@@ -3,8 +3,6 @@ package com.example.woowa.customer.entity;
 import static lombok.AccessLevel.PRIVATE;
 import static lombok.AccessLevel.PROTECTED;
 
-import com.example.woowa.customer.entity.CustomerAddress;
-import com.example.woowa.customer.entity.CustomerGrade;
 import com.example.woowa.review.entity.Review;
 import com.example.woowa.voucher.entity.Voucher;
 import java.util.List;
@@ -32,7 +30,7 @@ public class Customer {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 
-  @Column(unique = true, length = 45)
+  @Column(nullable = false, unique = true, length = 45)
   private String loginId;
 
   @Column(nullable = false, length = 45)
