@@ -30,7 +30,7 @@ public class MenuCategory {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "restaurant_id")
+    @JoinColumn(name = "restaurant_id", nullable = false)
     private Restaurant restaurant;
 
     @OneToMany(mappedBy = "menuCategory", cascade = CascadeType.REMOVE)
