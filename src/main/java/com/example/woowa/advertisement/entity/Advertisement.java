@@ -17,11 +17,11 @@ import lombok.NoArgsConstructor;
 @Entity
 public class Advertisement {
 
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id
-    private Integer id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-    @Column(name = "advertise_type", unique = true, nullable = false, length = 10)
+    @Column(unique = true, nullable = false, length = 10)
     private String advertiseType;
 
     @Column(nullable = false)

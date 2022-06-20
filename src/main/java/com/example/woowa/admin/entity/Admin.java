@@ -16,14 +16,14 @@ import lombok.NoArgsConstructor;
 @Entity
 public class Admin {
 
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id
-    private Integer id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-    @Column(name = "login_id", unique = true, nullable = false, updatable = false, length = 45)
+    @Column(unique = true, nullable = false, updatable = false, length = 45)
     private String loginId;
 
-    @Column(name = "login_password", nullable = false, length = 45)
+    @Column(nullable = false, length = 45)
     private String loginPassword;
 
     public Admin(String loginId, String loginPassword) {

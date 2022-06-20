@@ -16,20 +16,20 @@ import lombok.NoArgsConstructor;
 @Entity
 public class Owner {
 
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "login_id", unique = true, nullable = false, updatable = false, length = 45)
+    @Column(unique = true, nullable = false, updatable = false, length = 45)
     private String loginId;
 
-    @Column(name = "login_password", nullable = false, length = 45)
+    @Column(nullable = false, length = 45)
     private String loginPassword;
 
     @Column(nullable = false, length = 45)
     private String name;
 
-    @Column(name = "phone_number", nullable = false, length = 45)
+    @Column(nullable = false, length = 45)
     private String phoneNumber;
 
     public Owner(String loginId, String loginPassword, String name, String phoneNumber) {
