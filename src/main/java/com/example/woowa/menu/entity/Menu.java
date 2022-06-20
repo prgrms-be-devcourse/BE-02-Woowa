@@ -1,31 +1,30 @@
 package com.example.woowa.menu.entity;
 
-import static javax.persistence.EnumType.STRING;
-import static javax.persistence.FetchType.LAZY;
-import static javax.persistence.GenerationType.IDENTITY;
-import static lombok.AccessLevel.PROTECTED;
-
 import com.example.woowa.menu.enums.SaleStatus;
 import com.example.woowa.menucategory.entity.MenuCategory;
 import java.util.Objects;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
 @Entity
-@NoArgsConstructor(access = PROTECTED)
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Menu {
 
     @Id
-    @GeneratedValue(strategy = IDENTITY)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(fetch = LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "menu_category_id")
     private MenuCategory menuCategory;
 
@@ -40,7 +39,7 @@ public class Menu {
     @Column(nullable = false)
     private Boolean isMain;
 
-    @Enumerated(STRING)
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private SaleStatus saleStatus;
 
@@ -55,7 +54,8 @@ public class Menu {
         this.saleStatus = saleStatus;
     }
 
-    public Menu createMenu(MenuCategory menuCategory, String title, Integer price, String description,
+    public Menu createMenu(MenuCategory menuCategory, String title, Integer price,
+            String description,
             Boolean isMain,
             SaleStatus saleStatus) {
         return new Menu(menuCategory, title, price, description, isMain, saleStatus);
