@@ -1,6 +1,5 @@
 package com.example.woowa.voucher.entity;
 
-import static lombok.AccessLevel.PRIVATE;
 import static lombok.AccessLevel.PROTECTED;
 
 import java.time.LocalDateTime;
@@ -10,7 +9,6 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -43,11 +41,19 @@ public class Voucher {
 
   public Voucher(String voucherType, Integer discountValue, LocalDateTime expirationDate,
       String code, Integer couponCount) {
+    assert isValidVoucherType(voucherType, discountValue);
+    assert expirationDate != null;
+    assert ! code.isBlank();
+    assert couponCount > 0;
     this.voucherType = voucherType;
     this.discountValue = discountValue;
     this.expirationDate = expirationDate;
     this.code = code;
     this.couponCount = couponCount;
+  }
+
+  public boolean isValidVoucherType(String voucherType, Integer discountValue) {
+    return (voucherType.equals("fixed") && (discountValue > 0)) || (voucherType.equals("percent") && (discountValue <= 100) && (discountValue > 0));
   }
 
   public void setVoucherType(String voucherType) {
@@ -63,5 +69,18 @@ public class Voucher {
   public void setExpirationDate(LocalDateTime expirationDate) {
     assert expirationDate.isAfter(LocalDateTime.now());
     this.expirationDate = expirationDate;
+  }
+
+  public double useVoucher(double price) {
+    assert price > 0;
+    double discountResult = 0d;
+    if (voucherType.equals("fixed")) {
+      assert price >= discountValue;
+      discountResult = price - discountValue;
+    }
+    else if (voucherType.equals("percent")) {
+      discountResult = price * discountValue / 100;
+    }
+    return discountResult;
   }
 }
