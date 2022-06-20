@@ -1,6 +1,5 @@
 package com.example.woowa.customer.entity;
 
-import static lombok.AccessLevel.PRIVATE;
 import static lombok.AccessLevel.PROTECTED;
 
 import javax.persistence.Column;
@@ -9,7 +8,6 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -17,11 +15,10 @@ import lombok.NoArgsConstructor;
 @Table(name = "customer_grade")
 @Getter
 @NoArgsConstructor(access = PROTECTED)
-@AllArgsConstructor(access = PRIVATE)
 public class CustomerGrade {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Integer id;
+  private Long id;
 
   @Column(nullable = false)
   private Integer orderCount;
@@ -32,7 +29,18 @@ public class CustomerGrade {
   @Column(nullable = false)
   private Integer discountPrice;
 
-  public void setOrder_count(int orderCount) {
+  @Column(nullable = false)
+  private Integer voucherCount;
+
+  public CustomerGrade(Integer orderCount, String grade, Integer discountPrice,
+      Integer voucherCount) {
+    this.orderCount = orderCount;
+    this.grade = grade;
+    this.discountPrice = discountPrice;
+    this.voucherCount = voucherCount;
+  }
+
+  public void setOrderCount(int orderCount) {
     assert orderCount > 0;
     this.orderCount = orderCount;
   }
@@ -42,8 +50,13 @@ public class CustomerGrade {
     this.grade = grade;
   }
 
-  public void setDiscount_price(int discountPrice) {
+  public void setDiscountPrice(int discountPrice) {
     assert discountPrice > 0;
     this.discountPrice = discountPrice;
+  }
+
+  public void setVoucherCount(int voucherCount) {
+    assert voucherCount > 0;
+    this.voucherCount = voucherCount;
   }
 }

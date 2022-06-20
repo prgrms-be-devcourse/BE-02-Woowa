@@ -1,10 +1,10 @@
 package com.example.woowa.customer.entity;
 
-import static lombok.AccessLevel.PRIVATE;
 import static lombok.AccessLevel.PROTECTED;
 
 import com.example.woowa.review.entity.Review;
 import com.example.woowa.voucher.entity.Voucher;
+import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -16,7 +16,6 @@ import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -24,7 +23,6 @@ import lombok.NoArgsConstructor;
 @Table(name = "customer")
 @Getter
 @NoArgsConstructor(access = PROTECTED)
-@AllArgsConstructor(access = PRIVATE)
 public class Customer {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -36,38 +34,43 @@ public class Customer {
   @Column(nullable = false, length = 45)
   private String loginPassword;
 
-  @Column(columnDefinition = "INT default 0")
+  @Column(columnDefinition = "INT DEFAULT 0")
   private Integer orderPerMonth;
 
   @Column(nullable = false, length = 45)
   private String birthdate;
 
-  @Column(columnDefinition = "INT default 0")
+  @Column(columnDefinition = "INT DEFAULT 0")
   private Integer point;
 
   @OneToOne(fetch = FetchType.LAZY)
-  @JoinColumn(nullable = false)
+  @JoinColumn(name = "customer_grade_id", nullable = false)
   private CustomerGrade customerGrade;
-  //초기 등급
 
   @OneToMany(mappedBy = "customer")
-  private List<Review> reviews;
-  //초기 default value 빈 배열
+  private List<Review> reviews = new ArrayList<>();
 
   @OneToMany(mappedBy = "customer")
-  private List<CustomerAddress> customerAddresses;
+  private List<CustomerAddress> customerAddresses = new ArrayList<>();
 
   @OneToMany(mappedBy = "customer")
-  private List<Voucher> vouchers;
+  private List<Voucher> vouchers = new ArrayList<>();
 
-  public void setLoginId(String login_id) {
-    assert ! login_id.isBlank();
-    this.loginId = login_id;
+  public Customer(String loginId, String loginPassword, String birthdate,
+      CustomerGrade customerGrade) {
+    assert ! loginId.isBlank();
+    assert ! loginPassword.isBlank();
+    assert ! birthdate.isBlank();
+    assert customerGrade != null;
+    this.loginId = loginId;
+    this.loginPassword = loginPassword;
+    this.birthdate = birthdate;
+    this.customerGrade = customerGrade;
   }
 
-  public void setLoginPassword(String login_password) {
-    assert ! login_password.isBlank();
-    this.loginPassword = login_password;
+  public void setLoginPassword(String loginPassword) {
+    assert ! loginPassword.isBlank();
+    this.loginPassword = loginPassword;
   }
 
   public void initOrderPerMonth() {
@@ -76,11 +79,6 @@ public class Customer {
 
   public void addOrderPerMonth() {
     this.orderPerMonth += 1;
-  }
-
-  public void setBirthdate(String birthdate) {
-    assert ! birthdate.isBlank();
-    this.birthdate = birthdate;
   }
 
   public void usePoint(int point) {

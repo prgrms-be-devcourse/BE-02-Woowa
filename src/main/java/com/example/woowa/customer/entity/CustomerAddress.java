@@ -1,17 +1,16 @@
 package com.example.woowa.customer.entity;
 
-import static lombok.AccessLevel.PRIVATE;
 import static lombok.AccessLevel.PROTECTED;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -19,7 +18,6 @@ import lombok.NoArgsConstructor;
 @Table(name = "customer_address")
 @Getter
 @NoArgsConstructor(access = PROTECTED)
-@AllArgsConstructor(access = PRIVATE)
 public class CustomerAddress {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -34,9 +32,21 @@ public class CustomerAddress {
   @Column(nullable = false, length = 45)
   private String areaCode;
 
-  @ManyToOne
+  @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(nullable = false)
   private Customer customer;
+
+  public CustomerAddress(String address, String nickname, String areaCode,
+      Customer customer) {
+    assert !address.isBlank();
+    assert ! nickname.isBlank();
+    assert ! areaCode.isBlank();
+    assert customer != null;
+    this.address = address;
+    this.nickname = nickname;
+    this.areaCode = areaCode;
+    this.customer = customer;
+  }
 
   public void setAddress(String address) {
     assert !address.isBlank();
