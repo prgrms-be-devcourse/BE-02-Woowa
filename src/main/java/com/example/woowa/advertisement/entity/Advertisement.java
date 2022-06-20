@@ -5,7 +5,6 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.Lob;
 import javax.persistence.Table;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -27,7 +26,7 @@ public class Advertisement {
     @Column(nullable = false)
     private Integer price;
 
-    @Lob
+    @Column(columnDefinition = "TEXT")
     private String description;
 
     public Advertisement(String advertiseType, Integer price, String description) {
