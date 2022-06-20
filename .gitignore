@@ -33,4 +33,4 @@ build/
 .vscode/
 
 ### env
-application.yml
+src/main/resources/application-db.yaml
