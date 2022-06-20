@@ -1,0 +1,103 @@
+package com.example.woowa.restaurant.entity;
+
+import static javax.persistence.GenerationType.IDENTITY;
+import static lombok.AccessLevel.PRIVATE;
+import static lombok.AccessLevel.PROTECTED;
+
+import java.time.LocalTime;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+
+@Entity
+@NoArgsConstructor(access = PROTECTED)
+@AllArgsConstructor(access = PRIVATE)
+@Getter
+public class Restaurant {
+
+    @Id
+    @GeneratedValue(strategy = IDENTITY)
+    private Long id;
+
+    @Column(nullable = false)
+    private String name;
+
+    @Column(nullable = false)
+    private String businessNumber;
+
+    @Column(nullable = false)
+    private LocalTime openingTime;
+
+    @Column(nullable = false)
+    private LocalTime closingTime;
+
+    @Column(nullable = false)
+    private Boolean isOpen;
+
+    @Column(nullable = false)
+    private String phoneNumber;
+
+    private String description;
+
+    private Double averageReviewScore;
+
+    private Integer reviewCount;
+
+    @Column(nullable = false)
+    private String address;
+
+    public Restaurant(String name, String businessNumber, LocalTime openingTime,
+            LocalTime closingTime,
+            Boolean isOpen, String phoneNumber, String description, String address) {
+        this.name = name;
+        this.businessNumber = businessNumber;
+        this.openingTime = openingTime;
+        this.closingTime = closingTime;
+        this.isOpen = isOpen;
+        this.phoneNumber = phoneNumber;
+        this.description = description;
+        this.address = address;
+        this.reviewCount = 0;
+        this.averageReviewScore = 0.0D;
+    }
+
+    public Restaurant createRestaurant(String name, String businessNumber,
+            LocalTime openingTime, LocalTime closingTime, Boolean isOpen, String phoneNumber,
+            String description, String address) {
+        return new Restaurant(name, businessNumber, openingTime, closingTime, isOpen, phoneNumber,
+                description, address);
+    }
+
+    public void changeOpiningTime(LocalTime openingTime) {
+        this.openingTime = openingTime;
+    }
+
+    public void changeClosingTime(LocalTime closingTime) {
+        this.closingTime = closingTime;
+    }
+
+    public void changeOpenStatus(Boolean isOpen) {
+        this.isOpen = isOpen;
+    }
+
+    public void changePhoneNumber(String phoneNumber) {
+        this.phoneNumber = phoneNumber;
+    }
+
+    public void changeDescription(String description) {
+        this.description = description;
+    }
+
+    public void changeAddress(String address) {
+        this.address = address;
+    }
+
+    public void changeReviewInfo(Double averageReviewScore, Integer reviewCount) {
+        this.averageReviewScore = averageReviewScore;
+        this.reviewCount = reviewCount;
+    }
+}
