@@ -25,7 +25,7 @@ public class Rider {
     @Column(nullable = false)
     private String loginPassword;
 
-    @Column(columnDefinition="BOOLEAN DEFAULT false")
+    @Column(columnDefinition="BOOLEAN DEFAULT FALSE")
     private Boolean isDelivery;
 
     @Column(nullable = false)
