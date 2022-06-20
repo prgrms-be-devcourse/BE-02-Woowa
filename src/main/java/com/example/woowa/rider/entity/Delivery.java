@@ -1,6 +1,10 @@
-package com.example.woowa.rider;
+package com.example.woowa.rider.entity;
 
+import com.example.woowa.rider.enums.DeliveryStatus;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.time.LocalDate;
@@ -8,6 +12,8 @@ import java.time.LocalDate;
 @Entity
 @Table
 @Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class Delivery {
 
     @Id

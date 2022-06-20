@@ -1,9 +1,9 @@
-package com.example.woowa.rider;
+package com.example.woowa.rider.entity;
 
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.ColumnDefault;
-
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -11,10 +11,12 @@ import java.util.List;
 @Entity
 @Table
 @Getter
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class Rider {
 
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(nullable = false)
@@ -35,9 +37,6 @@ public class Rider {
     @OneToMany
     private List<Delivery> deliveryList = new ArrayList<>();
 
-    /*
-    배달 받는 위치 리스트.
-     */
     @OneToMany
     private List<DeliveryArea> deliveryAreaList = new ArrayList<>();
 

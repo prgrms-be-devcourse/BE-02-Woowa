@@ -1,4 +1,4 @@
-package com.example.woowa.rider;
+package com.example.woowa.rider.entity;
 
 import lombok.Getter;
 
@@ -9,12 +9,12 @@ import javax.persistence.*;
 @Getter
 public class DeliveryArea {
 
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private AreaCode areaCode;
+    private String areaCode;
 
     @Column(nullable = false)
     private Integer deliveryPrice;
