@@ -19,18 +19,18 @@ public class Advertisement {
 
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id
-    private int id;
+    private Integer id;
 
     @Column(name = "advertise_type", unique = true, nullable = false, length = 10)
     private String advertiseType;
 
     @Column(nullable = false)
-    private int price;
+    private Integer price;
 
     @Lob
     private String description;
 
-    public Advertisement(String advertiseType, int price, String description) {
+    public Advertisement(String advertiseType, Integer price, String description) {
         this.advertiseType = advertiseType;
         this.price = price;
         this.description = description;
@@ -40,7 +40,7 @@ public class Advertisement {
         this.advertiseType = advertiseType;
     }
 
-    public void changePrice(int price) {
+    public void changePrice(Integer price) {
         this.price = price;
     }
 

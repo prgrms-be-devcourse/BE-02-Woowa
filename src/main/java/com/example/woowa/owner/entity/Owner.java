@@ -18,7 +18,7 @@ public class Owner {
 
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id
-    private long id;
+    private Long id;
 
     @Column(name = "login_id", unique = true, nullable = false, updatable = false, length = 45)
     private String loginId;

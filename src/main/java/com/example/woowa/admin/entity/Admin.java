@@ -18,7 +18,7 @@ public class Admin {
 
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id
-    private int id;
+    private Integer id;
 
     @Column(name = "login_id", unique = true, nullable = false, updatable = false, length = 45)
     private String loginId;
