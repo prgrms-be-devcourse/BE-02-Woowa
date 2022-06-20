@@ -1,16 +1,21 @@
 package com.example.woowa.menucategory.entity;
 
+import static javax.persistence.CascadeType.REMOVE;
 import static javax.persistence.FetchType.LAZY;
 import static javax.persistence.GenerationType.IDENTITY;
 import static lombok.AccessLevel.PROTECTED;
 
+import com.example.woowa.menu.entity.Menu;
 import com.example.woowa.restaurant.entity.Restaurant;
+import java.util.ArrayList;
+import java.util.List;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -26,6 +31,9 @@ public class MenuCategory {
     @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "restaurant_id")
     private Restaurant restaurant;
+
+    @OneToMany(mappedBy = "menuCategory", cascade = REMOVE)
+    private List<Menu> menus = new ArrayList<>();
 
     @Column(nullable = false)
     private String title;
