@@ -42,6 +42,9 @@ public class Voucher {
   @Column(nullable = false)
   private String code;
 
+  @Column(nullable = false)
+  private String couponCount;
+
   @ManyToOne
   @JoinColumn
   private Customer customer;
