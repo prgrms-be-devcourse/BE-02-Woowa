@@ -31,3 +31,6 @@ build/
 
 ### VS Code ###
 .vscode/
+
+### env
+src/main/resources/application-db.yaml
