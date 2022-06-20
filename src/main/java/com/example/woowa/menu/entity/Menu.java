@@ -38,7 +38,7 @@ public class Menu {
 
     private String description;
 
-    @Column(nullable = false)
+    @Column(columnDefinition = "BOOLEAN DEFAULT FALSE")
     private Boolean isMain;
 
     @Enumerated(EnumType.STRING)
