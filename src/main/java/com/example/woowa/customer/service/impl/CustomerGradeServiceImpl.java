@@ -1,4 +1,4 @@
-package com.example.woowa.customer.impl;
+package com.example.woowa.customer.service.impl;
 
 import com.example.woowa.customer.repository.CustomerGradeRepository;
 import com.example.woowa.customer.service.CustomerGradeService;

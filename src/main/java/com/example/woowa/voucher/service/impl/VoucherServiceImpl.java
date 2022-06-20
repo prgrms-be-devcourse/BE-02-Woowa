@@ -1,4 +1,4 @@
-package com.example.woowa.voucher.impl;
+package com.example.woowa.voucher.service.impl;
 
 import com.example.woowa.voucher.repository.VoucherRepository;
 import com.example.woowa.voucher.service.VoucherService;
