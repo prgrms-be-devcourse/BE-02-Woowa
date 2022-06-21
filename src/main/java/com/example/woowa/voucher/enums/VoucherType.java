@@ -11,7 +11,7 @@ public enum VoucherType {
     }
 
     @Override
-    public float discount(int currentPrice, int amount) {
+    public int discount(int currentPrice, int amount) {
       return (currentPrice - amount);
     }
 
@@ -28,7 +28,7 @@ public enum VoucherType {
     }
 
     @Override
-    public float discount(int currentPrice, int percent) {
+    public int discount(int currentPrice, int percent) {
       return currentPrice * (100 - percent) / 100;
     }
   };
@@ -39,7 +39,7 @@ public enum VoucherType {
     this.type = type;
   }
 
-  public float discount(int currentPrice, int amount) {
+  public int discount(int currentPrice, int amount) {
     return 0;
   }
 

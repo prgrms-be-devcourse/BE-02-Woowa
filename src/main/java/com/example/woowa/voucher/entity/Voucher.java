@@ -52,6 +52,10 @@ public class Voucher {
     this.code = code;
   }
 
+  public String getVoucherType() {
+    return voucherType.toString();
+  }
+
   public void setVoucherType(VoucherType voucherType) {
     this.voucherType = voucherType;
   }
@@ -66,7 +70,7 @@ public class Voucher {
     this.expirationDate = expirationDate;
   }
 
-  public double useVoucher(int price) {
+  public int useVoucher(int price) {
     assert ! isUse && voucherType.isOkayToDiscount(price, discountValue) && expirationDate.isAfter(LocalDateTime.now());
     isUse = true;
     return voucherType.discount(price, discountValue);
