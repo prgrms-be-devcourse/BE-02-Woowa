@@ -53,7 +53,7 @@ public class Customer {
   @OneToMany(mappedBy = "customer")
   private List<CustomerAddress> customerAddresses = new ArrayList<>();
 
-  @OneToMany(mappedBy = "customer")
+  @OneToMany
   private List<Voucher> vouchers = new ArrayList<>();
 
   public Customer(String loginId, String loginPassword, String birthdate,
