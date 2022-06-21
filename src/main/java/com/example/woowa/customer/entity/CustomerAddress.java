@@ -26,7 +26,7 @@ public class CustomerAddress {
   @Column(nullable = false, length = 45)
   private String address;
 
-  @Column(nullable = false, length = 45)
+  @Column(nullable = false, unique = true, length = 45)
   private String nickname;
 
   @Column(nullable = false, length = 45)
@@ -36,21 +36,21 @@ public class CustomerAddress {
   @JoinColumn(nullable = false)
   private Customer customer;
 
-  public CustomerAddress(String address, String nickname, String areaCode,
-      Customer customer) {
+  public CustomerAddress(String address, String nickname, Customer customer) {
     assert !address.isBlank();
     assert ! nickname.isBlank();
     assert ! areaCode.isBlank();
     assert customer != null;
     this.address = address;
     this.nickname = nickname;
-    this.areaCode = areaCode;
+    this.areaCode = "mock";
     this.customer = customer;
   }
 
   public void setAddress(String address) {
     assert !address.isBlank();
     this.address = address;
+    setAreaCode("mock");
   }
 
   public void setNickname(String nickname) {
@@ -58,13 +58,8 @@ public class CustomerAddress {
     this.nickname = nickname;
   }
 
-  public void setAreaCode(String areaCode) {
+  private void setAreaCode(String areaCode) {
     assert ! areaCode.isBlank();
     this.areaCode = areaCode;
-  }
-
-  public void setCustomer(Customer customer) {
-    assert customer != null;
-    this.customer = customer;
   }
 }

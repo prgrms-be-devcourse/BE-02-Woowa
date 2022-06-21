@@ -94,9 +94,7 @@ public class Customer {
     this.customerGrade = customerGrade;
   }
 
-  public void addReview(Review review) {
-    this.reviews.add(review);
-  }
+  public void addReview(Review review) { this.reviews.add(review); }
 
   public void removeReview(Review review) {
     this.reviews.remove(review);
@@ -110,9 +108,7 @@ public class Customer {
     this.customerAddresses.remove(customerAddress);
   }
 
-  public void addVoucher(Voucher voucher) {
-    this.vouchers.add(voucher);
-  }
+  public void addVoucher(Voucher voucher) { this.vouchers.add(voucher); }
 
   public void removeVoucher(Voucher voucher) {
     this.vouchers.remove(voucher);

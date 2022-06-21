@@ -4,6 +4,7 @@ import static lombok.AccessLevel.PROTECTED;
 
 import com.example.woowa.voucher.enums.VoucherType;
 import java.time.LocalDateTime;
+import java.util.UUID;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -37,19 +38,17 @@ public class Voucher {
   @Column(columnDefinition = "TINYINT DEFAULT FALSE")
   private Boolean isUse;
 
-  @Column(nullable = false)
+  @Column(nullable = false, unique = true)
   private String code;
 
-  public Voucher(VoucherType voucherType, Integer discountValue, LocalDateTime expirationDate,
-      String code, Integer couponCount) {
+  public Voucher(VoucherType voucherType, Integer discountValue, LocalDateTime expirationDate) {
     assert voucherType.isValidAmount(discountValue);
     assert expirationDate != null;
     assert ! code.isBlank();
-    assert couponCount > 0;
     this.voucherType = voucherType;
     this.discountValue = discountValue;
     this.expirationDate = expirationDate;
-    this.code = code;
+    this.code = UUID.randomUUID().toString();
   }
 
   public String getVoucherType() {

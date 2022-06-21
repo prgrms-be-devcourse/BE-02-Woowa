@@ -28,13 +28,13 @@ public class Review {
   private String content;
 
   @Column(nullable = false, length = 45)
-  private String scoreType;
+  private Integer scoreType;
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(nullable = false)
   private Customer customer;
 
-  public Review(String content, String scoreType, Customer customer) {
+  public Review(String content, int scoreType, Customer customer) {
     this.content = content;
     this.scoreType = scoreType;
     this.customer = customer;
@@ -45,8 +45,8 @@ public class Review {
     this.content = content;
   }
 
-  public void setScoreType(String scoreType) {
-    assert ! scoreType.isBlank();
+  public void setScoreType(int scoreType) {
+    assert scoreType > 0;
     this.scoreType = scoreType;
   }
 }

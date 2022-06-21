@@ -1,5 +1,14 @@
 package com.example.woowa.customer.service;
 
-public interface CustomerGradeService {
+import com.example.woowa.customer.dto.CreateCustomerGradeDto;
+import com.example.woowa.customer.dto.CustomerGradeDto;
+import com.example.woowa.customer.dto.UpdateCustomerGradeDto;
+import com.example.woowa.customer.entity.CustomerGrade;
 
+public interface CustomerGradeService {
+  CustomerGradeDto createCustomerGrade(CreateCustomerGradeDto createCustomerGradeDto);
+  CustomerGradeDto updateCustomerGrade(UpdateCustomerGradeDto updateCustomerGradeDto);
+  void deleteCustomerGrade(String grade);
+  CustomerGrade findDefaultCustomerGrade();
+  CustomerGrade findCustomerGrade(int orderCount);
 }
