@@ -70,7 +70,7 @@ public class Voucher {
     this.expirationDate = expirationDate;
   }
 
-  public int useVoucher(int price) {
+  public int getDiscountPrice(int price) {
     assert ! isUse && voucherType.isOkayToDiscount(price, discountValue) && expirationDate.isAfter(LocalDateTime.now());
     isUse = true;
     return voucherType.discount(price, discountValue);
