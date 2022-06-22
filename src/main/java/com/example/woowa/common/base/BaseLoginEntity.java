@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @MappedSuperclass
-public abstract class BaseLoginEntity {
+public abstract class BaseLoginEntity extends BaseEntity {
 
     @Column(unique = true, nullable = false, updatable = false)
     private String loginId;
@@ -22,5 +22,13 @@ public abstract class BaseLoginEntity {
 
     @Column(nullable = false)
     private LocalDateTime lastLoginedAt;
+
+    public void changePassword(String password) {
+        this.password = password;
+    }
+
+    public void changeLastLoginedAt(LocalDateTime lastLoginedAt) {
+        this.lastLoginedAt = lastLoginedAt;
+    }
 
 }
