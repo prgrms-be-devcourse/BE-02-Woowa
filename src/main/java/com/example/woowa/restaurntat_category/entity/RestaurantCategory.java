@@ -24,11 +24,11 @@ public class RestaurantCategory {
     @Id
     @ManyToOne
     @JoinColumn(name = "restaurant_id")
-    private Restaurant restaurantId;
+    private Restaurant restaurant;
 
     @Id
     @ManyToOne
     @JoinColumn(name = "category_id")
-    private Category categoryId;
+    private Category category;
 
 }
