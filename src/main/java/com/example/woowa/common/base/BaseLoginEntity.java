@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @MappedSuperclass
-public abstract class BaseLoginEntity extends BaseEntity {
+public abstract class BaseLoginEntity extends BaseTimeEntity {
 
     @Column(unique = true, nullable = false, updatable = false)
     private String loginId;
