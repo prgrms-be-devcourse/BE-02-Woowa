@@ -57,7 +57,7 @@ public class Restaurant {
     @Column(nullable = false)
     private String address;
 
-    public Restaurant(String name, String businessNumber, LocalTime openingTime,
+    private Restaurant(String name, String businessNumber, LocalTime openingTime,
                       LocalTime closingTime,
                       Boolean isOpen, String phoneNumber, String description, String address) {
         this.name = name;
@@ -72,7 +72,7 @@ public class Restaurant {
         this.averageReviewScore = 0.0D;
     }
 
-    public Restaurant createRestaurant(String name, String businessNumber,
+    public static Restaurant createRestaurant(String name, String businessNumber,
                                        LocalTime openingTime, LocalTime closingTime, Boolean isOpen, String phoneNumber,
                                        String description, String address) {
         return new Restaurant(name, businessNumber, openingTime, closingTime, isOpen, phoneNumber,
