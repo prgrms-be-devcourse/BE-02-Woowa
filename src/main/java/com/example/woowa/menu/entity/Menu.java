@@ -15,11 +15,13 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import lombok.AccessLevel;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "menu")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Getter
 public class Menu {
 
     @Id
@@ -56,7 +58,7 @@ public class Menu {
         this.saleStatus = saleStatus;
     }
 
-    public Menu createMenu(MenuCategory menuCategory, String title, Integer price,
+    public static Menu createMenu(MenuCategory menuCategory, String title, Integer price,
             String description,
             Boolean isMain,
             SaleStatus saleStatus) {
