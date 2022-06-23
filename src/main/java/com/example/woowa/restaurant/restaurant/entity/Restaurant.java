@@ -91,8 +91,12 @@ public class Restaurant {
         this.closingTime = closingTime;
     }
 
-    public void changeOpenStatus(Boolean isOpen) {
-        this.isOpen = isOpen;
+    public void openRestaurant() {
+        this.isOpen = true;
+    }
+
+    public void closeRestaurant() {
+        this.isOpen = false;
     }
 
     public void changePhoneNumber(String phoneNumber) {
