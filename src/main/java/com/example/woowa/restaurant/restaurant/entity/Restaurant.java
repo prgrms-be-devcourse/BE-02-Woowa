@@ -82,11 +82,8 @@ public class Restaurant {
                 description, address);
     }
 
-    public void changeOpiningTime(LocalTime openingTime) {
+    public void updateBusinessHours(LocalTime openingTime, LocalTime closingTime) {
         this.openingTime = openingTime;
-    }
-
-    public void changeClosingTime(LocalTime closingTime) {
         this.closingTime = closingTime;
     }
 
