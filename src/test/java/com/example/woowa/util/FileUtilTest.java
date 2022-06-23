@@ -1,6 +1,7 @@
 package com.example.woowa.util;
 
-import com.example.woowa.common.AreaCode;
+import com.example.woowa.delivery.entity.AreaCode;
+import com.example.woowa.common.util.FileUtil;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 

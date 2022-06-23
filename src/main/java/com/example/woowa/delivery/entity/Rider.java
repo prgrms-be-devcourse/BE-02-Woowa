@@ -1,6 +1,6 @@
 package com.example.woowa.delivery.entity;
 
-import com.example.woowa.restaurant.entity.DeliveryArea;
+import com.example.woowa.restaurant.restaurant.entity.DeliveryArea;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

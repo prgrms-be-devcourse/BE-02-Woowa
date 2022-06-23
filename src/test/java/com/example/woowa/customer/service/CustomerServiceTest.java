@@ -4,14 +4,17 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import com.example.woowa.customer.dto.CreateCustomerDto;
-import com.example.woowa.customer.dto.CreateCustomerGradeDto;
-import com.example.woowa.customer.dto.CustomerDto;
-import com.example.woowa.customer.dto.UpdateCustomerDto;
-import com.example.woowa.customer.entity.CustomerGrade;
-import com.example.woowa.customer.repository.CustomerGradeRepository;
-import com.example.woowa.customer.repository.CustomerRepository;
+import com.example.woowa.customer.customer.dto.CreateCustomerDto;
+import com.example.woowa.customer.customer.dto.CreateCustomerGradeDto;
+import com.example.woowa.customer.customer.dto.CustomerDto;
+import com.example.woowa.customer.customer.dto.UpdateCustomerDto;
+import com.example.woowa.customer.customer.entity.CustomerGrade;
+import com.example.woowa.customer.customer.repository.CustomerGradeRepository;
+import com.example.woowa.customer.customer.repository.CustomerRepository;
 import java.time.LocalDate;
+
+import com.example.woowa.customer.customer.service.CustomerGradeService;
+import com.example.woowa.customer.customer.service.CustomerService;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
