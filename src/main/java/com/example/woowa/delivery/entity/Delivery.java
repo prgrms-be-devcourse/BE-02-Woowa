@@ -1,8 +1,7 @@
-package com.example.woowa.rider.entity;
+package com.example.woowa.delivery.entity;
 
-import com.example.woowa.rider.enums.DeliveryStatus;
+import com.example.woowa.delivery.enums.DeliveryStatus;
 import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 

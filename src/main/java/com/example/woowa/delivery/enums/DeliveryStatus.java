@@ -1,4 +1,4 @@
-package com.example.woowa.rider.enums;
+package com.example.woowa.delivery.enums;
 
 import lombok.RequiredArgsConstructor;
 
