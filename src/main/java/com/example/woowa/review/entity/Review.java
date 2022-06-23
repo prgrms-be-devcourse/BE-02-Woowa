@@ -3,8 +3,11 @@ package com.example.woowa.review.entity;
 import static lombok.AccessLevel.PROTECTED;
 
 import com.example.woowa.customer.entity.Customer;
+import com.example.woowa.review.enums.ScoreType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -27,26 +30,29 @@ public class Review {
   @Column(nullable = false)
   private String content;
 
-  @Column(nullable = false, length = 45)
-  private String scoreType;
+  @Enumerated(EnumType.ORDINAL)
+  @Column(nullable = false)
+  private ScoreType scoreType;
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(nullable = false)
   private Customer customer;
 
-  public Review(String content, String scoreType, Customer customer) {
+  public Review(String content, int scoreType, Customer customer) {
     this.content = content;
-    this.scoreType = scoreType;
+    this.scoreType = ScoreType.of(scoreType);
     this.customer = customer;
   }
 
+  public int getScoreType() {
+    return this.scoreType.getValue();
+  }
   public void setContent(String content) {
     assert ! content.isBlank();
     this.content = content;
   }
 
-  public void setScoreType(String scoreType) {
-    assert ! scoreType.isBlank();
-    this.scoreType = scoreType;
+  public void setScoreType(int scoreType) {
+    this.scoreType = ScoreType.of(scoreType);
   }
 }
