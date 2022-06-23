@@ -77,12 +77,16 @@ public class Restaurant {
 
     public static Restaurant createRestaurant(String name, String businessNumber,
             LocalTime openingTime, LocalTime closingTime, Boolean isOpen, String phoneNumber,
-            String description, String address) {
+            String description, String address) throws IllegalArgumentException {
+        validateBusinessHours(openingTime, closingTime);
+
         return new Restaurant(name, businessNumber, openingTime, closingTime, isOpen, phoneNumber,
                 description, address);
     }
 
-    public void updateBusinessHours(LocalTime openingTime, LocalTime closingTime) {
+    public void updateBusinessHours(LocalTime openingTime, LocalTime closingTime)
+            throws IllegalArgumentException {
+        validateBusinessHours(openingTime, closingTime);
         this.openingTime = openingTime;
         this.closingTime = closingTime;
     }
@@ -110,5 +114,12 @@ public class Restaurant {
 
     public void addRestaurantCategory(RestaurantCategory restaurantCategory) {
         restaurantCategories.add(restaurantCategory);
+    }
+
+    private static void validateBusinessHours(LocalTime openingTime, LocalTime closingTime)
+            throws IllegalArgumentException {
+        if (closingTime.equals(openingTime)) {
+            throw new IllegalStateException("openingTime 과 closingTime 은 같을 수 없습니다.");
+        }
     }
 }
