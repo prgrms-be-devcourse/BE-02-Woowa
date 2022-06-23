@@ -11,7 +11,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 class FileUtilTest {
 
     @Test
-    public void _1() {
+    public void parseAreaCodeList() {
         List<AreaCode> areaCodeList = FileUtil.parseAreaCodeList();
         assertThat(areaCodeList).hasSizeGreaterThan(1);
     }
