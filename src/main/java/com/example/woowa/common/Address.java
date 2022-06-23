@@ -1,6 +1,7 @@
 package com.example.woowa.common;
 
-import com.example.woowa.customer.entity.Customer;
+import com.example.woowa.customer.customer.entity.Customer;
+import com.example.woowa.delivery.entity.AreaCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 

@@ -3,10 +3,11 @@ package com.example.woowa.customer.service;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 
-import com.example.woowa.customer.dto.CreateCustomerGradeDto;
-import com.example.woowa.customer.dto.CustomerGradeDto;
-import com.example.woowa.customer.dto.UpdateCustomerGradeDto;
-import com.example.woowa.customer.repository.CustomerGradeRepository;
+import com.example.woowa.customer.customer.dto.CreateCustomerGradeDto;
+import com.example.woowa.customer.customer.dto.CustomerGradeDto;
+import com.example.woowa.customer.customer.dto.UpdateCustomerGradeDto;
+import com.example.woowa.customer.customer.repository.CustomerGradeRepository;
+import com.example.woowa.customer.customer.service.CustomerGradeService;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
