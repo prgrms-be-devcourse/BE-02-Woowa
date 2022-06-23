@@ -10,7 +10,6 @@ import com.example.woowa.customer.dto.CustomerAddressDto;
 import com.example.woowa.customer.dto.CustomerDto;
 import com.example.woowa.customer.dto.UpdateCustomerAddressDto;
 import com.example.woowa.customer.entity.Customer;
-import com.example.woowa.customer.entity.CustomerGrade;
 import com.example.woowa.customer.repository.CustomerAddressRepository;
 import com.example.woowa.customer.repository.CustomerGradeRepository;
 import com.example.woowa.customer.repository.CustomerRepository;
@@ -42,6 +41,10 @@ class CustomerAddressServiceTest {
   @Autowired
   private CustomerAddressRepository customerAddressRepository;
 
+  public void makeCustomer() {
+
+  }
+
   @BeforeEach
   void 기본_고객_등급_설정() {
     CreateCustomerGradeDto createCustomerGradeDto = new CreateCustomerGradeDto(5, "일반", 3000, 2);
@@ -59,12 +62,11 @@ class CustomerAddressServiceTest {
   @Transactional
   void 고객_주소_추가() {
     CreateCustomerDto createCustomerDto = new CreateCustomerDto("dev12","Programmers123!", "2000-01-01");
-    CustomerGrade defaultGrade = customerGradeService.findDefaultCustomerGrade();
-    CustomerDto customerDto = customerService.createCustomer(defaultGrade, createCustomerDto);
+    CustomerDto customerDto = customerService.createCustomer(createCustomerDto);
     CreateCustomerAddressDto createCustomerAddressDto = new CreateCustomerAddressDto("서울시 동작구", "집");
-    Customer customer = customerService.login(customerDto.getLoginId());
+    Customer customer = customerService.findCustomerEntity(customerDto.getLoginId());
 
-    CustomerAddressDto customerAddressDto = customerAddressService.createCustomerAddress(customer, createCustomerAddressDto);
+    CustomerAddressDto customerAddressDto = customerAddressService.createCustomerAddress(customer.getLoginId(), createCustomerAddressDto);
 
     assertThat(customerAddressDto.getAddress(), is("서울시 동작구"));
     assertThat(customerAddressDto.getNickname(), is("집"));
@@ -74,15 +76,14 @@ class CustomerAddressServiceTest {
   @Transactional
   void 고객_주소_목록_조회() {
     CreateCustomerDto createCustomerDto = new CreateCustomerDto("dev12","Programmers123!", "2000-01-01");
-    CustomerGrade defaultGrade = customerGradeService.findDefaultCustomerGrade();
-    CustomerDto customerDto = customerService.createCustomer(defaultGrade, createCustomerDto);
+    CustomerDto customerDto = customerService.createCustomer(createCustomerDto);
     CreateCustomerAddressDto createCustomerAddressDto = new CreateCustomerAddressDto("서울시 동작구", "집");
     CreateCustomerAddressDto createCustomerAddressDto1 = new CreateCustomerAddressDto("서울시 동작구", "회사");
-    Customer customer = customerService.login(customerDto.getLoginId());
+    Customer customer = customerService.findCustomerEntity(customerDto.getLoginId());
 
-    customerAddressService.createCustomerAddress(customer, createCustomerAddressDto);
-    customerAddressService.createCustomerAddress(customer, createCustomerAddressDto1);
-    List<CustomerAddressDto> customerAddressDtoList = customerAddressService.readCustomerAddress(customer);
+    customerAddressService.createCustomerAddress(customer.getLoginId(), createCustomerAddressDto);
+    customerAddressService.createCustomerAddress(customer.getLoginId(), createCustomerAddressDto1);
+    List<CustomerAddressDto> customerAddressDtoList = customerAddressService.findCustomerAddress(customer.getLoginId());
 
     assertThat(customerAddressDtoList.size(), is(2));
     assertThat(customerAddressDtoList.get(0).getNickname(), is("집"));
@@ -93,16 +94,15 @@ class CustomerAddressServiceTest {
   @Transactional
   void 고객_주소_수정() {
     CreateCustomerDto createCustomerDto = new CreateCustomerDto("dev12","Programmers123!", "2000-01-01");
-    CustomerGrade defaultGrade = customerGradeService.findDefaultCustomerGrade();
-    CustomerDto customerDto = customerService.createCustomer(defaultGrade, createCustomerDto);
+    CustomerDto customerDto = customerService.createCustomer(createCustomerDto);
     CreateCustomerAddressDto createCustomerAddressDto = new CreateCustomerAddressDto("서울시 동작구", "집");
-    Customer customer = customerService.login(customerDto.getLoginId());
-    CustomerAddressDto customerAddressDto = customerAddressService.createCustomerAddress(customer, createCustomerAddressDto);
+    Customer customer = customerService.findCustomerEntity(customerDto.getLoginId());
+    CustomerAddressDto customerAddressDto = customerAddressService.createCustomerAddress(customer.getLoginId(), createCustomerAddressDto);
 
     UpdateCustomerAddressDto updateCustomerAddressDto = new UpdateCustomerAddressDto("서울시 서초구", "회사");
 
-    customerAddressService.updateCustomerAddress(customer, customerAddressDto.getId(), updateCustomerAddressDto);
-    List<CustomerAddressDto> customerAddressDtoList = customerAddressService.readCustomerAddress(customer);
+    customerAddressService.updateCustomerAddress(customer.getLoginId(), customerAddressDto.getId(), updateCustomerAddressDto);
+    List<CustomerAddressDto> customerAddressDtoList = customerAddressService.findCustomerAddress(customer.getLoginId());
 
     assertThat(customerAddressDtoList.get(0).getNickname(), is("회사"));
     assertThat(customerAddressDtoList.get(0).getAddress(), is("서울시 서초구"));
@@ -112,14 +112,13 @@ class CustomerAddressServiceTest {
   @Transactional
   void 고객_주소_삭제() {
     CreateCustomerDto createCustomerDto = new CreateCustomerDto("dev12","Programmers123!", "2000-01-01");
-    CustomerGrade defaultGrade = customerGradeService.findDefaultCustomerGrade();
-    CustomerDto customerDto = customerService.createCustomer(defaultGrade, createCustomerDto);
+    CustomerDto customerDto = customerService.createCustomer(createCustomerDto);
     CreateCustomerAddressDto createCustomerAddressDto = new CreateCustomerAddressDto("서울시 동작구", "집");
-    Customer customer = customerService.login(customerDto.getLoginId());
-    CustomerAddressDto customerAddressDto = customerAddressService.createCustomerAddress(customer, createCustomerAddressDto);
+    Customer customer = customerService.findCustomerEntity(customerDto.getLoginId());
+    CustomerAddressDto customerAddressDto = customerAddressService.createCustomerAddress(customer.getLoginId(), createCustomerAddressDto);
 
-    customerAddressService.deleteCustomerAddress(customer, customerAddressDto.getId());
-    List<CustomerAddressDto> customerAddressDtoList = customerAddressService.readCustomerAddress(customer);
+    customerAddressService.deleteCustomerAddress(customer.getLoginId(), customerAddressDto.getId());
+    List<CustomerAddressDto> customerAddressDtoList = customerAddressService.findCustomerAddress(customer.getLoginId());
 
     assertThat(customerAddressDtoList.size(), is(0));
   }

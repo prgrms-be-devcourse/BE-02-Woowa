@@ -1,7 +1,10 @@
 package com.example.woowa.voucher.service.impl;
 
+import com.example.woowa.customer.dto.CustomerDto;
+import com.example.woowa.customer.dto.CustomerGradeDto;
 import com.example.woowa.customer.entity.Customer;
 import com.example.woowa.customer.entity.CustomerGrade;
+import com.example.woowa.customer.repository.CustomerRepository;
 import com.example.woowa.voucher.converter.VoucherConverter;
 import com.example.woowa.voucher.dto.CreateVoucherDto;
 import com.example.woowa.voucher.dto.VoucherDto;
@@ -12,19 +15,21 @@ import com.example.woowa.voucher.service.VoucherService;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Transactional(readOnly = true)
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class VoucherServiceImpl implements VoucherService {
-  private VoucherRepository voucherRepository;
+  private final VoucherRepository voucherRepository;
+  private final CustomerRepository customerRepository;
 
   @Override
-  public List<VoucherDto> giveMonthlyVoucher(Customer customer) {
+  public List<VoucherDto> giveMonthlyVoucher(String customerLoginId) {
     List<VoucherDto> result = new ArrayList<>();
+    Customer customer = findCustomerEntity(customerLoginId);
     CustomerGrade customerGrade = customer.getCustomerGrade();
     int disountPrice = customerGrade.getDiscountPrice();
     int voucherCount = customerGrade.getVoucherCount();
@@ -46,14 +51,21 @@ public class VoucherServiceImpl implements VoucherService {
   }
 
   @Override
-  public VoucherDto readVoucher(Long id) {
+  public VoucherDto findVoucher(Long id) {
     Voucher voucher = voucherRepository.findById(id).orElseThrow(()-> new RuntimeException("voucher not existed"));
     return VoucherConverter.toVoucherDto(voucher);
   }
 
   @Override
+  @Transactional
   public void deleteVoucher(Long id) {
-    Voucher voucher = voucherRepository.findById(id).orElseThrow(()-> new RuntimeException("voucher not existed"));
-    voucherRepository.delete(voucher);
+    voucherRepository.deleteById(id);
+  }
+
+  @Override
+  @Transactional(readOnly = true)
+  public Customer findCustomerEntity(String loginId) {
+    Customer customer = customerRepository.findByLoginId(loginId).orElseThrow(()-> new RuntimeException("login id not existed"));
+    return customer;
   }
 }

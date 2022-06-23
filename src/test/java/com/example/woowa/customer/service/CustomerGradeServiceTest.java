@@ -6,7 +6,6 @@ import static org.hamcrest.Matchers.is;
 import com.example.woowa.customer.dto.CreateCustomerGradeDto;
 import com.example.woowa.customer.dto.CustomerGradeDto;
 import com.example.woowa.customer.dto.UpdateCustomerGradeDto;
-import com.example.woowa.customer.entity.CustomerGrade;
 import com.example.woowa.customer.repository.CustomerGradeRepository;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
@@ -43,7 +42,7 @@ class CustomerGradeServiceTest {
     CreateCustomerGradeDto createCustomerGradeDto = new CreateCustomerGradeDto(5, "일반", 3000, 2);
     CustomerGradeDto customerGradeDto = customerGradeService.createCustomerGrade(createCustomerGradeDto);
 
-    CustomerGradeDto customerGradeDto1 = customerGradeService.readCustomerGrade(customerGradeDto.getId());
+    CustomerGradeDto customerGradeDto1 = customerGradeService.findCustomerGrade(customerGradeDto.getId());
 
     assertThat(customerGradeDto1.getOrderCount(), is(5));
     assertThat(customerGradeDto1.getGrade(), is("일반"));
@@ -63,37 +62,5 @@ class CustomerGradeServiceTest {
     assertThat(customerGradeDto1.getGrade(), is("실버"));
     assertThat(customerGradeDto1.getDiscountPrice(), is(2000));
     assertThat(customerGradeDto1.getVoucherCount(), is(2));
-  }
-
-  @Test
-  void 고객_등급_기본_등급으로_초기화() {
-    CreateCustomerGradeDto createCustomerGradeDto = new CreateCustomerGradeDto(5, "일반", 3000, 2);
-    customerGradeService.createCustomerGrade(createCustomerGradeDto);
-    CreateCustomerGradeDto createCustomerGradeDto1 = new CreateCustomerGradeDto(10, "실버", 3000, 2);
-    customerGradeService.createCustomerGrade(createCustomerGradeDto1);
-
-    CustomerGrade customerGrade = customerGradeService.findDefaultCustomerGrade();
-
-    assertThat(customerGrade.getOrderCount(), is(5));
-    assertThat(customerGrade.getGrade(), is("일반"));
-    assertThat(customerGrade.getDiscountPrice(), is(3000));
-    assertThat(customerGrade.getVoucherCount(), is(2));
-  }
-
-  @Test
-  void 주문_횟수를_반영한_고객_등급_갱신() {
-    CreateCustomerGradeDto createCustomerGradeDto = new CreateCustomerGradeDto(5, "일반", 3000, 2);
-    customerGradeService.createCustomerGrade(createCustomerGradeDto);
-    CreateCustomerGradeDto createCustomerGradeDto1 = new CreateCustomerGradeDto(10, "실버", 3000, 2);
-    customerGradeService.createCustomerGrade(createCustomerGradeDto1);
-    CreateCustomerGradeDto createCustomerGradeDto2 = new CreateCustomerGradeDto(15, "골드", 3000, 2);
-    customerGradeService.createCustomerGrade(createCustomerGradeDto2);
-
-    CustomerGrade customerGrade = customerGradeService.findCustomerGrade(4);
-
-    assertThat(customerGrade.getOrderCount(), is(5));
-    assertThat(customerGrade.getGrade(), is("일반"));
-    assertThat(customerGrade.getDiscountPrice(), is(3000));
-    assertThat(customerGrade.getVoucherCount(), is(2));
   }
 }

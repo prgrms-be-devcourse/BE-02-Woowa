@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/vouchers")
 public class VoucherController {
-  private VoucherService voucherService;
+  private final VoucherService voucherService;
 
   @PostMapping
   public VoucherDto createVoucher(@RequestBody @Valid CreateVoucherDto createVoucherDto)
@@ -27,7 +27,7 @@ public class VoucherController {
 
   @GetMapping("/{id}")
   public VoucherDto readVoucher(@PathVariable Long id) {
-    return voucherService.readVoucher(id);
+    return voucherService.findVoucher(id);
   }
 
   @DeleteMapping("/{id}")

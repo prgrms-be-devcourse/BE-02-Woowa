@@ -6,8 +6,9 @@ import com.example.woowa.voucher.dto.VoucherDto;
 import java.util.List;
 
 public interface VoucherService {
-  List<VoucherDto> giveMonthlyVoucher(Customer customer);
+  List<VoucherDto> giveMonthlyVoucher(String customerLoginId);
   VoucherDto createVoucher(CreateVoucherDto createVoucherDto) throws Exception;
-  VoucherDto readVoucher(Long id);
+  VoucherDto findVoucher(Long id);
   void deleteVoucher(Long id);
+  Customer findCustomerEntity(String loginId);
 }

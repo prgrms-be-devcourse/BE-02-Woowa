@@ -6,34 +6,36 @@ import com.example.woowa.customer.dto.CustomerDto;
 import com.example.woowa.customer.dto.UpdateCustomerDto;
 import com.example.woowa.customer.entity.Customer;
 import com.example.woowa.customer.entity.CustomerGrade;
+import com.example.woowa.customer.repository.CustomerGradeRepository;
 import com.example.woowa.customer.repository.CustomerRepository;
 import com.example.woowa.customer.service.CustomerService;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Transactional
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class CustomerServiceImpl implements CustomerService {
-  private CustomerRepository customerRepository;
+  private final CustomerRepository customerRepository;
+  private final CustomerGradeRepository customerGradeRepository;
 
   @Override
-  public CustomerDto createCustomer(CustomerGrade defaultGrade, CreateCustomerDto createCustomerDto) {
-    Customer customer = CustomerConverter.toCustomer(createCustomerDto, defaultGrade);
+  public CustomerDto createCustomer(CreateCustomerDto createCustomerDto) {
+    Customer customer = CustomerConverter.toCustomer(createCustomerDto, findDefaultCustomerGrade());
     return CustomerConverter.toCustomerDto(customerRepository.save(customer));
   }
 
   @Override
   @Transactional(readOnly = true)
-  public CustomerDto readCustomer(String loginId) {
-    Customer customer = login(loginId);
+  public CustomerDto findCustomer(String loginId) {
+    Customer customer = findCustomerEntity(loginId);
     return CustomerConverter.toCustomerDto(customer);
   }
 
   @Override
   public CustomerDto updateCustomer(String loginId, UpdateCustomerDto updateCustomerDto) {
-    Customer customer = login(loginId);
+    Customer customer = findCustomerEntity(loginId);
     if (updateCustomerDto.getLoginPassword() != null) {
       customer.setLoginPassword(updateCustomerDto.getLoginPassword());
     }
@@ -42,20 +44,30 @@ public class CustomerServiceImpl implements CustomerService {
 
   @Override
   public void deleteCustomer(String loginId) {
-    Customer customer = login(loginId);
+    Customer customer = findCustomerEntity(loginId);
     customerRepository.delete(customer);
   }
 
   @Override
-  public void updateCustomerGrade(CustomerGrade customerGrade, String loginId) {
-    Customer customer = login(loginId);
-    customer.setCustomerGrade(customerGrade);
+  public void updateCustomerGrade(String loginId) {
+    Customer customer = findCustomerEntity(loginId);
+    customer.setCustomerGrade(findCustomerGrade(customer.getOrderPerMonth()));
   }
 
   @Override
   @Transactional(readOnly = true)
-  public Customer login(String loginId) {
+  public Customer findCustomerEntity(String loginId) {
     Customer customer = customerRepository.findByLoginId(loginId).orElseThrow(()-> new RuntimeException("login id not existed"));
     return customer;
+  }
+
+  @Override
+  public CustomerGrade findDefaultCustomerGrade() {
+    return customerGradeRepository.findFirstByOrderByOrderCount().orElseThrow(()-> new RuntimeException("no customer grade existed"));
+  }
+
+  @Override
+  public CustomerGrade findCustomerGrade(int orderCount) {
+    return customerGradeRepository.findFirstByOrderCountLessThanEqualOrderByOrderCountDesc(orderCount).orElse(findDefaultCustomerGrade());
   }
 }

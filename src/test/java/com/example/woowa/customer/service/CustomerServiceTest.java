@@ -14,6 +14,7 @@ import com.example.woowa.customer.repository.CustomerRepository;
 import java.time.LocalDate;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -47,9 +48,7 @@ class CustomerServiceTest {
   @Test
   void 유저_생성() {
     CreateCustomerDto createCustomerDto = new CreateCustomerDto("dev12","Programmers123!", "2000-01-01");
-    CustomerGrade defaultCustomerGrade = customerGradeService.findDefaultCustomerGrade();
-
-    CustomerDto customerDto = customerService.createCustomer(defaultCustomerGrade, createCustomerDto);
+    CustomerDto customerDto = customerService.createCustomer(createCustomerDto);
 
     assertThat(customerDto.getLoginId(), is("dev12"));
     assertThat(customerDto.getPoint(), is(0));
@@ -61,42 +60,42 @@ class CustomerServiceTest {
   }
 
   @Test
-  void 잘못된_유저_생성1_닉네임() {
+  @DisplayName("아이디 입력 오류")
+  void createCustomerFail1() {
     CreateCustomerDto createCustomerDto = new CreateCustomerDto("devcourse","Programmers123!", "2000-01-01");
 
     assertThrows(AssertionError.class, ()-> {
-      CustomerGrade defaultCustomerGrade = customerGradeService.findDefaultCustomerGrade();
-      customerService.createCustomer(defaultCustomerGrade, createCustomerDto);
+      customerService.createCustomer(createCustomerDto);
     });
   }
 
   @Test
-  void 잘못된_유저_생성2_비밀번호() {
+  @DisplayName("비밀번호 입력 오류")
+  void createCustomerFail2() {
     CreateCustomerDto createCustomerDto = new CreateCustomerDto("dev12","Programmers123", "2000-01-01");
 
     assertThrows(AssertionError.class, ()-> {
-      CustomerGrade defaultCustomerGrade = customerGradeService.findDefaultCustomerGrade();
-      customerService.createCustomer(defaultCustomerGrade, createCustomerDto);
+      customerService.createCustomer(createCustomerDto);
     });
   }
 
   @Test
-  void 잘못된_유저_생성3_생년월일() {
+  @DisplayName("생년월일 입력 오류")
+  void createCustomerFail3() {
     CreateCustomerDto createCustomerDto = new CreateCustomerDto("dev12","Programmers123!", "hello");
 
     assertThrows(AssertionError.class, ()-> {
-      CustomerGrade defaultCustomerGrade = customerGradeService.findDefaultCustomerGrade();
-      customerService.createCustomer(defaultCustomerGrade, createCustomerDto);
+      customerService.createCustomer(createCustomerDto);
     });
   }
 
   @Test
-  void 유저_조회() {
+  @DisplayName("유저 정보 조회")
+  void findCustomer() {
     CreateCustomerDto createCustomerDto = new CreateCustomerDto("dev12","Programmers123!", "2000-01-01");
-    CustomerGrade defaultCustomerGrade = customerGradeService.findDefaultCustomerGrade();
-    customerService.createCustomer(defaultCustomerGrade, createCustomerDto);
+    customerService.createCustomer(createCustomerDto);
 
-    CustomerDto customerDto = customerService.readCustomer(createCustomerDto.getLoginId());
+    CustomerDto customerDto = customerService.findCustomer(createCustomerDto.getLoginId());
 
     assertThat(customerDto.getLoginId(), is("dev12"));
     assertThat(customerDto.getPoint(), is(0));
@@ -108,14 +107,14 @@ class CustomerServiceTest {
   }
 
   @Test
-  void 유저_정보_업데이트() {
+  @DisplayName("유저 정보 업데이트")
+  void updateCustomer() {
     CreateCustomerDto createCustomerDto = new CreateCustomerDto("dev12","Programmers123!", "2000-01-01");
-    CustomerGrade defaultCustomerGrade = customerGradeService.findDefaultCustomerGrade();
-    CustomerDto customerDto = customerService.createCustomer(defaultCustomerGrade, createCustomerDto);
+    CustomerDto customerDto = customerService.createCustomer(createCustomerDto);
 
     UpdateCustomerDto updateCustomerDto = new UpdateCustomerDto("Programmers234!");
     customerService.updateCustomer(customerDto.getLoginId(), updateCustomerDto);
-    CustomerDto customerDto1 = customerService.readCustomer(customerDto.getLoginId());
+    CustomerDto customerDto1 = customerService.findCustomer(customerDto.getLoginId());
 
     assertThat(customerDto1.getLoginId(), is("dev12"));
     assertThat(customerDto.getPoint(), is(0));
@@ -127,10 +126,10 @@ class CustomerServiceTest {
   }
 
   @Test
-  void 잘못된_유저_정보_업데이트() {
+  @DisplayName("잘못된 유저 정보 업데이트")
+  void updateCustomerFail() {
     CreateCustomerDto createCustomerDto = new CreateCustomerDto("dev12","Programmers123!", "2000-01-01");
-    CustomerGrade defaultCustomerGrade = customerGradeService.findDefaultCustomerGrade();
-    CustomerDto customerDto = customerService.createCustomer(defaultCustomerGrade, createCustomerDto);
+    CustomerDto customerDto = customerService.createCustomer(createCustomerDto);
 
     assertThrows(AssertionError.class, ()-> {
       UpdateCustomerDto updateCustomerDto = new UpdateCustomerDto("programmers");
@@ -139,15 +138,45 @@ class CustomerServiceTest {
   }
 
   @Test
-  void 유저_삭제() {
+  @DisplayName("유저 삭제")
+  void deleteCustomer() {
     CreateCustomerDto createCustomerDto = new CreateCustomerDto("dev12","Programmers123!", "2000-01-01");
-    CustomerGrade defaultCustomerGrade = customerGradeService.findDefaultCustomerGrade();
-    CustomerDto customerDto = customerService.createCustomer(defaultCustomerGrade, createCustomerDto);
+    CustomerDto customerDto = customerService.createCustomer(createCustomerDto);
 
     customerService.deleteCustomer(customerDto.getLoginId());
 
     assertThrows(Exception.class, ()-> {
-      customerService.readCustomer(customerDto.getLoginId());
+      customerService.findCustomer(customerDto.getLoginId());
     });
+  }
+
+  @Test
+  @DisplayName("고객 등급 기본 등급으로 초기화")
+  void initCustomerGrade() {
+    CreateCustomerGradeDto createCustomerGradeDto1 = new CreateCustomerGradeDto(10, "실버", 3000, 2);
+    customerGradeService.createCustomerGrade(createCustomerGradeDto1);
+
+    CustomerGrade customerGrade = customerService.findDefaultCustomerGrade();
+
+    assertThat(customerGrade.getOrderCount(), is(5));
+    assertThat(customerGrade.getGrade(), is("일반"));
+    assertThat(customerGrade.getDiscountPrice(), is(3000));
+    assertThat(customerGrade.getVoucherCount(), is(2));
+  }
+
+  @Test
+  @DisplayName("주문 횟수를 반영한 고객 등급 갱신")
+  void updateCustomerGrade() {
+    CreateCustomerGradeDto createCustomerGradeDto1 = new CreateCustomerGradeDto(10, "실버", 3000, 2);
+    customerGradeService.createCustomerGrade(createCustomerGradeDto1);
+    CreateCustomerGradeDto createCustomerGradeDto2 = new CreateCustomerGradeDto(15, "골드", 3000, 2);
+    customerGradeService.createCustomerGrade(createCustomerGradeDto2);
+
+    //CustomerGrade customerGrade = customerGradeService.findCustomerGrade();
+
+//    assertThat(customerGrade.getOrderCount(), is(5));
+//    assertThat(customerGrade.getGrade(), is("일반"));
+//    assertThat(customerGrade.getDiscountPrice(), is(3000));
+//    assertThat(customerGrade.getVoucherCount(), is(2));
   }
 }

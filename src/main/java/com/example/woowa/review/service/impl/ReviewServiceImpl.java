@@ -8,5 +8,5 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 public class ReviewServiceImpl implements ReviewService {
-  private ReviewRepository reviewRepository;
+  private final ReviewRepository reviewRepository;
 }

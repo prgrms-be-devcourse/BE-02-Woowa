@@ -28,22 +28,22 @@ public class CustomerAddressController {
 
   @PostMapping("/{loginId}")
   public CustomerAddressDto createCustomerAddress(@PathVariable String loginId, @RequestBody @Valid CreateCustomerAddressDto createCustomerAddressDto) {
-    return customerAddressService.createCustomerAddress(customerService.login(loginId), createCustomerAddressDto);
+    return customerAddressService.createCustomerAddress(loginId, createCustomerAddressDto);
   }
 
   @GetMapping("/{loginId}")
   public List<CustomerAddressDto> readCustomerAddress(@PathVariable String loginId) {
-     return customerAddressService.readCustomerAddress(customerService.login(loginId));
+     return customerAddressService.findCustomerAddress(loginId);
   }
 
   @PutMapping("/{loginId}/{addressId}")
   public CustomerAddressDto updateCustomerAddress(@PathVariable String loginId, @PathVariable Long addressId, @RequestBody @Valid UpdateCustomerAddressDto updateCustomerAddressDto) {
-    return customerAddressService.updateCustomerAddress(customerService.login(loginId), addressId, updateCustomerAddressDto);
+    return customerAddressService.updateCustomerAddress(loginId, addressId, updateCustomerAddressDto);
   }
 
   @DeleteMapping("/{loginId}/{addressId}")
   public String deleteCustomerAddress(@PathVariable String loginId, @PathVariable Long addressId) {
-    customerAddressService.deleteCustomerAddress(customerService.login(loginId), addressId);
+    customerAddressService.deleteCustomerAddress(loginId, addressId);
     return "delete id - " + addressId;
   }
 }

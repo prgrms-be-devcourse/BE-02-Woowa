@@ -7,10 +7,12 @@ import com.example.woowa.customer.entity.Customer;
 import com.example.woowa.customer.entity.CustomerGrade;
 
 public interface CustomerService {
-  CustomerDto createCustomer(CustomerGrade defaultGrade, CreateCustomerDto createCustomerDto);
-  CustomerDto readCustomer(String loginId);
+  CustomerDto createCustomer(CreateCustomerDto createCustomerDto);
+  CustomerDto findCustomer(String loginId);
   CustomerDto updateCustomer(String loginId, UpdateCustomerDto updateCustomerDto);
   void deleteCustomer(String loginId);
-  void updateCustomerGrade(CustomerGrade customerGrade, String loginId);
-  Customer login(String loginId);
+  void updateCustomerGrade(String loginId);
+  Customer findCustomerEntity(String loginId);
+  CustomerGrade findDefaultCustomerGrade();
+  CustomerGrade findCustomerGrade(int orderCount);
 }

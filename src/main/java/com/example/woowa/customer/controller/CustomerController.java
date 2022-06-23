@@ -26,13 +26,12 @@ public class CustomerController {
 
   @PostMapping()
   public CustomerDto createCustomer(@RequestBody @Valid CreateCustomerDto createCustomerDto) {
-    CustomerGrade defaultGrade = customerGradeService.findDefaultCustomerGrade();
-    return customerService.createCustomer(defaultGrade, createCustomerDto);
+    return customerService.createCustomer(createCustomerDto);
   }
 
   @GetMapping("/{loginId}")
   public CustomerDto readCustomer(@PathVariable String loginId) {
-    return customerService.readCustomer(loginId);
+    return customerService.findCustomer(loginId);
   }
 
   @PutMapping("/{loginId}")

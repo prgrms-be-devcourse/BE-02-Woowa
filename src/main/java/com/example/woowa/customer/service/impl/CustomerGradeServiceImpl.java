@@ -7,15 +7,15 @@ import com.example.woowa.customer.dto.UpdateCustomerGradeDto;
 import com.example.woowa.customer.entity.CustomerGrade;
 import com.example.woowa.customer.repository.CustomerGradeRepository;
 import com.example.woowa.customer.service.CustomerGradeService;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Transactional(readOnly = true)
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class CustomerGradeServiceImpl implements CustomerGradeService {
-  private CustomerGradeRepository customerGradeRepository;
+  private final CustomerGradeRepository customerGradeRepository;
 
   @Override
   @Transactional
@@ -26,7 +26,7 @@ public class CustomerGradeServiceImpl implements CustomerGradeService {
   }
 
   @Override
-  public CustomerGradeDto readCustomerGrade(Long id) {
+  public CustomerGradeDto findCustomerGrade(Long id) {
     CustomerGrade customerGrade = customerGradeRepository.findById(id).orElseThrow(()-> new RuntimeException("customer grade not existed"));
     return CustomerGradeConverter.toCustomerGradeDto(customerGrade);
   }
@@ -54,20 +54,5 @@ public class CustomerGradeServiceImpl implements CustomerGradeService {
   public void deleteCustomerGrade(Long id) {
     CustomerGrade customerGrade = customerGradeRepository.findById(id).orElseThrow(()-> new RuntimeException("customer grade not existed"));
     customerGradeRepository.delete(customerGrade);
-  }
-
-  @Override
-  public CustomerGrade findDefaultCustomerGrade() {
-    return customerGradeRepository.findFirstByOrderByOrderCount().orElseThrow(()-> new RuntimeException("no customer grade existed"));
-  }
-
-  @Override
-  public CustomerGrade findCustomerGrade(int orderCount) {
-    try {
-      return customerGradeRepository.findFirstByOrderCountLessThanEqualOrderByOrderCountDesc(orderCount).orElseThrow(()-> new RuntimeException("no customer grade existed"));
-    }
-    catch (Exception e) {
-     return findDefaultCustomerGrade();
-    }
   }
 }

@@ -31,7 +31,7 @@ public class CustomerGradeController {
 
   @GetMapping("/{id}")
   public CustomerGradeDto readCustomerGrade(@PathVariable Long id) {
-    return customerGradeService.readCustomerGrade(id);
+    return customerGradeService.findCustomerGrade(id);
   }
 
   @PutMapping("/{id}")
