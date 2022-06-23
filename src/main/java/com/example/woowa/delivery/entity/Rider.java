@@ -1,7 +1,6 @@
-package com.example.woowa.rider.entity;
+package com.example.woowa.delivery.entity;
 
 import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import javax.persistence.*;

@@ -74,4 +74,8 @@ public class Voucher {
     isUse = true;
     return voucherType.discount(price, discountValue);
   }
+
+  public void cancelUse() {
+      isUse = false;
+  }
 }

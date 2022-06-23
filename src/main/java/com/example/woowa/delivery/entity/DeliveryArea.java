@@ -1,4 +1,4 @@
-package com.example.woowa.rider.entity;
+package com.example.woowa.delivery.entity;
 
 import lombok.*;
 

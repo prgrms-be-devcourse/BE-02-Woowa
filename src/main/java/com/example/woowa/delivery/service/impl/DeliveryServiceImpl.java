@@ -1,7 +1,7 @@
-package com.example.woowa.rider.service.impl;
+package com.example.woowa.delivery.service.impl;
 
-import com.example.woowa.rider.repository.DeliveryRepository;
-import com.example.woowa.rider.service.DeliveryService;
+import com.example.woowa.delivery.repository.DeliveryRepository;
+import com.example.woowa.delivery.service.DeliveryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
