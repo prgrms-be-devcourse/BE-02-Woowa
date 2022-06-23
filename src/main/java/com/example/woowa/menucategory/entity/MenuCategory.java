@@ -44,9 +44,10 @@ public class MenuCategory {
         this.title = title;
     }
 
-    public MenuCategory createMenuCategory(Restaurant restaurant, String title) {
-        restaurant.getMenuCategories().add(this);
-        return new MenuCategory(restaurant, title);
+    public static MenuCategory createMenuCategory(Restaurant restaurant, String title) {
+        MenuCategory menuCategory = new MenuCategory(restaurant, title);
+        restaurant.getMenuCategories().add(menuCategory);
+        return menuCategory;
     }
 
     public void changeTitle(String title) {
