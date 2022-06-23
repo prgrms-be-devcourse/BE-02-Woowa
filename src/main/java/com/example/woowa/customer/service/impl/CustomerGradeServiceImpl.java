@@ -7,13 +7,13 @@ import com.example.woowa.customer.dto.UpdateCustomerGradeDto;
 import com.example.woowa.customer.entity.CustomerGrade;
 import com.example.woowa.customer.repository.CustomerGradeRepository;
 import com.example.woowa.customer.service.CustomerGradeService;
-import lombok.RequiredArgsConstructor;
+import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Transactional(readOnly = true)
-@RequiredArgsConstructor
+@AllArgsConstructor
 public class CustomerGradeServiceImpl implements CustomerGradeService {
   private CustomerGradeRepository customerGradeRepository;
 
@@ -26,10 +26,15 @@ public class CustomerGradeServiceImpl implements CustomerGradeService {
   }
 
   @Override
+  public CustomerGradeDto readCustomerGrade(Long id) {
+    CustomerGrade customerGrade = customerGradeRepository.findById(id).orElseThrow(()-> new RuntimeException("customer grade not existed"));
+    return CustomerGradeConverter.toCustomerGradeDto(customerGrade);
+  }
+
+  @Override
   @Transactional
-  public CustomerGradeDto updateCustomerGrade(UpdateCustomerGradeDto updateCustomerGradeDto) {
-    CustomerGrade customerGrade = customerGradeRepository.findByGrade(
-        updateCustomerGradeDto.getGrade()).orElseThrow(()-> new RuntimeException("customer grade not existed"));
+  public CustomerGradeDto updateCustomerGrade(Long id, UpdateCustomerGradeDto updateCustomerGradeDto) {
+    CustomerGrade customerGrade = customerGradeRepository.findById(id).orElseThrow(()-> new RuntimeException("customer grade not existed"));
     if (updateCustomerGradeDto.getGrade() != null) {
       customerGrade.setGrade(updateCustomerGradeDto.getGrade());
     }
@@ -46,8 +51,8 @@ public class CustomerGradeServiceImpl implements CustomerGradeService {
   }
 
   @Override
-  public void deleteCustomerGrade(String grade) {
-    CustomerGrade customerGrade = customerGradeRepository.findByGrade(grade).orElseThrow(()-> new RuntimeException("customer grade not existed"));
+  public void deleteCustomerGrade(Long id) {
+    CustomerGrade customerGrade = customerGradeRepository.findById(id).orElseThrow(()-> new RuntimeException("customer grade not existed"));
     customerGradeRepository.delete(customerGrade);
   }
 
@@ -58,6 +63,11 @@ public class CustomerGradeServiceImpl implements CustomerGradeService {
 
   @Override
   public CustomerGrade findCustomerGrade(int orderCount) {
-    return customerGradeRepository.findFirstByOrderCountLessThanEqualOrderByOrderCountDesc(orderCount).orElseThrow(()-> new RuntimeException("no customer grade existed"));
+    try {
+      return customerGradeRepository.findFirstByOrderCountLessThanEqualOrderByOrderCountDesc(orderCount).orElseThrow(()-> new RuntimeException("no customer grade existed"));
+    }
+    catch (Exception e) {
+     return findDefaultCustomerGrade();
+    }
   }
 }

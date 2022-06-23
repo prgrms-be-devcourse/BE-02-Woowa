@@ -4,8 +4,11 @@ import static lombok.AccessLevel.PROTECTED;
 
 import com.example.woowa.review.entity.Review;
 import com.example.woowa.voucher.entity.Voucher;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Pattern;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -37,8 +40,8 @@ public class Customer {
   @Column(columnDefinition = "INT DEFAULT 0")
   private Integer orderPerMonth;
 
-  @Column(nullable = false, length = 45)
-  private String birthdate;
+  @Column(nullable = false)
+  private LocalDate birthdate;
 
   @Column(columnDefinition = "INT DEFAULT 0")
   private Integer point;
@@ -58,18 +61,20 @@ public class Customer {
 
   public Customer(String loginId, String loginPassword, String birthdate,
       CustomerGrade customerGrade) {
-    assert ! loginId.isBlank();
-    assert ! loginPassword.isBlank();
-    assert ! birthdate.isBlank();
+    assert Pattern.matches("^(?=.*\\d)(?=.*[a-zA-Z])[a-zA-z0-9]{5,10}$", loginId);
+    assert Pattern.matches("^(?=.*\\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[!,@,#,$,%]).{8,}$", loginPassword);
+    assert Pattern.matches("^(19|20)\\d{2}[-](0?[1-9]|1[0-2])[-](0?[1-9]|[12]\\d|3[01])$", birthdate);
     assert customerGrade != null;
     this.loginId = loginId;
     this.loginPassword = loginPassword;
-    this.birthdate = birthdate;
+    this.orderPerMonth = 0;
+    this.birthdate = LocalDate.parse(birthdate, DateTimeFormatter.ISO_DATE);
+    this.point = 0;
     this.customerGrade = customerGrade;
   }
 
   public void setLoginPassword(String loginPassword) {
-    assert ! loginPassword.isBlank();
+    assert Pattern.matches("^(?=.*\\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[!,@,#,$,%]).{8,}$", loginPassword);
     this.loginPassword = loginPassword;
   }
 

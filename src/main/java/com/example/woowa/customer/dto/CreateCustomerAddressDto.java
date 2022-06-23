@@ -1,13 +1,14 @@
 package com.example.woowa.customer.dto;
 
-import javax.validation.Valid;
+import javax.validation.constraints.NotBlank;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 
 @Getter
-@NoArgsConstructor
+@AllArgsConstructor
 public class CreateCustomerAddressDto {
+  @NotBlank
   private String address;
+  @NotBlank
   private String nickname;
-  private @Valid CustomerDto customer;
 }

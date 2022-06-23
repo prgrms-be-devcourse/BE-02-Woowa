@@ -3,6 +3,8 @@ package com.example.woowa.customer.controller;
 import com.example.woowa.customer.dto.CreateCustomerDto;
 import com.example.woowa.customer.dto.CustomerDto;
 import com.example.woowa.customer.dto.UpdateCustomerDto;
+import com.example.woowa.customer.entity.CustomerGrade;
+import com.example.woowa.customer.service.CustomerGradeService;
 import com.example.woowa.customer.service.CustomerService;
 import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -20,25 +22,27 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/v1/customers")
 public class CustomerController {
   private CustomerService customerService;
+  private CustomerGradeService customerGradeService;
 
-  @PostMapping
+  @PostMapping()
   public CustomerDto createCustomer(@RequestBody @Valid CreateCustomerDto createCustomerDto) {
-    return customerService.createCustomer(createCustomerDto);
+    CustomerGrade defaultGrade = customerGradeService.findDefaultCustomerGrade();
+    return customerService.createCustomer(defaultGrade, createCustomerDto);
   }
 
-  @GetMapping("/{id}")
-  public CustomerDto readCustomer(@PathVariable Long id) {
-    return customerService.readCustomer(id);
+  @GetMapping("/{loginId}")
+  public CustomerDto readCustomer(@PathVariable String loginId) {
+    return customerService.readCustomer(loginId);
   }
 
-  @PutMapping
-  public CustomerDto updateCustomer(@RequestBody @Valid UpdateCustomerDto updateCustomerDto) {
-    return customerService.updateCustomer(updateCustomerDto);
+  @PutMapping("/{loginId}")
+  public CustomerDto updateCustomer(@PathVariable String loginId, @RequestBody @Valid UpdateCustomerDto updateCustomerDto) {
+    return customerService.updateCustomer(loginId, updateCustomerDto);
   }
 
-  @DeleteMapping("/{id}")
-  public String deleteCustomer(@PathVariable Long id) {
-    customerService.deleteCustomer(id);
-    return "delete id - " + id;
+  @DeleteMapping("/{loginId}")
+  public String deleteCustomer(@PathVariable String loginId) {
+    customerService.deleteCustomer(loginId);
+    return "delete id - " + loginId;
   }
 }

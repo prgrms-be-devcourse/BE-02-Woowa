@@ -1,11 +1,14 @@
 package com.example.woowa.customer.dto;
 
+import javax.validation.constraints.NotBlank;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 
 @Getter
-@NoArgsConstructor
+@AllArgsConstructor
 public class UpdateCustomerAddressDto {
+  @NotBlank
   private String address;
+  @NotBlank
   private String nickname;
 }

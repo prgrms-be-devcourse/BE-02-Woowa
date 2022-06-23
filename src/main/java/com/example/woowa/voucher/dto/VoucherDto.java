@@ -7,6 +7,7 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 public class VoucherDto {
+  private Long id;
   private String voucherType;
   private Integer discountValue;
   private LocalDateTime expirationDate;

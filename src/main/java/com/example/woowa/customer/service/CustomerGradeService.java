@@ -7,8 +7,9 @@ import com.example.woowa.customer.entity.CustomerGrade;
 
 public interface CustomerGradeService {
   CustomerGradeDto createCustomerGrade(CreateCustomerGradeDto createCustomerGradeDto);
-  CustomerGradeDto updateCustomerGrade(UpdateCustomerGradeDto updateCustomerGradeDto);
-  void deleteCustomerGrade(String grade);
+  CustomerGradeDto readCustomerGrade(Long id);
+  CustomerGradeDto updateCustomerGrade(Long id, UpdateCustomerGradeDto updateCustomerGradeDto);
+  void deleteCustomerGrade(Long id);
   CustomerGrade findDefaultCustomerGrade();
   CustomerGrade findCustomerGrade(int orderCount);
 }

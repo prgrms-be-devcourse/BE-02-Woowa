@@ -2,6 +2,7 @@ package com.example.woowa.customer.entity;
 
 import static lombok.AccessLevel.PROTECTED;
 
+import java.util.regex.Pattern;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -39,7 +40,7 @@ public class CustomerAddress {
   public CustomerAddress(String address, String nickname, Customer customer) {
     assert !address.isBlank();
     assert ! nickname.isBlank();
-    assert ! areaCode.isBlank();
+    //assert ! areaCode.isBlank();
     assert customer != null;
     this.address = address;
     this.nickname = nickname;

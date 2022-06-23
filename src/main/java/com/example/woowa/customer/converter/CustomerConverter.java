@@ -26,7 +26,7 @@ public class CustomerConverter {
     List<CustomerAddressDto> customerAddressDtoList =  customer.getCustomerAddresses().stream().map(CustomerAddressConverter::toCustomerAddressDto).collect(toList());
     List<ReviewDto> reviewDtoList = customer.getReviews().stream().map(ReviewConverter::toReviewDto).collect(toList());
     List<VoucherDto> voucherDtoList = customer.getVouchers().stream().map(VoucherConverter::toVoucherDto).collect(toList());
-    return new CustomerDto(customer.getLoginId(), customer.getBirthdate(),
+    return new CustomerDto(customer.getLoginId(), customer.getBirthdate().toString(),
         customer.getOrderPerMonth(), customer.getPoint(), customerGradeDto, reviewDtoList, customerAddressDtoList, voucherDtoList);
   }
 }

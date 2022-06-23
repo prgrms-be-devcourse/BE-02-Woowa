@@ -6,6 +6,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface CustomerGradeRepository extends JpaRepository<CustomerGrade, Integer> {
   Optional<CustomerGrade> findFirstByOrderByOrderCount();
-  Optional<CustomerGrade> findByGrade(String grade);
   Optional<CustomerGrade> findFirstByOrderCountLessThanEqualOrderByOrderCountDesc(int orderCount);
+  Optional<CustomerGrade> findById(Long id);
 }

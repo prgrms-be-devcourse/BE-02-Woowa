@@ -7,7 +7,7 @@ import com.example.woowa.customer.entity.CustomerGrade;
 public class CustomerGradeConverter {
 
   public static CustomerGradeDto toCustomerGradeDto(CustomerGrade customerGrade) {
-    return new CustomerGradeDto(customerGrade.getOrderCount(), customerGrade.getGrade(),
+    return new CustomerGradeDto(customerGrade.getId(), customerGrade.getOrderCount(), customerGrade.getGrade(),
         customerGrade.getDiscountPrice(), customerGrade.getVoucherCount());
   }
 

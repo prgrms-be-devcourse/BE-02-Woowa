@@ -7,7 +7,7 @@ import com.example.woowa.voucher.enums.VoucherType;
 
 public class VoucherConverter {
   public static VoucherDto toVoucherDto(Voucher voucher) {
-    return new VoucherDto(voucher.getVoucherType(), voucher.getDiscountValue(), voucher.getExpirationDate(),
+    return new VoucherDto(voucher.getId(), voucher.getVoucherType(), voucher.getDiscountValue(), voucher.getExpirationDate(),
         voucher.getCode());
   }
 

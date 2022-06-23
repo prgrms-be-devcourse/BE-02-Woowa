@@ -7,7 +7,7 @@ import com.example.woowa.customer.entity.CustomerAddress;
 
 public class CustomerAddressConverter {
   public static CustomerAddressDto toCustomerAddressDto(CustomerAddress customerAddress) {
-    return new CustomerAddressDto(customerAddress.getAddress(), customerAddress.getNickname());
+    return new CustomerAddressDto(customerAddress.getId(), customerAddress.getAddress(), customerAddress.getNickname());
   }
 
   public static CustomerAddress toCustomerAddress(CreateCustomerAddressDto createCustomerAddressDto, Customer customer) {
