@@ -6,12 +6,12 @@ import com.example.woowa.customer.entity.Customer;
 import com.example.woowa.customer.entity.CustomerAddress;
 
 public class CustomerAddressConverter {
-  public static CustomerAddressDto toCustomerAddressDto(CustomerAddress customerAddress) {
-    return new CustomerAddressDto(customerAddress.getId(), customerAddress.getAddress(), customerAddress.getNickname());
-  }
+    public static CustomerAddressDto toCustomerAddressDto(CustomerAddress customerAddress) {
+        return new CustomerAddressDto(customerAddress.getId(), customerAddress.getAddress(), customerAddress.getNickname());
+    }
 
-  public static CustomerAddress toCustomerAddress(CreateCustomerAddressDto createCustomerAddressDto, Customer customer) {
-    return new CustomerAddress(createCustomerAddressDto.getAddress(),
-        createCustomerAddressDto.getNickname(), customer);
-  }
+    public static CustomerAddress toCustomerAddress(CreateCustomerAddressDto createCustomerAddressDto, Customer customer) {
+        return new CustomerAddress(createCustomerAddressDto.getAddress(),
+                createCustomerAddressDto.getNickname(), customer);
+    }
 }

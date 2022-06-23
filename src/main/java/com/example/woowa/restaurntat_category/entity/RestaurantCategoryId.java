@@ -1,6 +1,7 @@
 package com.example.woowa.restaurntat_category.entity;
 
 import java.io.Serializable;
+
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;

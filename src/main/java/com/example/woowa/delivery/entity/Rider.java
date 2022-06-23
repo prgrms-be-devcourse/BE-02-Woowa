@@ -1,8 +1,10 @@
 package com.example.woowa.delivery.entity;
 
+import com.example.woowa.restaurant.entity.DeliveryArea;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -23,7 +25,7 @@ public class Rider {
     @Column(nullable = false)
     private String loginPassword;
 
-    @Column(columnDefinition="BOOLEAN DEFAULT FALSE")
+    @Column(columnDefinition = "BOOLEAN DEFAULT FALSE")
     private Boolean isDelivery;
 
     @Column(nullable = false)

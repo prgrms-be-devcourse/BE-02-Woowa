@@ -7,7 +7,7 @@ import com.example.woowa.advertisement.repository.AdvertisementRepository;
 import com.example.woowa.restaurant.entity.Restaurant;
 import com.example.woowa.restaurant.repository.RestaurantRepository;
 import com.example.woowa.restaurant_advertisement.entity.RestaurantAdvertisement;
-import com.example.woowa.restaurant_advertisement.entity.RestaurnatAdvertisementId;
+import com.example.woowa.restaurant_advertisement.entity.RestaurantAdvertisementId;
 import java.time.LocalTime;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -43,10 +43,10 @@ class RestaurantAdvertisementRepositoryTest {
         restaurantAdvertisementRepository.save(new RestaurantAdvertisement(restaurant, advertisement));
 
         // Then
-        RestaurnatAdvertisementId restaurnatAdvertisementId = new RestaurnatAdvertisementId(
+        RestaurantAdvertisementId restaurantAdvertisementId = new RestaurantAdvertisementId(
             restaurant.getId(), advertisement.getId());
         RestaurantAdvertisement restaurantAdvertisement = restaurantAdvertisementRepository.findById(
-            restaurnatAdvertisementId).get();
+                restaurantAdvertisementId).get();
 
         assertThat(restaurantAdvertisement.getRestaurant().getId()).isEqualTo(restaurant.getId());
         assertThat(restaurantAdvertisement.getAdvertisement().getId()).isEqualTo(advertisement.getId());

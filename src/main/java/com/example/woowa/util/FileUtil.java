@@ -36,10 +36,10 @@ public class FileUtil {
         Boolean abolish = null;
 
         switch (s) {
-            case "존재" :
+            case "존재":
                 abolish = true;
                 break;
-            case "폐지" :
+            case "폐지":
                 abolish = false;
         }
 

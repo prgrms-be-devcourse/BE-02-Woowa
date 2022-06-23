@@ -5,8 +5,10 @@ import com.example.woowa.customer.dto.CustomerDto;
 import com.example.woowa.customer.dto.CustomerGradeDto;
 import com.example.woowa.customer.dto.UpdateCustomerGradeDto;
 import com.example.woowa.customer.service.CustomerGradeService;
+
 import javax.persistence.criteria.CriteriaBuilder.In;
 import javax.validation.Valid;
+
 import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -22,26 +24,26 @@ import org.springframework.web.bind.annotation.RestController;
 @AllArgsConstructor
 @RequestMapping("/api/v1/customers/grades")
 public class CustomerGradeController {
-  private CustomerGradeService customerGradeService;
+    private CustomerGradeService customerGradeService;
 
-  @PostMapping
-  public CustomerGradeDto createCustomerGrade(@RequestBody @Valid CreateCustomerGradeDto createCustomerGradeDto) {
-    return customerGradeService.createCustomerGrade(createCustomerGradeDto);
-  }
+    @PostMapping
+    public CustomerGradeDto createCustomerGrade(@RequestBody @Valid CreateCustomerGradeDto createCustomerGradeDto) {
+        return customerGradeService.createCustomerGrade(createCustomerGradeDto);
+    }
 
-  @GetMapping("/{id}")
-  public CustomerGradeDto readCustomerGrade(@PathVariable Long id) {
-    return customerGradeService.findCustomerGrade(id);
-  }
+    @GetMapping("/{id}")
+    public CustomerGradeDto readCustomerGrade(@PathVariable Long id) {
+        return customerGradeService.findCustomerGrade(id);
+    }
 
-  @PutMapping("/{id}")
-  public CustomerGradeDto updateCustomerGrade(@PathVariable Long id, @RequestBody @Valid UpdateCustomerGradeDto updateCustomerGradeDto) {
-    return customerGradeService.updateCustomerGrade(id, updateCustomerGradeDto);
-  }
+    @PutMapping("/{id}")
+    public CustomerGradeDto updateCustomerGrade(@PathVariable Long id, @RequestBody @Valid UpdateCustomerGradeDto updateCustomerGradeDto) {
+        return customerGradeService.updateCustomerGrade(id, updateCustomerGradeDto);
+    }
 
-  @DeleteMapping("/{id}")
-  public String deleteCustomerGrade(@PathVariable Long id) {
-    customerGradeService.deleteCustomerGrade(id);
-    return "delete id - " + id;
-  }
+    @DeleteMapping("/{id}")
+    public String deleteCustomerGrade(@PathVariable Long id) {
+        customerGradeService.deleteCustomerGrade(id);
+        return "delete id - " + id;
+    }
 }

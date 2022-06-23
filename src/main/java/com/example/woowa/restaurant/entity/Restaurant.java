@@ -1,6 +1,7 @@
 package com.example.woowa.restaurant.entity;
 
 import com.example.woowa.menucategory.entity.MenuCategory;
+
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -11,6 +12,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -56,8 +58,8 @@ public class Restaurant {
     private String address;
 
     public Restaurant(String name, String businessNumber, LocalTime openingTime,
-            LocalTime closingTime,
-            Boolean isOpen, String phoneNumber, String description, String address) {
+                      LocalTime closingTime,
+                      Boolean isOpen, String phoneNumber, String description, String address) {
         this.name = name;
         this.businessNumber = businessNumber;
         this.openingTime = openingTime;
@@ -71,8 +73,8 @@ public class Restaurant {
     }
 
     public Restaurant createRestaurant(String name, String businessNumber,
-            LocalTime openingTime, LocalTime closingTime, Boolean isOpen, String phoneNumber,
-            String description, String address) {
+                                       LocalTime openingTime, LocalTime closingTime, Boolean isOpen, String phoneNumber,
+                                       String description, String address) {
         return new Restaurant(name, businessNumber, openingTime, closingTime, isOpen, phoneNumber,
                 description, address);
     }

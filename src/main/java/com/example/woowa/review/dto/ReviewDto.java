@@ -6,6 +6,6 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 public class ReviewDto {
-  private String content;
-  private Integer scoreType;
+    private String content;
+    private Integer scoreType;
 }

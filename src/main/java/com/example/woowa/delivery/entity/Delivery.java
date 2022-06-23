@@ -25,7 +25,7 @@ public class Delivery {
     private String customerAddress;
 
     @Enumerated(EnumType.STRING)
-    @Column(columnDefinition="BOOLEAN DEFAULT FALSE")
+    @Column(columnDefinition = "BOOLEAN DEFAULT FALSE")
     private DeliveryStatus deliveryStatus;
 
     @Column(nullable = false)

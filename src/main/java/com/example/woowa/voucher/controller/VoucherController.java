@@ -3,7 +3,9 @@ package com.example.woowa.voucher.controller;
 import com.example.woowa.voucher.dto.CreateVoucherDto;
 import com.example.woowa.voucher.dto.VoucherDto;
 import com.example.woowa.voucher.service.VoucherService;
+
 import javax.validation.Valid;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -17,21 +19,21 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/vouchers")
 public class VoucherController {
-  private final VoucherService voucherService;
+    private final VoucherService voucherService;
 
-  @PostMapping
-  public VoucherDto createVoucher(@RequestBody @Valid CreateVoucherDto createVoucherDto)
-      throws Exception {
-    return voucherService.createVoucher(createVoucherDto);
-  }
+    @PostMapping
+    public VoucherDto createVoucher(@RequestBody @Valid CreateVoucherDto createVoucherDto)
+            throws Exception {
+        return voucherService.createVoucher(createVoucherDto);
+    }
 
-  @GetMapping("/{id}")
-  public VoucherDto readVoucher(@PathVariable Long id) {
-    return voucherService.findVoucher(id);
-  }
+    @GetMapping("/{id}")
+    public VoucherDto readVoucher(@PathVariable Long id) {
+        return voucherService.findVoucher(id);
+    }
 
-  @DeleteMapping("/{id}")
-  public void deleteVoucher(@PathVariable Long id) {
-    voucherService.deleteVoucher(id);
-  }
+    @DeleteMapping("/{id}")
+    public void deleteVoucher(@PathVariable Long id) {
+        voucherService.deleteVoucher(id);
+    }
 }

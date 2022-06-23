@@ -3,23 +3,23 @@ package com.example.woowa.review.enums;
 import java.util.Arrays;
 
 public enum ScoreType {
-  ONE(1),
-  TWO(2),
-  THREE(3),
-  FOUR(4),
-  FIVE(5);
+    ONE(1),
+    TWO(2),
+    THREE(3),
+    FOUR(4),
+    FIVE(5);
 
-  private final int value;
+    private final int value;
 
-  ScoreType(int i) {
-    this.value = i;
-  }
+    ScoreType(int i) {
+        this.value = i;
+    }
 
-  public int getValue() {
-    return value;
-  }
+    public int getValue() {
+        return value;
+    }
 
-  public static ScoreType of(int value) {
-    return Arrays.stream(values()).filter((e)->e.value == value).findFirst().orElseThrow(() -> new RuntimeException("1~5 사이 값을 입력하세요"));
-  }
+    public static ScoreType of(int value) {
+        return Arrays.stream(values()).filter((e) -> e.value == value).findFirst().orElseThrow(() -> new RuntimeException("1~5 사이 값을 입력하세요"));
+    }
 }

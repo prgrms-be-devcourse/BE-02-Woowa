@@ -5,6 +5,7 @@ import com.example.woowa.order.enums.OrderStatus;
 import com.example.woowa.order.enums.PaymentType;
 import com.example.woowa.restaurant.entity.Restaurant;
 import com.example.woowa.voucher.entity.Voucher;
+
 import java.util.List;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -18,6 +19,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
+
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -66,9 +68,9 @@ public class Order {
     private OrderStatus orderStatus;
 
     public Order(Voucher voucher, Customer customer, Restaurant restaurant,
-            Integer beforeDiscountTotalPrice, Integer afterDiscountTotalPrice,
-            Integer discountPrice,
-            PaymentType paymentType, Integer usedPoint, OrderStatus orderStatus) {
+                 Integer beforeDiscountTotalPrice, Integer afterDiscountTotalPrice,
+                 Integer discountPrice,
+                 PaymentType paymentType, Integer usedPoint, OrderStatus orderStatus) {
         this.voucher = voucher;
         this.customer = customer;
         this.restaurant = restaurant;
@@ -81,8 +83,8 @@ public class Order {
     }
 
     public static Order createOrder(Customer customer, Restaurant restaurant, Voucher voucher,
-            List<Cart> carts,
-            Integer usedPoint, PaymentType paymentType) {
+                                    List<Cart> carts,
+                                    Integer usedPoint, PaymentType paymentType) {
         customer.usePoint(usedPoint);
 
         int beforeDiscountTotalPrice = carts.stream()
