@@ -1,10 +1,11 @@
 package com.example.woowa.restaurant.restaurant.entity;
 
 import com.example.woowa.restaurant.menucategory.entity.MenuCategory;
-
+import com.example.woowa.restaurant.restaurntat_category.entity.RestaurantCategory;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -12,7 +13,6 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
-
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -29,6 +29,9 @@ public class Restaurant {
 
     @OneToMany(mappedBy = "restaurant")
     private List<MenuCategory> menuCategories = new ArrayList<>();
+
+    @OneToMany(mappedBy = "restaurant", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<RestaurantCategory> restaurantCategories = new ArrayList<>();
 
     @Column(nullable = false)
     private String name;
@@ -58,8 +61,8 @@ public class Restaurant {
     private String address;
 
     private Restaurant(String name, String businessNumber, LocalTime openingTime,
-                      LocalTime closingTime,
-                      Boolean isOpen, String phoneNumber, String description, String address) {
+            LocalTime closingTime,
+            Boolean isOpen, String phoneNumber, String description, String address) {
         this.name = name;
         this.businessNumber = businessNumber;
         this.openingTime = openingTime;
@@ -73,8 +76,8 @@ public class Restaurant {
     }
 
     public static Restaurant createRestaurant(String name, String businessNumber,
-                                       LocalTime openingTime, LocalTime closingTime, Boolean isOpen, String phoneNumber,
-                                       String description, String address) {
+            LocalTime openingTime, LocalTime closingTime, Boolean isOpen, String phoneNumber,
+            String description, String address) {
         return new Restaurant(name, businessNumber, openingTime, closingTime, isOpen, phoneNumber,
                 description, address);
     }
@@ -106,5 +109,9 @@ public class Restaurant {
     public void changeReviewInfo(Double averageReviewScore, Integer reviewCount) {
         this.averageReviewScore = averageReviewScore;
         this.reviewCount = reviewCount;
+    }
+
+    public void addRestaurantCategory(RestaurantCategory restaurantCategory) {
+        restaurantCategories.add(restaurantCategory);
     }
 }
