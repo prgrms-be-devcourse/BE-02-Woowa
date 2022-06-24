@@ -55,4 +55,8 @@ public class MenuCategory {
     public void changeTitle(String title) {
         this.title = title;
     }
+
+    public void addMenu(Menu menu) {
+        menus.add(menu);
+    }
 }

@@ -62,7 +62,9 @@ public class Menu {
             String description,
             Boolean isMain,
             SaleStatus saleStatus) {
-        return new Menu(menuCategory, title, price, description, isMain, saleStatus);
+        Menu menu = new Menu(menuCategory, title, price, description, isMain, saleStatus);
+        menuCategory.addMenu(menu);
+        return menu;
     }
 
     public void change(MenuCategory menuCategory, String title, Integer price, String description) {
