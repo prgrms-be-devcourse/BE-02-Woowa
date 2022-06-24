@@ -2,13 +2,16 @@ package com.example.woowa.restaurntat_category.repository;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.example.woowa.category.entity.Category;
-import com.example.woowa.category.repository.CategoryRepository;
-import com.example.woowa.restaurant.entity.Restaurant;
-import com.example.woowa.restaurant.repository.RestaurantRepository;
-import com.example.woowa.restaurntat_category.entity.RestaurantCategory;
-import com.example.woowa.restaurntat_category.entity.RestaurantCategoryId;
+import com.example.woowa.restaurant.category.entity.Category;
+import com.example.woowa.restaurant.category.repository.CategoryRepository;
+import com.example.woowa.restaurant.restaurant.entity.Restaurant;
+import com.example.woowa.restaurant.restaurant.repository.RestaurantRepository;
+import com.example.woowa.restaurant.restaurntat_category.entity.RestaurantCategory;
+import com.example.woowa.restaurant.restaurntat_category.entity.RestaurantCategoryId;
 import java.time.LocalTime;
+
+import com.example.woowa.restaurant.restaurntat_category.repository.RestaurantCategoryRepository;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,7 +34,8 @@ class RestaurantCategoryRepositoryTest {
     public void testSaveRestaurantCategory() {
         // Given
         Restaurant restaurant = restaurantRepository.save(
-            new Restaurant("테스트 레스토랑", "1234567890",
+
+        Restaurant.createRestaurant("테스트 레스토랑", "1234567890",
                 LocalTime.now(), LocalTime.now(), true,
                 "010-123-4567", "테스트용 임시 레스토랑 생성입니다.", "서울시 종로구"));
 

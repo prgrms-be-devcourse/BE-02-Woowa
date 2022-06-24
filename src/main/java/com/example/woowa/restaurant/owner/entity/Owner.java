@@ -1,4 +1,4 @@
-package com.example.woowa.admin.entity;
+package com.example.woowa.restaurant.owner.entity;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -13,9 +13,9 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Table(name = "admin")
+@Table(name = "owner")
 @Entity
-public class Admin {
+public class Owner {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -27,13 +27,25 @@ public class Admin {
     @Column(nullable = false, length = 45)
     private String loginPassword;
 
-    public Admin(String loginId, String loginPassword) {
+    @Column(nullable = false, length = 45)
+    private String name;
+
+    @Column(nullable = false, length = 45)
+    private String phoneNumber;
+
+    public Owner(String loginId, String loginPassword, String name, String phoneNumber) {
         this.loginId = loginId;
         this.loginPassword = loginPassword;
+        this.name = name;
+        this.phoneNumber = phoneNumber;
     }
 
     public void changePassword(String loginPassword) {
         this.loginPassword = loginPassword;
+    }
+
+    public void changePhoneNumber(String phoneNumber) {
+        this.phoneNumber = phoneNumber;
     }
 
 }
