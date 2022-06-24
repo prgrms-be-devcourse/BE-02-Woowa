@@ -3,12 +3,7 @@ package com.example.woowa.restaurant.restaurant_advertisement.entity;
 import com.example.woowa.restaurant.advertisement.entity.Advertisement;
 import com.example.woowa.restaurant.restaurant.entity.Restaurant;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.IdClass;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -24,12 +19,12 @@ import lombok.NoArgsConstructor;
 public class RestaurantAdvertisement {
 
     @Id
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "restaurant_id")
     private Restaurant restaurant;
 
     @Id
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "advertisement_id")
     private Advertisement advertisement;
 

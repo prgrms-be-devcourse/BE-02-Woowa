@@ -2,15 +2,7 @@ package com.example.woowa.restaurant_advertisement.repository;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.example.woowa.restaurant.advertisement.entity.Advertisement;
-import com.example.woowa.restaurant.advertisement.repository.AdvertisementRepository;
-import com.example.woowa.restaurant.restaurant.entity.Restaurant;
-import com.example.woowa.restaurant.restaurant.repository.RestaurantRepository;
-import com.example.woowa.restaurant.restaurant_advertisement.entity.RestaurantAdvertisement;
-import com.example.woowa.restaurant.restaurant_advertisement.entity.RestaurantAdvertisementId;
-import java.time.LocalTime;
 
-import com.example.woowa.restaurant.restaurant_advertisement.repository.RestaurantAdvertisementRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,6 +37,7 @@ class RestaurantAdvertisementRepositoryTest {
         restaurantAdvertisementRepository.save(new RestaurantAdvertisement(restaurant, advertisement));
 
         // Then
+
         RestaurantAdvertisementId restaurantAdvertisementId = new RestaurantAdvertisementId(
             restaurant.getId(), advertisement.getId());
         RestaurantAdvertisement restaurantAdvertisement = restaurantAdvertisementRepository.findById(
