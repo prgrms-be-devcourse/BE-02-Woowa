@@ -1,7 +1,7 @@
 package com.example.woowa.restaurant.menu.entity;
 
 import com.example.woowa.restaurant.menu.enums.SaleStatus;
-import com.example.woowa.restaurant.menucategory.entity.MenuCategory;
+import com.example.woowa.restaurant.menugroup.entity.MenuGroup;
 import java.util.Objects;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -29,8 +29,8 @@ public class Menu {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "menu_category_id", nullable = false)
-    private MenuCategory menuCategory;
+    @JoinColumn(name = "menu_group_id", nullable = false)
+    private MenuGroup menuGroup;
 
     @Column(nullable = false)
     private String title;
@@ -47,10 +47,10 @@ public class Menu {
     @Column(nullable = false)
     private SaleStatus saleStatus;
 
-    private Menu(MenuCategory menuCategory, String title, Integer price, String description,
+    private Menu(MenuGroup menuGroup, String title, Integer price, String description,
             Boolean isMain,
             SaleStatus saleStatus) {
-        this.menuCategory = menuCategory;
+        this.menuGroup = menuGroup;
         this.title = title;
         this.price = price;
         this.description = description;
@@ -58,22 +58,22 @@ public class Menu {
         this.saleStatus = saleStatus;
     }
 
-    public static Menu createMenu(MenuCategory menuCategory, String title, Integer price,
+    public static Menu createMenu(MenuGroup menuGroup, String title, Integer price,
             String description,
             Boolean isMain,
             SaleStatus saleStatus) {
-        Menu menu = new Menu(menuCategory, title, price, description, isMain, saleStatus);
-        menuCategory.addMenu(menu);
+        Menu menu = new Menu(menuGroup, title, price, description, isMain, saleStatus);
+        menuGroup.addMenu(menu);
         return menu;
     }
 
-    public void change(MenuCategory menuCategory, String title, Integer price, String description) {
-        if (Objects.nonNull(this.menuCategory)) {
-            menuCategory.getMenus().remove(this);
+    public void change(MenuGroup menuGroup, String title, Integer price, String description) {
+        if (Objects.nonNull(this.menuGroup)) {
+            menuGroup.getMenus().remove(this);
         }
 
-        menuCategory.getMenus().add(this);
-        this.menuCategory = menuCategory;
+        menuGroup.getMenus().add(this);
+        this.menuGroup = menuGroup;
         this.title = title;
         this.price = price;
         this.description = description;

@@ -1,6 +1,6 @@
 package com.example.woowa.restaurant.restaurant.entity;
 
-import com.example.woowa.restaurant.menucategory.entity.MenuCategory;
+import com.example.woowa.restaurant.menugroup.entity.MenuGroup;
 import com.example.woowa.restaurant.restaurntat_category.entity.RestaurantCategory;
 import java.time.LocalTime;
 import java.util.ArrayList;
@@ -28,7 +28,7 @@ public class Restaurant {
     private Long id;
 
     @OneToMany(mappedBy = "restaurant")
-    private List<MenuCategory> menuCategories = new ArrayList<>();
+    private List<MenuGroup> menuGroups = new ArrayList<>();
 
     @OneToMany(mappedBy = "restaurant", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<RestaurantCategory> restaurantCategories = new ArrayList<>();

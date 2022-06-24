@@ -1,4 +1,4 @@
-package com.example.woowa.restaurant.menucategory.entity;
+package com.example.woowa.restaurant.menugroup.entity;
 
 import com.example.woowa.restaurant.menu.entity.Menu;
 import com.example.woowa.restaurant.restaurant.entity.Restaurant;
@@ -22,10 +22,10 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "menu_category")
+@Table(name = "menu_groups")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
-public class MenuCategory {
+public class MenuGroup {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -35,21 +35,21 @@ public class MenuCategory {
     @JoinColumn(name = "restaurant_id", nullable = false)
     private Restaurant restaurant;
 
-    @OneToMany(mappedBy = "menuCategory", cascade = CascadeType.REMOVE)
+    @OneToMany(mappedBy = "menuGroup", cascade = CascadeType.REMOVE)
     private List<Menu> menus = new ArrayList<>();
 
     @Column(nullable = false)
     private String title;
 
-    private MenuCategory(Restaurant restaurant, String title) {
+    private MenuGroup(Restaurant restaurant, String title) {
         this.restaurant = restaurant;
         this.title = title;
     }
 
-    public static MenuCategory createMenuCategory(Restaurant restaurant, String title) {
-        MenuCategory menuCategory = new MenuCategory(restaurant, title);
-        restaurant.getMenuCategories().add(menuCategory);
-        return menuCategory;
+    public static MenuGroup createMenuGroup(Restaurant restaurant, String title) {
+        MenuGroup menuGroup = new MenuGroup(restaurant, title);
+        restaurant.getMenuGroups().add(menuGroup);
+        return menuGroup;
     }
 
     public void changeTitle(String title) {
