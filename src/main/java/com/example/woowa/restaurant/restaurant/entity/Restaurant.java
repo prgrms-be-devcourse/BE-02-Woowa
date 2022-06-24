@@ -123,7 +123,7 @@ public class Restaurant {
     private static void validateBusinessHours(LocalTime openingTime, LocalTime closingTime)
             throws IllegalArgumentException {
         if (closingTime.equals(openingTime)) {
-            throw new IllegalStateException("openingTime 과 closingTime 은 같을 수 없습니다.");
+            throw new IllegalArgumentException("openingTime 과 closingTime 은 같을 수 없습니다.");
         }
     }
 }
