@@ -1,6 +1,6 @@
 package com.example.woowa.restaurant.menu.entity;
 
-import com.example.woowa.restaurant.menu.enums.SaleStatus;
+import com.example.woowa.restaurant.menu.enums.MenuStatus;
 import com.example.woowa.restaurant.menugroup.entity.MenuGroup;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -44,24 +44,24 @@ public class Menu {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private SaleStatus saleStatus;
+    private MenuStatus menuStatus;
 
     private Menu(MenuGroup menuGroup, String title, Integer price, String description,
             Boolean isMain,
-            SaleStatus saleStatus) {
+            MenuStatus menuStatus) {
         this.menuGroup = menuGroup;
         this.title = title;
         this.price = price;
         this.description = description;
         this.isMain = isMain;
-        this.saleStatus = saleStatus;
+        this.menuStatus = menuStatus;
     }
 
     public static Menu createMenu(MenuGroup menuGroup, String title, Integer price,
             String description,
             Boolean isMain,
-            SaleStatus saleStatus) {
-        Menu menu = new Menu(menuGroup, title, price, description, isMain, saleStatus);
+            MenuStatus menuStatus) {
+        Menu menu = new Menu(menuGroup, title, price, description, isMain, menuStatus);
         menuGroup.addMenu(menu);
         return menu;
     }
@@ -72,8 +72,8 @@ public class Menu {
         this.description = description;
     }
 
-    public void changeSaleStatus(SaleStatus saleStatus) {
-        this.saleStatus = saleStatus;
+    public void changeMenuStatus(MenuStatus menuStatus) {
+        this.menuStatus = menuStatus;
     }
 
     public void setMainMenu(Boolean isMain) {

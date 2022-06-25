@@ -4,7 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.example.woowa.restaurant.menu.entity.Menu;
-import com.example.woowa.restaurant.menu.enums.SaleStatus;
+import com.example.woowa.restaurant.menu.enums.MenuStatus;
 import com.example.woowa.restaurant.menugroup.entity.MenuGroup;
 import com.example.woowa.restaurant.restaurant.entity.Restaurant;
 import com.example.woowa.restaurant.restaurant.repository.RestaurantRepository;
@@ -49,11 +49,11 @@ class RestaurantServiceTest {
         MenuGroup menuGroup1 = MenuGroup.createMenuGroup(restaurant, "밥", null);
         MenuGroup menuGroup2 = MenuGroup.createMenuGroup(restaurant, "면", null);
 
-        Menu.createMenu(menuGroup1, "김치 볶음밥", 10000, "맛있어요", true, SaleStatus.SALE);
-        Menu.createMenu(menuGroup1, "비빔밥", 10000, "맛있어요", true, SaleStatus.SALE);
+        Menu.createMenu(menuGroup1, "김치 볶음밥", 10000, "맛있어요", true, MenuStatus.SALE);
+        Menu.createMenu(menuGroup1, "비빔밥", 10000, "맛있어요", true, MenuStatus.SALE);
 
-        Menu.createMenu(menuGroup2, "라면", 10000, "맛있어요", true, SaleStatus.SALE);
-        Menu.createMenu(menuGroup2, "국수", 10000, "맛있어요", true, SaleStatus.SALE);
+        Menu.createMenu(menuGroup2, "라면", 10000, "맛있어요", true, MenuStatus.SALE);
+        Menu.createMenu(menuGroup2, "국수", 10000, "맛있어요", true, MenuStatus.SALE);
     }
 
     @Test
