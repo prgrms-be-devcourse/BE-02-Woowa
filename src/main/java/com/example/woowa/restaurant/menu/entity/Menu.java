@@ -16,6 +16,7 @@ import javax.persistence.Table;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.util.StringUtils;
 
 @Entity
 @Table(name = "menu")
@@ -37,6 +38,7 @@ public class Menu {
     @Column(nullable = false)
     private Integer price;
 
+    @Column(length = 500)
     private String description;
 
     @Column(columnDefinition = "BOOLEAN DEFAULT FALSE")
@@ -61,7 +63,9 @@ public class Menu {
             String description,
             Boolean isMain,
             MenuStatus menuStatus) {
-        Menu menu = new Menu(menuGroup, title, price, description, isMain, menuStatus);
+        Menu menu = new Menu(menuGroup, title, price, convertToNullIfEmptyDescription(description),
+                isMain,
+                menuStatus);
         menuGroup.addMenu(menu);
         return menu;
     }
@@ -69,7 +73,7 @@ public class Menu {
     public void update(String title, Integer price, String description) {
         this.title = title;
         this.price = price;
-        this.description = description;
+        this.description = convertToNullIfEmptyDescription(description);
     }
 
     public void changeMenuStatus(MenuStatus menuStatus) {
@@ -82,5 +86,9 @@ public class Menu {
 
     public void cancelMainMenu() {
         isMain = false;
+    }
+
+    private static String convertToNullIfEmptyDescription(String description) {
+        return StringUtils.hasText(description) ? description : null;
     }
 }
