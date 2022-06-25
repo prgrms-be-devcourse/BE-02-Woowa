@@ -2,7 +2,6 @@ package com.example.woowa.restaurant.menu.entity;
 
 import com.example.woowa.restaurant.menu.enums.SaleStatus;
 import com.example.woowa.restaurant.menugroup.entity.MenuGroup;
-import java.util.Objects;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -67,13 +66,7 @@ public class Menu {
         return menu;
     }
 
-    public void change(MenuGroup menuGroup, String title, Integer price, String description) {
-        if (Objects.nonNull(this.menuGroup)) {
-            menuGroup.getMenus().remove(this);
-        }
-
-        menuGroup.getMenus().add(this);
-        this.menuGroup = menuGroup;
+    public void update(String title, Integer price, String description) {
         this.title = title;
         this.price = price;
         this.description = description;
