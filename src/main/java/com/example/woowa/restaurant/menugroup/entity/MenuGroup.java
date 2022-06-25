@@ -20,6 +20,7 @@ import javax.persistence.Table;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.util.StringUtils;
 
 @Entity
 @Table(name = "menu_groups")
@@ -41,19 +42,29 @@ public class MenuGroup {
     @Column(nullable = false)
     private String title;
 
-    private MenuGroup(Restaurant restaurant, String title) {
+    @Column(length = 500)
+    private String description;
+
+    private MenuGroup(Restaurant restaurant, String title, String description) {
         this.restaurant = restaurant;
         this.title = title;
+        this.description = description;
     }
 
-    public static MenuGroup createMenuGroup(Restaurant restaurant, String title) {
-        MenuGroup menuGroup = new MenuGroup(restaurant, title);
+    public static MenuGroup createMenuGroup(Restaurant restaurant, String title,
+            String description) {
+        MenuGroup menuGroup = new MenuGroup(restaurant, title, getStoreDescription(description));
         restaurant.getMenuGroups().add(menuGroup);
         return menuGroup;
     }
 
-    public void changeTitle(String title) {
+    public void update(String title, String description) {
         this.title = title;
+        this.description = getStoreDescription(description);
+    }
+
+    private static String getStoreDescription(String description) {
+        return StringUtils.hasText(description) ? description : null;
     }
 
     public void addMenu(Menu menu) {

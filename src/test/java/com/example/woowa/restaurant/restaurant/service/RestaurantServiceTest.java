@@ -46,8 +46,8 @@ class RestaurantServiceTest {
                 false, phoneNumber,
                 description, address);
 
-        MenuGroup menuGroup1 = MenuGroup.createMenuGroup(restaurant, "밥");
-        MenuGroup menuGroup2 = MenuGroup.createMenuGroup(restaurant, "면");
+        MenuGroup menuGroup1 = MenuGroup.createMenuGroup(restaurant, "밥", null);
+        MenuGroup menuGroup2 = MenuGroup.createMenuGroup(restaurant, "면", null);
 
         Menu.createMenu(menuGroup1, "김치 볶음밥", 10000, "맛있어요", true, SaleStatus.SALE);
         Menu.createMenu(menuGroup1, "비빔밥", 10000, "맛있어요", true, SaleStatus.SALE);
