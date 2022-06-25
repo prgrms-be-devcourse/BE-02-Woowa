@@ -76,7 +76,11 @@ public class Menu {
         this.menuStatus = menuStatus;
     }
 
-    public void setMainMenu(Boolean isMain) {
-        this.isMain = isMain;
+    public void setMainMenu() {
+        isMain = true;
+    }
+
+    public void cancelMainMenu() {
+        isMain = false;
     }
 }
