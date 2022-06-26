@@ -27,8 +27,8 @@ public class CategoryService {
             .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 카테고리 아이디입니다."));
     }
 
-    public Category findCategoryByName(String name) {
-        return categoryRepository.findCategoryByName(name)
+    public Category findCategoryByName(String categoryName) {
+        return categoryRepository.findCategoryByName(categoryName)
             .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 카테고리 이름입니다."));
     }
 
@@ -39,16 +39,16 @@ public class CategoryService {
             .collect(Collectors.toList());
     }
 
-    public List<Restaurant> findRestaurantsByCategoryName(String name) {
-        return findCategoryByName(name).getRestaurantCategories().stream()
-            .filter(restaurantCategory -> Objects.equals(restaurantCategory.getCategory().getName(), name))
+    public List<Restaurant> findRestaurantsByCategoryName(String categoryName) {
+        return findCategoryByName(categoryName).getRestaurantCategories().stream()
+            .filter(restaurantCategory -> Objects.equals(restaurantCategory.getCategory().getName(), categoryName))
             .map(RestaurantCategory::getRestaurant)
             .collect(Collectors.toList());
     }
 
     @Transactional
-    public Long createCategory(String name) {
-        return categoryRepository.save(new Category(name)).getId();
+    public Long createCategory(String categoryName) {
+        return categoryRepository.save(new Category(categoryName)).getId();
     }
 
     @Transactional
