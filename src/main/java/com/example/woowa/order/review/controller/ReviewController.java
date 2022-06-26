@@ -1,7 +1,8 @@
 package com.example.woowa.order.review.controller;
 
-import com.example.woowa.order.review.dto.CreateReviewDto;
-import com.example.woowa.order.review.dto.ReviewDto;
+import com.example.woowa.order.review.dto.ReviewCreateRequest;
+import com.example.woowa.order.review.dto.ReviewFindResponse;
+import com.example.woowa.order.review.dto.ReviewUpdateRequest;
 import com.example.woowa.order.review.service.ReviewService;
 
 import javax.validation.Valid;
@@ -20,25 +21,26 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/reviews")
 public class ReviewController {
-    private ReviewService reviewService;
+    private final ReviewService reviewService;
 
-    @PostMapping
-    public ReviewDto createReview(@RequestBody @Valid CreateReviewDto createReviewDto) {
-        return null;
+    @PostMapping("/{loginId}/{orderId}")
+    public ReviewFindResponse createReview(@PathVariable String loginId, @PathVariable Long orderId, @RequestBody @Valid ReviewCreateRequest reviewCreateRequest) {
+        return reviewService.createReview(loginId, orderId, reviewCreateRequest);
     }
 
     @GetMapping("/{id}")
-    public ReviewDto readReview(@PathVariable Long id) {
-        return null;
+    public ReviewFindResponse readReview(@PathVariable Long id) {
+        return reviewService.findReview(id);
     }
 
-    @PutMapping
-    public ReviewDto updateReview(@RequestBody @Valid CreateReviewDto createReviewDto) {
-        return null;
+    @PutMapping("/{id}")
+    public ReviewFindResponse updateReview(@PathVariable Long id, @RequestBody @Valid ReviewUpdateRequest reviewUpdateRequest) {
+        return reviewService.updateReview(id, reviewUpdateRequest);
     }
 
     @DeleteMapping("/{id}")
-    public void deleteReview(@PathVariable Long id) {
-        return;
+    public String deleteReview(@PathVariable Long id) {
+        reviewService.deleteReview(id);
+        return "delete id - " + id;
     }
 }

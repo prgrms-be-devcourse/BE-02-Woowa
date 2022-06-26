@@ -5,7 +5,7 @@ import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public class CustomerAddressDto {
+public class CustomerAddressFindResponse {
     private Long id;
     private String address;
     private String nickname;

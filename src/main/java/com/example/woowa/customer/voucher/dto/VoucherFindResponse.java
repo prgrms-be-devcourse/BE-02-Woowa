@@ -7,8 +7,10 @@ import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public class CreateVoucherDto {
+public class VoucherFindResponse {
+    private Long id;
     private String voucherType;
+    private String eventType;
     private Integer discountValue;
     private LocalDateTime expirationDate;
     private String code;

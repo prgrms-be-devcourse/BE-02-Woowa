@@ -8,7 +8,7 @@ import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public class CreateCustomerGradeDto {
+public class CustomerGradeUpdateRequest {
     @Positive
     private Integer orderCount;
     @NotBlank

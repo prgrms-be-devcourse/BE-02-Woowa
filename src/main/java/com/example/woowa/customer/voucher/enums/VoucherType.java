@@ -56,7 +56,7 @@ public enum VoucherType {
         return type;
     }
 
-    public static VoucherType fromString(String value) throws Exception {
+    public static VoucherType of(String value) throws Exception {
         return Optional.ofNullable(find(value)).orElseThrow(() -> new RuntimeException("not valid voucher type"));
     }
 

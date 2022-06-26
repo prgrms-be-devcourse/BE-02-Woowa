@@ -1,9 +1,9 @@
 package com.example.woowa.customer.customer.service;
 
 import com.example.woowa.customer.customer.converter.CustomerGradeConverter;
-import com.example.woowa.customer.customer.dto.CreateCustomerGradeDto;
-import com.example.woowa.customer.customer.dto.CustomerGradeDto;
-import com.example.woowa.customer.customer.dto.UpdateCustomerGradeDto;
+import com.example.woowa.customer.customer.dto.CustomerGradeCreateRequest;
+import com.example.woowa.customer.customer.dto.CustomerGradeFindResponse;
+import com.example.woowa.customer.customer.dto.CustomerGradeUpdateRequest;
 import com.example.woowa.customer.customer.entity.CustomerGrade;
 import com.example.woowa.customer.customer.repository.CustomerGradeRepository;
 import lombok.RequiredArgsConstructor;
@@ -17,19 +17,21 @@ public class CustomerGradeService {
     private final CustomerGradeRepository customerGradeRepository;
 
     @Transactional
-    public CustomerGradeDto createCustomerGrade(CreateCustomerGradeDto createCustomerGradeDto) {
-        CustomerGrade customerGrade = CustomerGradeConverter.toCustomerGrade(createCustomerGradeDto);
+    public CustomerGradeFindResponse createCustomerGrade(
+        CustomerGradeCreateRequest customerGradeCreateRequest) {
+        CustomerGrade customerGrade = CustomerGradeConverter.toCustomerGrade(
+            customerGradeCreateRequest);
         customerGrade = customerGradeRepository.save(customerGrade);
         return CustomerGradeConverter.toCustomerGradeDto(customerGrade);
     }
 
-    public CustomerGradeDto findCustomerGrade(Long id) {
+    public CustomerGradeFindResponse findCustomerGrade(Long id) {
         CustomerGrade customerGrade = customerGradeRepository.findById(id).orElseThrow(() -> new RuntimeException("customer grade not existed"));
         return CustomerGradeConverter.toCustomerGradeDto(customerGrade);
     }
 
     @Transactional
-    public CustomerGradeDto updateCustomerGrade(Long id, UpdateCustomerGradeDto updateCustomerGradeDto) {
+    public CustomerGradeFindResponse updateCustomerGrade(Long id, CustomerGradeUpdateRequest updateCustomerGradeDto) {
         CustomerGrade customerGrade = customerGradeRepository.findById(id).orElseThrow(() -> new RuntimeException("customer grade not existed"));
         if (updateCustomerGradeDto.getGrade() != null) {
             customerGrade.setGrade(updateCustomerGradeDto.getGrade());
@@ -49,5 +51,13 @@ public class CustomerGradeService {
     public void deleteCustomerGrade(Long id) {
         CustomerGrade customerGrade = customerGradeRepository.findById(id).orElseThrow(() -> new RuntimeException("customer grade not existed"));
         customerGradeRepository.delete(customerGrade);
+    }
+
+    public CustomerGrade findDefaultCustomerGrade() {
+        return customerGradeRepository.findFirstByOrderByOrderCount().orElseThrow(() -> new RuntimeException("no customer grade existed"));
+    }
+
+    public CustomerGrade findCustomerGradeByOrderPerMonthCount(int orderCount) {
+        return customerGradeRepository.findFirstByOrderCountLessThanEqualOrderByOrderCountDesc(orderCount).orElse(findDefaultCustomerGrade());
     }
 }

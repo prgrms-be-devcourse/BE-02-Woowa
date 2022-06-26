@@ -7,9 +7,11 @@ import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public class CreateCustomerAddressDto {
+public class CustomerAddressUpdateRequest {
     @NotBlank
-    private String address;
+    private String defaultAddress;
+    @NotBlank
+    private String detailAddress;
     @NotBlank
     private String nickname;
 }
