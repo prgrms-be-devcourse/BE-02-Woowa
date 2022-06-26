@@ -53,12 +53,12 @@ public class CategoryService {
 
     @Transactional
     public void changeCategoryName(Long categoryId, String newName) {
-        findCategoryById(categoryId).changeCategoryName(newName);
+        findCategoryById(categoryId).changeName(newName);
     }
 
     @Transactional
     public void changeCategoryName(String oldName, String newName) {
-        findCategoryByName(oldName).changeCategoryName(newName);
+        findCategoryByName(oldName).changeName(newName);
     }
 
     @Transactional

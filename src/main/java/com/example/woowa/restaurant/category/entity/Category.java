@@ -42,7 +42,7 @@ public class Category {
         }
     }
 
-    public void changeCategoryName(String name) {
+    public void changeName(String name) {
         this.name = name;
     }
 
