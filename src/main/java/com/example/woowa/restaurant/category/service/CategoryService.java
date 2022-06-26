@@ -34,14 +34,12 @@ public class CategoryService {
 
     public List<Restaurant> findRestaurantsByCategoryId(Long categoryId) {
         return findCategoryById(categoryId).getRestaurantCategories().stream()
-            .filter(restaurantCategory -> Objects.equals(restaurantCategory.getCategory().getId(), categoryId))
             .map(RestaurantCategory::getRestaurant)
             .collect(Collectors.toList());
     }
 
     public List<Restaurant> findRestaurantsByCategoryName(String categoryName) {
         return findCategoryByName(categoryName).getRestaurantCategories().stream()
-            .filter(restaurantCategory -> Objects.equals(restaurantCategory.getCategory().getName(), categoryName))
             .map(RestaurantCategory::getRestaurant)
             .collect(Collectors.toList());
     }
