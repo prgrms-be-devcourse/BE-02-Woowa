@@ -2,32 +2,48 @@ package com.example.woowa.delivery.service;
 
 import com.example.woowa.delivery.entity.AreaCode;
 import lombok.RequiredArgsConstructor;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
+@SpringBootTest
 class AreaCodeServiceTest {
 
     @Autowired
     AreaCodeService areaCodeService;
 
     @Test
-    @DisplayName("AreaCode ÆÄÀÏÀ» ÀĞ¾î¿Í¼­ ÃÊ±âÈ­ ÇÒ ¼ö ÀÖ´Ù.")
+    @DisplayName("AreaCodeì˜ ê¸°ë³¸ ë°ì´í„°ë¥¼ ì´ˆê¸°í™”í•  ìˆ˜ ìˆë‹¤.")
     @BeforeEach
     public void init() {
+        areaCodeService.deleteAll();
         areaCodeService.init();
     }
 
     @Test
-    @DisplayName("defaultAddress¸¦ ÅëÇØ AreaCode¸¦ Á¶È¸ÇÒ ¼ö ÀÖ´Ù.")
+    @DisplayName("defaultAddressë¥¼ í†µí•´ AreaCodeë¥¼ ì°¾ì„ ìˆ˜ ìˆë‹¤.")
     public void findByDefaultAddress() {
-        AreaCode areaCode = areaCodeService.findByAddress("¼­¿ïÆ¯º°½Ã Á¾·Î±¸");
-        assertThat(areaCode.getCode()).isEqualTo(1111000000);
-        assertThat(areaCode.getDefaultAddress()).isEqualTo("¼­¿ïÆ¯º°½Ã Á¾·Î±¸");
+        String address = "ì„œìš¸íŠ¹ë³„ì‹œ ì¢…ë¡œêµ¬";
+        AreaCode areaCode = areaCodeService.findByAddress(address);
+        assertThat(areaCode.getCode()).isEqualTo("1111000000");
+        assertThat(areaCode.getDefaultAddress()).isEqualTo(address);
+    }
+
+    @Test
+    @DisplayName("ë²•ì •ë™ ì½”ë“œë¥¼ í†µí•´ AreaCodeë¥¼ ì°¾ì„ ìˆ˜ ìˆë‹¤.")
+    public void findByCode() {
+        String code = "1111000000";
+        AreaCode areaCode = areaCodeService.findByCode(code);
+        assertThat(areaCode.getCode()).isEqualTo(code);
+        assertThat(areaCode.getDefaultAddress()).isEqualTo("ì„œìš¸íŠ¹ë³„ì‹œ ì¢…ë¡œêµ¬");
     }
 
 
