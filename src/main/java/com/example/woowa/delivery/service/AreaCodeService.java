@@ -16,13 +16,26 @@ public class AreaCodeService {
 
     private final AreaCodeRepository areaCodeRepository;
 
-    public AreaCode findByAddress(String defaultAddress) {
-        AreaCode areaCode = areaCodeRepository.findByDefaultAddress(defaultAddress).orElseThrow(() -> new RuntimeException("없는 행정구역 입니다."));
-        return areaCode;
+    @Transactional
+    public void deleteAll() {
+        areaCodeRepository.deleteAll();
+        return;
+    }
+    public List<AreaCode> findAll() {
+        return areaCodeRepository.findAll();
     }
 
+    public AreaCode findByAddress(String defaultAddress) {
+        return areaCodeRepository.findByDefaultAddress(defaultAddress).orElseThrow(() -> new RuntimeException("없는 행정구역 입니다."));
+    }
+
+    @Transactional
     public void init() {
         List<AreaCode> areaCodeList = FileUtil.parseAreaCodeList();
         areaCodeRepository.saveAll(areaCodeList);
+    }
+
+    public AreaCode findByCode(String code) {
+        return areaCodeRepository.findByCode(code).orElseThrow(() -> new RuntimeException("없는 행정구역 입니다."));
     }
 }
