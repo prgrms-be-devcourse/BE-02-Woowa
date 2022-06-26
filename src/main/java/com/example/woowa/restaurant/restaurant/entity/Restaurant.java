@@ -1,5 +1,7 @@
 package com.example.woowa.restaurant.restaurant.entity;
 
+import com.example.woowa.delivery.entity.AreaCode;
+import com.example.woowa.delivery.entity.DeliveryArea;
 import com.example.woowa.restaurant.menucategory.entity.MenuCategory;
 
 import java.time.LocalTime;
@@ -29,6 +31,9 @@ public class Restaurant {
 
     @OneToMany(mappedBy = "restaurant")
     private List<MenuCategory> menuCategories = new ArrayList<>();
+
+    @OneToMany(mappedBy = "restaurant")
+    private List<DeliveryArea> deliveryAreas = new ArrayList<>();
 
     @Column(nullable = false)
     private String name;
@@ -108,5 +113,9 @@ public class Restaurant {
     public void changeReviewInfo(Double averageReviewScore, Integer reviewCount) {
         this.averageReviewScore = averageReviewScore;
         this.reviewCount = reviewCount;
+    }
+
+    public void addDeliveryArea(DeliveryArea deliveryArea) {
+        deliveryAreas.add(deliveryArea);
     }
 }
