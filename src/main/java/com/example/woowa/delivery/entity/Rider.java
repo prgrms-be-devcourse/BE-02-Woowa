@@ -1,6 +1,6 @@
 package com.example.woowa.delivery.entity;
 
-import com.example.woowa.restaurant.restaurant.entity.DeliveryArea;
+import com.example.woowa.common.base.BaseLoginEntity;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -13,17 +13,11 @@ import java.util.List;
 @Table(name = "rider")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Rider {
+public class Rider extends BaseLoginEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
-    @Column(nullable = false)
-    private String loginId;
-
-    @Column(nullable = false)
-    private String loginPassword;
 
     @Column(columnDefinition = "BOOLEAN DEFAULT FALSE")
     private Boolean isDelivery;
@@ -37,13 +31,12 @@ public class Rider {
     @OneToMany
     private List<Delivery> deliveryList = new ArrayList<>();
 
-    @OneToMany
-    private List<DeliveryArea> deliveryAreaList = new ArrayList<>();
+    @OneToMany(mappedBy = "rider", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<RiderAreaCode> riderAreaCodeList = new ArrayList<>();
 
-    public Rider(String loginId, String loginPassword, Boolean isDelivery, String name, String phoneNumber) {
-        this.loginId = loginId;
-        this.loginPassword = loginPassword;
-        this.isDelivery = isDelivery;
+    public Rider(String loginId, String loginPassword, String name, String phoneNumber) {
+        super(loginId, loginPassword);
+        this.isDelivery = false;
         this.name = name;
         this.phoneNumber = phoneNumber;
     }
@@ -55,4 +48,8 @@ public class Rider {
     public void addDelivery(Delivery delivery) {
         this.deliveryList.add(delivery);
     }
+    public void addRiderAreaCode(RiderAreaCode riderAreaCode) {
+        this.riderAreaCodeList.add(riderAreaCode);
+    }
+
 }
