@@ -94,7 +94,7 @@ public class Order {
         int beforeDiscountTotalPrice = carts.stream()
                 .mapToInt(cart -> cart.getMenu().getPrice() * cart.getQuantity())
                 .sum();
-        int discountPrice = voucher.getDiscountPrice(beforeDiscountTotalPrice);
+        int discountPrice = getDiscountPrice(voucher, usedPoint, beforeDiscountTotalPrice);
         int afterDiscountTotalPrice = beforeDiscountTotalPrice - discountPrice;
 
         Order order = new Order(voucher, customer, restaurant, beforeDiscountTotalPrice,
@@ -120,5 +120,10 @@ public class Order {
     public void addCart(Cart cart) {
         carts.add(cart);
         cart.setOrder(this);
+    }
+
+    private static int getDiscountPrice(Voucher voucher, Integer usedPoint,
+            int beforeDiscountTotalPrice) {
+        return voucher.getDiscountPrice(beforeDiscountTotalPrice) + usedPoint;
     }
 }
