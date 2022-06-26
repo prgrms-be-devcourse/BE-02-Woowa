@@ -5,7 +5,6 @@ import com.example.woowa.restaurant.category.repository.CategoryRepository;
 import com.example.woowa.restaurant.restaurant.entity.Restaurant;
 import com.example.woowa.restaurant.restaurntat_category.entity.RestaurantCategory;
 import java.util.List;
-import java.util.Objects;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -17,6 +16,11 @@ import org.springframework.transaction.annotation.Transactional;
 public class CategoryService {
 
     private final CategoryRepository categoryRepository;
+
+    @Transactional
+    public Long createCategory(String categoryName) {
+        return categoryRepository.save(new Category(categoryName)).getId();
+    }
 
     public List<Category> findCategories() {
         return categoryRepository.findAll();
@@ -42,11 +46,6 @@ public class CategoryService {
         return findCategoryByName(categoryName).getRestaurantCategories().stream()
             .map(RestaurantCategory::getRestaurant)
             .collect(Collectors.toList());
-    }
-
-    @Transactional
-    public Long createCategory(String categoryName) {
-        return categoryRepository.save(new Category(categoryName)).getId();
     }
 
     @Transactional
