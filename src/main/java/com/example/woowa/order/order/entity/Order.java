@@ -1,12 +1,14 @@
 package com.example.woowa.order.order.entity;
 
 import com.example.woowa.customer.customer.entity.Customer;
-import com.example.woowa.customer.voucher.entity.Voucher;
 import com.example.woowa.order.order.enums.OrderStatus;
 import com.example.woowa.order.order.enums.PaymentType;
 import com.example.woowa.restaurant.restaurant.entity.Restaurant;
+import com.example.woowa.customer.voucher.entity.Voucher;
+
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -21,6 +23,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
+
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -94,7 +97,8 @@ public class Order {
         int beforeDiscountTotalPrice = carts.stream()
                 .mapToInt(cart -> cart.getMenu().getPrice() * cart.getQuantity())
                 .sum();
-        int discountPrice = getDiscountPrice(voucher, usedPoint, beforeDiscountTotalPrice);
+        int discountPrice =
+                usedPoint + getVoucherDiscountPrice(voucher, beforeDiscountTotalPrice);
         int afterDiscountTotalPrice = beforeDiscountTotalPrice - discountPrice;
 
         Order order = new Order(voucher, customer, restaurant, beforeDiscountTotalPrice,
@@ -112,8 +116,11 @@ public class Order {
     }
 
     public void cancelOrder() {
-        voucher.cancelUse();
-        voucher = null;
+        if (Objects.nonNull(voucher)) {
+            voucher.cancelUse();
+            voucher = null;
+        }
+
         orderStatus = OrderStatus.CANCEL;
     }
 
@@ -122,8 +129,7 @@ public class Order {
         cart.setOrder(this);
     }
 
-    private static int getDiscountPrice(Voucher voucher, Integer usedPoint,
-            int beforeDiscountTotalPrice) {
-        return voucher.getDiscountPrice(beforeDiscountTotalPrice) + usedPoint;
+    private static int getVoucherDiscountPrice(Voucher voucher, int beforeDiscountTotalPrice) {
+        return Objects.isNull(voucher) ? 0 : voucher.getDiscountPrice(beforeDiscountTotalPrice);
     }
 }
