@@ -49,7 +49,7 @@ public class CustomerAddress {
         this.customer = customer;
     }
 
-    //areaCode 서비스를 사용한 변환
+    //areaCode 서비스를 사용한 변환 -> 서비스 단에서 사용하기
     private AreaCode findAreaCode(String defaultAddress) {
         return null;
     }

@@ -95,13 +95,21 @@ public class Customer {
     }
 
     public void updateCustomerStatusWhenOrder(int plusPoint) {
-        ++this.orderPerMonth;
+        addOrderPerMonth();
         addPoint(plusPoint);
     }
 
     public void updateCustomerStatusWhenOrderCancel(int minusPoint) {
-        --this.orderPerMonth;
+        minusOrderPerMonth();
         usePoint(minusPoint);
+    }
+
+    public void addOrderPerMonth() {
+        ++this.orderPerMonth;
+    }
+
+    public void minusOrderPerMonth() {
+        --this.orderPerMonth;
     }
 
     public void useMonthlyCoupon() {

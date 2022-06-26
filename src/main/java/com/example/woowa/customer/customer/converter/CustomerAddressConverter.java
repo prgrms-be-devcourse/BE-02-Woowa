@@ -12,17 +12,7 @@ public class CustomerAddressConverter {
 
     public static CustomerAddress toCustomerAddress(
         CustomerAddressCreateRequest customerAddressCreateRequest, Customer customer) {
-        validateCustomerAddress(customerAddressCreateRequest.getDefaultAddress(), customerAddressCreateRequest.getDetailAddress(),
-            customerAddressCreateRequest.getNickname(), customer);
         return new CustomerAddress(customerAddressCreateRequest.getDefaultAddress(), customerAddressCreateRequest.getDetailAddress(),
                 customerAddressCreateRequest.getNickname(), customer);
-    }
-
-    private static void validateCustomerAddress(String defaultAddress, String detailAddress, String nickname,
-        Customer customer) {
-        assert !defaultAddress.isBlank();
-        assert !detailAddress.isBlank();
-        assert !nickname.isBlank();
-        assert customer != null;
     }
 }

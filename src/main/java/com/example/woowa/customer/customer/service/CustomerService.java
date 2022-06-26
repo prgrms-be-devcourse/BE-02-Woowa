@@ -14,13 +14,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
-@Transactional
+@Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class CustomerService {
     private final CustomerAddressRepository customerAddressRepository;
     private final CustomerRepository customerRepository;
     private final CustomerGradeService customerGradeService;
 
+    @Transactional
     public CustomerFindResponse createCustomer(CustomerCreateRequest customerCreateRequest) {
         Customer customer = CustomerConverter.toCustomer(customerCreateRequest, customerGradeService.findDefaultCustomerGrade());
         customerRepository.save(customer);
@@ -30,12 +31,12 @@ public class CustomerService {
         return CustomerConverter.toCustomerDto(customer);
     }
 
-    @Transactional(readOnly = true)
     public CustomerFindResponse findCustomer(String loginId) {
         Customer customer = findCustomerEntity(loginId);
         return CustomerConverter.toCustomerDto(customer);
     }
 
+    @Transactional
     public CustomerFindResponse updateCustomer(String loginId, CustomerUpdateRequest customerUpdateRequest) {
         Customer customer = findCustomerEntity(loginId);
         if (customerUpdateRequest.getLoginPassword() != null) {
@@ -44,22 +45,24 @@ public class CustomerService {
         return CustomerConverter.toCustomerDto(customer);
     }
 
+    @Transactional
     public void deleteCustomer(String loginId) {
         Customer customer = findCustomerEntity(loginId);
         customerRepository.delete(customer);
     }
 
-    @Transactional(readOnly = true)
     public Customer findCustomerEntity(String loginId) {
         Customer customer = customerRepository.findByLoginId(loginId).orElseThrow(() -> new RuntimeException("login id not existed"));
         return customer;
     }
 
+    @Transactional
     public void updateCustomerGrade(String loginId) {
         Customer customer = findCustomerEntity(loginId);
         customer.setCustomerGrade(customerGradeService.findCustomerGradeByOrderPerMonthCount(customer.getOrderPerMonth()));
     }
 
+    @Transactional
     public CustomerFindResponse updateCustomerStatusOnFirstDay(String loginId) {
         Customer customer = findCustomerEntity(loginId);
         customer.updateCustomerStatusOnFirstDay();

@@ -48,9 +48,6 @@ public class Voucher {
     private String code;
 
     public Voucher(VoucherType voucherType, EventType eventType, Integer discountValue, LocalDateTime expirationDate) {
-        assert voucherType.isValidAmount(discountValue);
-        assert eventType != null;
-        assert expirationDate != null;
         this.voucherType = voucherType;
         this.eventType = eventType;
         this.discountValue = discountValue;

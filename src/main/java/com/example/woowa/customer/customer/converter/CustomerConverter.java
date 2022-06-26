@@ -15,26 +15,15 @@ import com.example.woowa.order.review.dto.ReviewFindResponse;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
-import java.util.regex.Pattern;
 
 public class CustomerConverter {
 
     public static Customer toCustomer(CustomerCreateRequest customerCreateRequest, CustomerGrade customerGrade) {
-        validateCustomer(customerCreateRequest.getLoginId(), customerCreateRequest.getLoginPassword(),
-            customerCreateRequest.getBirthdate(), customerGrade);
         LocalDate localDate = LocalDate.parse(customerCreateRequest.getBirthdate(), DateTimeFormatter.ISO_DATE);
         Customer customer = new Customer(customerCreateRequest.getLoginId(), customerCreateRequest.getLoginPassword(),
             localDate, customerGrade);
         return customer;
     }
-
-    private static void validateCustomer(String loginId, String loginPassword, String birthdate, CustomerGrade customerGrade) {
-        assert Pattern.matches("^(?=.*\\d)(?=.*[a-zA-Z])[a-zA-z0-9]{5,10}$", loginId);
-        assert Pattern.matches("^(?=.*\\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[!,@,#,$,%]).{8,}$", loginPassword);
-        assert Pattern.matches("^(19|20)\\d{2}[-](0?[1-9]|[12][0-9]|3[01])[-](0?[1-9]|1[012])$", birthdate);
-        assert customerGrade != null;
-    }
-
     public static CustomerFindResponse toCustomerDto(Customer customer) {
         //order 엔티티에 대한 dto 변환 미구현
         CustomerGradeFindResponse customerGradeFindResponse = CustomerGradeConverter.toCustomerGradeDto(customer.getCustomerGrade());

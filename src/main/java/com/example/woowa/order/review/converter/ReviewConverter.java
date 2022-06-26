@@ -13,15 +13,7 @@ public class ReviewConverter {
     }
 
     public static Review toReview(ReviewCreateRequest reviewCreateRequest, Customer customer, Order order) {
-        validateReview(reviewCreateRequest.getContent(),
-            reviewCreateRequest.getScoreType(), customer, order);
         return new Review(reviewCreateRequest.getContent(), ScoreType.of(
             reviewCreateRequest.getScoreType()), customer, order);
-    }
-
-    private static void validateReview(String content, Integer score, Customer customer, Order order) {
-        assert content.length() >= 10 && content.length() <= 500;
-        assert score >= 1 && score <= 5;
-        assert customer != null;
     }
 }

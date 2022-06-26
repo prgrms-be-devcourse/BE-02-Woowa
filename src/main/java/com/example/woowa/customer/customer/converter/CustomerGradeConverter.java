@@ -13,18 +13,8 @@ public class CustomerGradeConverter {
 
     public static CustomerGrade toCustomerGrade(
         CustomerGradeCreateRequest customerGradeCreateRequest) {
-        validateCustomerGrade(customerGradeCreateRequest.getOrderCount(),
-            customerGradeCreateRequest.getGrade(), customerGradeCreateRequest.getDiscountPrice(),
-            customerGradeCreateRequest.getVoucherCount());
         return new CustomerGrade(customerGradeCreateRequest.getOrderCount(),
                 customerGradeCreateRequest.getGrade(), customerGradeCreateRequest.getDiscountPrice(),
                 customerGradeCreateRequest.getVoucherCount());
-    }
-
-    private static void validateCustomerGrade(Integer orderCount, String grade, Integer discountPrice, Integer voucherCount) {
-        assert orderCount > 0;
-        assert !grade.isBlank();
-        assert discountPrice > 0;
-        assert voucherCount > 0;
     }
 }
