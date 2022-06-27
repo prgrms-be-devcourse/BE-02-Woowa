@@ -71,7 +71,7 @@ public class OwnerService {
         Owner owner = findOwnerById(ownerId);
         Restaurant restaurant = restaurantService.findRestaurantById(restaurantId);
 
-        owner.addRestaurant(restaurant);
+//        owner.addRestaurant(restaurant);
     }
 
     @Transactional

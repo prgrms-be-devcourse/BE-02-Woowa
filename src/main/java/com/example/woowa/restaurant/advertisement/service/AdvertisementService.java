@@ -90,12 +90,12 @@ public class AdvertisementService {
         advertisementRepository.deleteById(advertisementId);
     }
 
-    @Transactional
-    public void includeRestaurantInAdvertisement(Long advertisementId, Long restaurantId) {
-        Advertisement advertisement = findAdvertisementById(advertisementId);
-        Restaurant restaurant = restaurantService.findRestaurantById(restaurantId);
-        restaurantAdvertisementRepository.save(new RestaurantAdvertisement(restaurant, advertisement));
-    }
+//    @Transactional
+//    public void includeRestaurantInAdvertisement(Long advertisementId, Long restaurantId) {
+//        Advertisement advertisement = findAdvertisementById(advertisementId);
+//        Restaurant restaurant = restaurantService.findRestaurantById(restaurantId);
+//        restaurantAdvertisementRepository.save(new RestaurantAdvertisement(restaurant, advertisement));
+//    }
 
     @Transactional
     public void excludeRestaurantInAdvertisement(Long advertisementId, Long restaurantId) {
@@ -104,7 +104,7 @@ public class AdvertisementService {
             .orElseThrow(() -> new IllegalArgumentException("부적절한 정보입니다."));
 
         findAdvertisementById(advertisementId).getRestaurantAdvertisements().remove(restaurantAdvertisement);
-        restaurantService.findRestaurantById(restaurantId).getRestaurantAdvertisements().remove(restaurantAdvertisement);
+//        restaurantService.findRestaurantById(restaurantId).getRestaurantAdvertisements().remove(restaurantAdvertisement);
     }
 
 }

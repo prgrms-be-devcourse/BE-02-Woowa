@@ -33,18 +33,18 @@ public class RestaurantAdvertisement {
     @JoinColumn(name = "advertisement_id", nullable = false)
     private Advertisement advertisement;
 
-    public RestaurantAdvertisement(Restaurant restaurant, Advertisement advertisement) {
-        setRestaurant(restaurant);
-        setAdvertisement(advertisement);
-    }
+//    public RestaurantAdvertisement(Restaurant restaurant, Advertisement advertisement) {
+//        setRestaurant(restaurant);
+//        setAdvertisement(advertisement);
+//    }
 
-    public void setRestaurant(Restaurant restaurant) {
-        if (Objects.nonNull(this.restaurant)) {
-            this.restaurant.getRestaurantAdvertisements().remove(this);
-        }
-        this.restaurant = restaurant;
-        this.restaurant.getRestaurantAdvertisements().add(this);
-    }
+//    public void setRestaurant(Restaurant restaurant) {
+//        if (Objects.nonNull(this.restaurant)) {
+//            this.restaurant.getRestaurantAdvertisements().remove(this);
+//        }
+//        this.restaurant = restaurant;
+//        this.restaurant.getRestaurantAdvertisements().add(this);
+//    }
 
     public void setAdvertisement(Advertisement advertisement) {
         if (Objects.nonNull(this.advertisement)) {

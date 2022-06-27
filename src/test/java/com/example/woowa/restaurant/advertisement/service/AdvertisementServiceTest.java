@@ -78,26 +78,26 @@ class AdvertisementServiceTest {
             LocalTime.now(), LocalTime.now(), true,
             "010-123-4567", "테스트용 임시 레스토랑 생성입니다.", "서울시 종로구"));
 
-        advertisementService.includeRestaurantInAdvertisement(advertisementId, restaurant.getId());
+//        advertisementService.includeRestaurantInAdvertisement(advertisementId, restaurant.getId());
 
         List<Restaurant> restaurants = advertisementService.findRestaurantsByAdvertisementId(
             advertisementId);
         assertThat(restaurants.get(0).getId()).isEqualTo(restaurant.getId());
     }
 
-    @Test
-    void findRestaurantByAdvertisementName() {
-        Long advertisementId = advertisementService.createAdvertisement("울트라콜", UnitType.PER_ORDER,
-            RateType.PERCENT, 7, "test ad");
-        Restaurant restaurant = restaurantRepository.save(Restaurant.createRestaurant("테스트 레스토랑", "1234567890",
-            LocalTime.now(), LocalTime.now(), true,
-            "010-123-4567", "테스트용 임시 레스토랑 생성입니다.", "서울시 종로구"));
-
-        advertisementService.includeRestaurantInAdvertisement(advertisementId, restaurant.getId());
-
-        List<Restaurant> restaurants = advertisementService.findRestaurantByAdvertisementTitle("울트라콜");
-        assertThat(restaurants.get(0).getId()).isEqualTo(restaurant.getId());
-    }
+//    @Test
+//    void findRestaurantByAdvertisementName() {
+//        Long advertisementId = advertisementService.createAdvertisement("울트라콜", UnitType.PER_ORDER,
+//            RateType.PERCENT, 7, "test ad");
+//        Restaurant restaurant = restaurantRepository.save(Restaurant.createRestaurant("테스트 레스토랑", "1234567890",
+//            LocalTime.now(), LocalTime.now(), true,
+//            "010-123-4567", "테스트용 임시 레스토랑 생성입니다.", "서울시 종로구"));
+//
+//        advertisementService.includeRestaurantInAdvertisement(advertisementId, restaurant.getId());
+//
+//        List<Restaurant> restaurants = advertisementService.findRestaurantByAdvertisementTitle("울트라콜");
+//        assertThat(restaurants.get(0).getId()).isEqualTo(restaurant.getId());
+//    }
 
     @Test
     @DisplayName("광고명을 변경할 수 있다.")
@@ -177,42 +177,42 @@ class AdvertisementServiceTest {
             .hasMessage("존재하지 않는 광고 아이디입니다.");
     }
 
-    @Test
-    @DisplayName("가게를 광고에 포함시킬 수 있다.")
-    void includeRestaurantInAdvertisement() {
-        Long advertisementId = advertisementService.createAdvertisement("울트라콜", UnitType.PER_ORDER,
-            RateType.PERCENT, 7, "test ad");
-        Restaurant restaurant = restaurantRepository.save(Restaurant.createRestaurant("테스트 레스토랑", "1234567890",
-            LocalTime.now(), LocalTime.now(), true,
-            "010-123-4567", "테스트용 임시 레스토랑 생성입니다.", "서울시 종로구"));
-
-        advertisementService.includeRestaurantInAdvertisement(advertisementId, restaurant.getId());
-
-        List<Restaurant> restaurants = advertisementService.findRestaurantsByAdvertisementId(
-            advertisementId);
-        assertThat(restaurants.get(0).getId()).isEqualTo(restaurant.getId());
-    }
-
-    @Test
-    @DisplayName("가게를 광고에서 제외시킬 수 있다.")
-    void excludeRestaurantInAdvertisement() {
-        Long advertisementId = advertisementService.createAdvertisement("울트라콜", UnitType.PER_ORDER,
-            RateType.PERCENT, 7, "test ad");
-        Restaurant restaurant = restaurantRepository.save(Restaurant.createRestaurant("테스트 레스토랑", "1234567890",
-            LocalTime.now(), LocalTime.now(), true,
-            "010-123-4567", "테스트용 임시 레스토랑 생성입니다.", "서울시 종로구"));
-
-        advertisementService.includeRestaurantInAdvertisement(advertisementId, restaurant.getId());
-
-        List<Restaurant> restaurantsAfterInclude = advertisementService.findRestaurantsByAdvertisementId(
-            advertisementId);
-        assertThat(restaurantsAfterInclude.get(0).getId()).isEqualTo(restaurant.getId());
-
-        advertisementService.excludeRestaurantInAdvertisement(advertisementId, restaurant.getId());
-
-        List<Restaurant> restaurantsAfterExclude = advertisementService.findRestaurantsByAdvertisementId(
-            advertisementId);
-        assertThat(restaurantsAfterExclude.isEmpty()).isTrue();
-    }
+//    @Test
+//    @DisplayName("가게를 광고에 포함시킬 수 있다.")
+//    void includeRestaurantInAdvertisement() {
+//        Long advertisementId = advertisementService.createAdvertisement("울트라콜", UnitType.PER_ORDER,
+//            RateType.PERCENT, 7, "test ad");
+//        Restaurant restaurant = restaurantRepository.save(Restaurant.createRestaurant("테스트 레스토랑", "1234567890",
+//            LocalTime.now(), LocalTime.now(), true,
+//            "010-123-4567", "테스트용 임시 레스토랑 생성입니다.", "서울시 종로구"));
+//
+//        advertisementService.includeRestaurantInAdvertisement(advertisementId, restaurant.getId());
+//
+//        List<Restaurant> restaurants = advertisementService.findRestaurantsByAdvertisementId(
+//            advertisementId);
+//        assertThat(restaurants.get(0).getId()).isEqualTo(restaurant.getId());
+//    }
+//
+//    @Test
+//    @DisplayName("가게를 광고에서 제외시킬 수 있다.")
+//    void excludeRestaurantInAdvertisement() {
+//        Long advertisementId = advertisementService.createAdvertisement("울트라콜", UnitType.PER_ORDER,
+//            RateType.PERCENT, 7, "test ad");
+//        Restaurant restaurant = restaurantRepository.save(Restaurant.createRestaurant("테스트 레스토랑", "1234567890",
+//            LocalTime.now(), LocalTime.now(), true,
+//            "010-123-4567", "테스트용 임시 레스토랑 생성입니다.", "서울시 종로구"));
+//
+//        advertisementService.includeRestaurantInAdvertisement(advertisementId, restaurant.getId());
+//
+//        List<Restaurant> restaurantsAfterInclude = advertisementService.findRestaurantsByAdvertisementId(
+//            advertisementId);
+//        assertThat(restaurantsAfterInclude.get(0).getId()).isEqualTo(restaurant.getId());
+//
+//        advertisementService.excludeRestaurantInAdvertisement(advertisementId, restaurant.getId());
+//
+//        List<Restaurant> restaurantsAfterExclude = advertisementService.findRestaurantsByAdvertisementId(
+//            advertisementId);
+//        assertThat(restaurantsAfterExclude.isEmpty()).isTrue();
+//    }
 
 }
