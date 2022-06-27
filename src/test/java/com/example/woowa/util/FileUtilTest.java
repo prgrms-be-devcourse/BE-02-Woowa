@@ -13,7 +13,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 class FileUtilTest {
 
     @Test
-    @DisplayName("txt ¹ıÁ¤µ¿ ÆÄÀÏÀ» ÅëÇØ AreaCode List¸¦ ÆÄ½ÌÇÒ ¼ö ÀÖ´Ù.")
+    @DisplayName("txt íŒŒì¼ì„ ì½ì–´ì„œ í–‰ì •êµ¬ì—­ì„ ì €ì¥í•  ìˆ˜ ìˆë‹¤.")
     public void parseAreaCodeList() {
         List<AreaCode> areaCodeList = FileUtil.parseAreaCodeList();
         assertThat(areaCodeList).hasSizeGreaterThan(1);
