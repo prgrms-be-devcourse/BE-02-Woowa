@@ -26,7 +26,7 @@ public class AreaCode {
     @Column(nullable = false)
     private boolean isAbolish;
 
-    @OneToMany(mappedBy = "areaCode")
+    @OneToMany(mappedBy = "areaCode", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<DeliveryArea> deliveryAreaList = new ArrayList<>();
 
     public AreaCode(String code, String defaultAddress, boolean isAbolish) {
