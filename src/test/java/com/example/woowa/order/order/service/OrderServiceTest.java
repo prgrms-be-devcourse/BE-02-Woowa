@@ -264,7 +264,8 @@ class OrderServiceTest {
 
     private Customer initCustomer() {
         CustomerGrade customerGrade = new CustomerGrade(4, "고마운분", 1000, 1);
-        return new Customer("dev12", "Programmers123!", "2000-01-01", customerGrade);
+        return null;
+//        return new Customer("dev12", "Programmers123!", "2000-01-01", customerGrade);
     }
 
     private Restaurant initRestaurant() {
