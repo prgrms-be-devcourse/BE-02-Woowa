@@ -1,8 +1,7 @@
 package com.example.woowa.restaurant.menu.entity;
 
-import com.example.woowa.restaurant.menu.enums.SaleStatus;
-import com.example.woowa.restaurant.menucategory.entity.MenuCategory;
-import java.util.Objects;
+import com.example.woowa.restaurant.menu.enums.MenuStatus;
+import com.example.woowa.restaurant.menugroup.entity.MenuGroup;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -17,6 +16,7 @@ import javax.persistence.Table;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.util.StringUtils;
 
 @Entity
 @Table(name = "menu")
@@ -29,8 +29,8 @@ public class Menu {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "menu_category_id", nullable = false)
-    private MenuCategory menuCategory;
+    @JoinColumn(name = "menu_group_id", nullable = false)
+    private MenuGroup menuGroup;
 
     @Column(nullable = false)
     private String title;
@@ -38,6 +38,7 @@ public class Menu {
     @Column(nullable = false)
     private Integer price;
 
+    @Column(length = 500)
     private String description;
 
     @Column(columnDefinition = "BOOLEAN DEFAULT FALSE")
@@ -45,43 +46,49 @@ public class Menu {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private SaleStatus saleStatus;
+    private MenuStatus menuStatus;
 
-    private Menu(MenuCategory menuCategory, String title, Integer price, String description,
+    private Menu(MenuGroup menuGroup, String title, Integer price, String description,
             Boolean isMain,
-            SaleStatus saleStatus) {
-        this.menuCategory = menuCategory;
+            MenuStatus menuStatus) {
+        this.menuGroup = menuGroup;
         this.title = title;
         this.price = price;
         this.description = description;
         this.isMain = isMain;
-        this.saleStatus = saleStatus;
+        this.menuStatus = menuStatus;
     }
 
-    public static Menu createMenu(MenuCategory menuCategory, String title, Integer price,
+    public static Menu createMenu(MenuGroup menuGroup, String title, Integer price,
             String description,
             Boolean isMain,
-            SaleStatus saleStatus) {
-        return new Menu(menuCategory, title, price, description, isMain, saleStatus);
+            MenuStatus menuStatus) {
+        Menu menu = new Menu(menuGroup, title, price, convertToNullIfEmptyDescription(description),
+                isMain,
+                menuStatus);
+        menuGroup.addMenu(menu);
+        return menu;
     }
 
-    public void change(MenuCategory menuCategory, String title, Integer price, String description) {
-        if (Objects.nonNull(this.menuCategory)) {
-            menuCategory.getMenus().remove(this);
-        }
-
-        menuCategory.getMenus().add(this);
-        this.menuCategory = menuCategory;
+    public void update(String title, Integer price, String description) {
         this.title = title;
         this.price = price;
-        this.description = description;
+        this.description = convertToNullIfEmptyDescription(description);
     }
 
-    public void changeSaleStatus(SaleStatus saleStatus) {
-        this.saleStatus = saleStatus;
+    public void changeMenuStatus(MenuStatus menuStatus) {
+        this.menuStatus = menuStatus;
     }
 
-    public void setMainMenu(Boolean isMain) {
-        this.isMain = isMain;
+    public void setMainMenu() {
+        isMain = true;
+    }
+
+    public void cancelMainMenu() {
+        isMain = false;
+    }
+
+    private static String convertToNullIfEmptyDescription(String description) {
+        return StringUtils.hasText(description) ? description : null;
     }
 }
