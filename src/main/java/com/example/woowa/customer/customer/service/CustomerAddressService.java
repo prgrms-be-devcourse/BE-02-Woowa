@@ -7,6 +7,8 @@ import com.example.woowa.customer.customer.dto.CustomerAddressUpdateRequest;
 import com.example.woowa.customer.customer.entity.Customer;
 import com.example.woowa.customer.customer.entity.CustomerAddress;
 import com.example.woowa.customer.customer.repository.CustomerAddressRepository;
+import com.example.woowa.delivery.entity.AreaCode;
+import com.example.woowa.delivery.service.AreaCodeService;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -20,12 +22,13 @@ import org.springframework.transaction.annotation.Transactional;
 public class CustomerAddressService {
     private final CustomerAddressRepository customerAddressRepository;
     private final CustomerService customerService;
+    private final AreaCodeService areaCodeService;
 
     @Transactional
     public CustomerAddressFindResponse createCustomerAddress(String loginId, CustomerAddressCreateRequest customerAddressCreateRequest) {
         Customer customer = customerService.findCustomerEntity(loginId);
-        CustomerAddress customerAddress = CustomerAddressConverter.toCustomerAddress(
-            customerAddressCreateRequest, customer);
+        AreaCode areaCode = areaCodeService.findByAddress(customerAddressCreateRequest.getDefaultAddress());
+        CustomerAddress customerAddress = CustomerAddressConverter.toCustomerAddress(areaCode, customerAddressCreateRequest, customer);
         customerAddress = customerAddressRepository.save(customerAddress);
         customer.addCustomerAddress(customerAddress);
         return CustomerAddressConverter.toCustomerAddressDto(customerAddress);
@@ -37,7 +40,7 @@ public class CustomerAddressService {
             return new ArrayList<>();
         }
         return customer.getCustomerAddresses().stream().map(CustomerAddressConverter::toCustomerAddressDto).collect(
-                Collectors.toList());
+            Collectors.toList());
     }
 
     @Transactional
@@ -45,8 +48,8 @@ public class CustomerAddressService {
         Customer customer = findCustomerAddressEntity(id).getCustomer();
         CustomerAddress customerAddress = customer.getCustomerAddresses().stream().filter((e) -> e.getId().equals(id)).findFirst().orElseThrow(() -> new RuntimeException("customer address not existed"));
         if ((customerAddressUpdateRequest.getDefaultAddress() != null) && (customerAddressUpdateRequest.getDetailAddress() != null)) {
-            customerAddress.setAddress(customerAddressUpdateRequest.getDefaultAddress(),
-                customerAddressUpdateRequest.getDetailAddress());
+            AreaCode areaCode = areaCodeService.findByAddress(customerAddressUpdateRequest.getDefaultAddress());
+            customerAddress.setAddress(areaCode, customerAddressUpdateRequest.getDetailAddress());
         }
         if (customerAddressUpdateRequest.getNickname() != null) {
             customerAddress.setNickname(customerAddressUpdateRequest.getNickname());

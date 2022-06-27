@@ -9,6 +9,8 @@ import com.example.woowa.customer.customer.entity.Customer;
 import com.example.woowa.customer.customer.entity.CustomerAddress;
 import com.example.woowa.customer.customer.repository.CustomerAddressRepository;
 import com.example.woowa.customer.customer.repository.CustomerRepository;
+import com.example.woowa.delivery.entity.AreaCode;
+import com.example.woowa.delivery.service.AreaCodeService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,12 +22,14 @@ public class CustomerService {
     private final CustomerAddressRepository customerAddressRepository;
     private final CustomerRepository customerRepository;
     private final CustomerGradeService customerGradeService;
+    private final AreaCodeService areaCodeService;
 
     @Transactional
     public CustomerFindResponse createCustomer(CustomerCreateRequest customerCreateRequest) {
         Customer customer = CustomerConverter.toCustomer(customerCreateRequest, customerGradeService.findDefaultCustomerGrade());
         customerRepository.save(customer);
-        CustomerAddress customerAddress = CustomerAddressConverter.toCustomerAddress(customerCreateRequest.getAddress(), customer);
+        AreaCode areaCode = areaCodeService.findByAddress(customerCreateRequest.getAddress().getDefaultAddress());
+        CustomerAddress customerAddress = CustomerAddressConverter.toCustomerAddress(areaCode, customerCreateRequest.getAddress(), customer);
         customerAddressRepository.save(customerAddress);
         customer.addCustomerAddress(customerAddress);
         return CustomerConverter.toCustomerDto(customer);
@@ -40,7 +44,7 @@ public class CustomerService {
     public CustomerFindResponse updateCustomer(String loginId, CustomerUpdateRequest customerUpdateRequest) {
         Customer customer = findCustomerEntity(loginId);
         if (customerUpdateRequest.getLoginPassword() != null) {
-            customer.setLoginPassword(customerUpdateRequest.getLoginPassword());
+            customer.changePassword(customerUpdateRequest.getLoginPassword());
         }
         return CustomerConverter.toCustomerDto(customer);
     }

@@ -2,6 +2,7 @@ package com.example.woowa.customer.voucher.entity;
 
 import static lombok.AccessLevel.PROTECTED;
 
+import com.example.woowa.common.base.BaseTimeEntity;
 import com.example.woowa.customer.voucher.enums.EventType;
 import com.example.woowa.customer.voucher.enums.VoucherType;
 import java.time.LocalDateTime;
@@ -21,7 +22,7 @@ import lombok.NoArgsConstructor;
 @Table(name = "voucher")
 @Getter
 @NoArgsConstructor(access = PROTECTED)
-public class Voucher {
+public class Voucher extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

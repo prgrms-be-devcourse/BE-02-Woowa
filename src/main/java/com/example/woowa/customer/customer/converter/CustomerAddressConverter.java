@@ -4,6 +4,7 @@ import com.example.woowa.customer.customer.dto.CustomerAddressCreateRequest;
 import com.example.woowa.customer.customer.dto.CustomerAddressFindResponse;
 import com.example.woowa.customer.customer.entity.Customer;
 import com.example.woowa.customer.customer.entity.CustomerAddress;
+import com.example.woowa.delivery.entity.AreaCode;
 
 public class CustomerAddressConverter {
     public static CustomerAddressFindResponse toCustomerAddressDto(CustomerAddress customerAddress) {
@@ -11,8 +12,8 @@ public class CustomerAddressConverter {
     }
 
     public static CustomerAddress toCustomerAddress(
-        CustomerAddressCreateRequest customerAddressCreateRequest, Customer customer) {
-        return new CustomerAddress(customerAddressCreateRequest.getDefaultAddress(), customerAddressCreateRequest.getDetailAddress(),
-                customerAddressCreateRequest.getNickname(), customer);
+        AreaCode areaCode, CustomerAddressCreateRequest customerAddressCreateRequest, Customer customer) {
+        return new CustomerAddress(areaCode, customerAddressCreateRequest.getDetailAddress(),
+            customerAddressCreateRequest.getNickname(), customer);
     }
 }

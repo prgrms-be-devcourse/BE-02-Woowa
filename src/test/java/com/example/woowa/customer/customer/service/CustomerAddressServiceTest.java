@@ -13,10 +13,9 @@ import com.example.woowa.customer.customer.entity.Customer;
 import com.example.woowa.customer.customer.repository.CustomerAddressRepository;
 import com.example.woowa.customer.customer.repository.CustomerGradeRepository;
 import com.example.woowa.customer.customer.repository.CustomerRepository;
-import com.example.woowa.customer.customer.service.CustomerAddressService;
-import com.example.woowa.customer.customer.service.CustomerGradeService;
-import com.example.woowa.customer.customer.service.CustomerService;
+import com.example.woowa.delivery.service.AreaCodeService;
 import java.util.List;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -44,13 +43,16 @@ class CustomerAddressServiceTest {
   @Autowired
   private CustomerAddressRepository customerAddressRepository;
 
+  @Autowired
+  private AreaCodeService areaCodeService;
+
   public void makeDefaultCustomerGrade() {
     CustomerGradeCreateRequest customerGradeCreateRequest = new CustomerGradeCreateRequest(5, "일반", 3000, 2);
     customerGradeService.createCustomerGrade(customerGradeCreateRequest);
   }
 
   public String getCustomerLoginId() {
-    CustomerAddressCreateRequest customerAddressCreateRequest = new CustomerAddressCreateRequest("서울시","동작구","집");
+    CustomerAddressCreateRequest customerAddressCreateRequest = new CustomerAddressCreateRequest("서울특별시 서초구 방배동","123-4 빌라 101호","집");
     CustomerCreateRequest customerCreateRequest = new CustomerCreateRequest("dev12","Programmers123!", "2000-01-01", customerAddressCreateRequest);
     CustomerFindResponse customerFindResponse = customerService.createCustomer(
         customerCreateRequest);
@@ -73,58 +75,58 @@ class CustomerAddressServiceTest {
   @DisplayName("고객 주소 추가")
   void createCustomerAddress() {
     Customer customer = customerService.findCustomerEntity(getCustomerLoginId());
-    CustomerAddressCreateRequest customerAddressCreateRequest = new CustomerAddressCreateRequest("서울시 동작구 상도동 101-2", "아파트 101호","집");
+    CustomerAddressCreateRequest customerAddressCreateRequest = new CustomerAddressCreateRequest("서울특별시 동작구 상도동", "아파트 101호","집");
 
     CustomerAddressFindResponse customerAddressFindResponse = customerAddressService.createCustomerAddress(customer.getLoginId(),
         customerAddressCreateRequest);
 
-    assertThat(customerAddressFindResponse.getAddress(), is("서울시 동작구 상도동 101-2 아파트 101호"));
-    assertThat(customerAddressFindResponse.getNickname(), is("집"));
+    Assertions.assertThat(customerAddressFindResponse.getAddress()).isEqualTo("서울특별시 동작구 상도동 아파트 101호");
+    Assertions.assertThat(customerAddressFindResponse.getNickname()).isEqualTo("집");
   }
 
   @Test
   @DisplayName("고객 주소 목록 조회")
   void findCustomerAddress() {
-    CustomerAddressCreateRequest customerAddressCreateRequest = new CustomerAddressCreateRequest("서울시 동작구 상도동 101-2", "아파트 101호","회사");
+    CustomerAddressCreateRequest customerAddressCreateRequest = new CustomerAddressCreateRequest("서울특별시 동작구 상도동", "아파트 101호","회사");
     String loginId = getCustomerLoginId();
 
     customerAddressService.createCustomerAddress(loginId,
         customerAddressCreateRequest);
     List<CustomerAddressFindResponse> customerAddressFindResponseList = customerAddressService.findCustomerAddresses(loginId);
 
-    assertThat(customerAddressFindResponseList.size(), is(2));
-    assertThat(customerAddressFindResponseList.get(0).getNickname(), is("집"));
-    assertThat(customerAddressFindResponseList.get(1).getNickname(), is("회사"));
+    Assertions.assertThat(customerAddressFindResponseList.size()).isEqualTo(2);
+    Assertions.assertThat(customerAddressFindResponseList.get(0).getNickname()).isEqualTo("집");
+    Assertions.assertThat(customerAddressFindResponseList.get(1).getNickname()).isEqualTo("회사");
   }
 
   @Test
   @DisplayName("고객 주소 수정")
   void updateCustomerAddress() {
     String loginId = getCustomerLoginId();
-    CustomerAddressCreateRequest customerAddressCreateRequest = new CustomerAddressCreateRequest("서울시 동작구 상도동 101-2", "아파트 101호","집");
+    CustomerAddressCreateRequest customerAddressCreateRequest = new CustomerAddressCreateRequest("서울특별시 동작구 상도동", "아파트 101호","집");
     CustomerAddressFindResponse customerAddressFindResponse = customerAddressService.createCustomerAddress(loginId,
         customerAddressCreateRequest);
 
-    CustomerAddressUpdateRequest customerAddressUpdateRequest = new CustomerAddressUpdateRequest("서울시 서초구 서초동 34-5", "빌라 201호","회사");
+    CustomerAddressUpdateRequest customerAddressUpdateRequest = new CustomerAddressUpdateRequest("서울특별시 서초구 방배동", "빌라 201호","회사");
     customerAddressService.updateCustomerAddress(customerAddressFindResponse.getId(),
         customerAddressUpdateRequest);
     List<CustomerAddressFindResponse> customerAddressFindResponseList = customerAddressService.findCustomerAddresses(loginId);
 
-    assertThat(customerAddressFindResponseList.get(1).getNickname(), is("회사"));
-    assertThat(customerAddressFindResponseList.get(1).getAddress(), is("서울시 서초구 서초동 34-5 빌라 201호"));
+    Assertions.assertThat(customerAddressFindResponseList.get(1).getNickname()).isEqualTo("회사");
+    Assertions.assertThat(customerAddressFindResponseList.get(1).getAddress()).isEqualTo("서울특별시 서초구 방배동 빌라 201호");
   }
 
   @Test
   @DisplayName("고객 주소 삭제")
   void deleteCustomerAddress() {
     String loginId = getCustomerLoginId();
-    CustomerAddressCreateRequest customerAddressCreateRequest = new CustomerAddressCreateRequest("서울시 동작구 상도동 101-2", "아파트 101호","집");
+    CustomerAddressCreateRequest customerAddressCreateRequest = new CustomerAddressCreateRequest("서울특별시 동작구 상도동", "아파트 101호","집");
     CustomerAddressFindResponse customerAddressFindResponse = customerAddressService.createCustomerAddress(loginId,
         customerAddressCreateRequest);
 
     customerAddressService.deleteCustomerAddress(customerAddressFindResponse.getId());
     List<CustomerAddressFindResponse> customerAddressFindResponseList = customerAddressService.findCustomerAddresses(loginId);
 
-    assertThat(customerAddressFindResponseList.size(), is(1));
+    Assertions.assertThat(customerAddressFindResponseList.size()).isEqualTo(1);
   }
 }

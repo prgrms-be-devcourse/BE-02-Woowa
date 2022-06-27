@@ -25,13 +25,12 @@ public class CustomerConverter {
         return customer;
     }
     public static CustomerFindResponse toCustomerDto(Customer customer) {
-        //order 엔티티에 대한 dto 변환 미구현
         CustomerGradeFindResponse customerGradeFindResponse = CustomerGradeConverter.toCustomerGradeDto(customer.getCustomerGrade());
         List<CustomerAddressFindResponse> customerAddressFindResponseList = customer.getCustomerAddresses().stream().map(CustomerAddressConverter::toCustomerAddressDto).collect(toList());
         List<ReviewFindResponse> reviewFindResponseList = customer.getReviews().stream().map(ReviewConverter::toReviewDto).collect(toList());
         List<VoucherFindResponse> voucherFindResponseList = customer.getVouchers().stream().map(VoucherConverter::toVoucherDto).collect(toList());
         return new CustomerFindResponse(customer.getLoginId(), customer.getBirthdate().toString(),
-                customer.getOrderPerMonth(), customer.getPoint(), customer.getIsIssued(),
+            customer.getOrderPerMonth(), customer.getPoint(), customer.getIsIssued(),
             customerGradeFindResponse, reviewFindResponseList,
             customerAddressFindResponseList, voucherFindResponseList);
     }
