@@ -1,5 +1,9 @@
 package com.example.woowa.restaurant.restaurant.entity;
 
+import com.example.woowa.delivery.entity.AreaCode;
+import com.example.woowa.delivery.entity.DeliveryArea;
+import com.example.woowa.restaurant.menucategory.entity.MenuCategory;
+
 import com.example.woowa.restaurant.menugroup.entity.MenuGroup;
 import com.example.woowa.restaurant.restaurntat_category.entity.RestaurantCategory;
 import java.time.LocalTime;
@@ -33,6 +37,9 @@ public class Restaurant {
     @OneToMany(mappedBy = "restaurant", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<RestaurantCategory> restaurantCategories = new ArrayList<>();
 
+    @OneToMany(mappedBy = "restaurant")
+    private List<DeliveryArea> deliveryAreas = new ArrayList<>();
+
     @Column(nullable = false)
     private String name;
 
@@ -60,6 +67,7 @@ public class Restaurant {
     @Column(nullable = false)
     private String address;
 
+
     private Restaurant(String name, String businessNumber, LocalTime openingTime,
             LocalTime closingTime,
             Boolean isOpen, String phoneNumber, String description, String address) {
@@ -74,6 +82,7 @@ public class Restaurant {
         this.reviewCount = 0;
         this.averageReviewScore = 0.0D;
     }
+
 
     public static Restaurant createRestaurant(String name, String businessNumber,
             LocalTime openingTime, LocalTime closingTime, Boolean isOpen, String phoneNumber,
@@ -116,6 +125,10 @@ public class Restaurant {
         this.reviewCount = reviewCount;
     }
 
+    public void addDeliveryArea(DeliveryArea deliveryArea) {
+        deliveryAreas.add(deliveryArea);
+    }
+  
     public void addRestaurantCategory(RestaurantCategory restaurantCategory) {
         restaurantCategories.add(restaurantCategory);
     }
