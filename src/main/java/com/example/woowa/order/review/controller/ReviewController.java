@@ -5,6 +5,7 @@ import com.example.woowa.order.review.dto.ReviewFindResponse;
 import com.example.woowa.order.review.dto.ReviewUpdateRequest;
 import com.example.woowa.order.review.service.ReviewService;
 
+import java.util.List;
 import javax.validation.Valid;
 
 import lombok.RequiredArgsConstructor;
@@ -29,8 +30,13 @@ public class ReviewController {
     }
 
     @GetMapping("/{id}")
-    public ReviewFindResponse readReview(@PathVariable Long id) {
+    public ReviewFindResponse findReview(@PathVariable Long id) {
         return reviewService.findReview(id);
+    }
+
+    @GetMapping("/{loginId}")
+    public List<ReviewFindResponse> findUserReview(@PathVariable String loginId) {
+        return reviewService.findUserReview(loginId);
     }
 
     @PutMapping("/{id}")

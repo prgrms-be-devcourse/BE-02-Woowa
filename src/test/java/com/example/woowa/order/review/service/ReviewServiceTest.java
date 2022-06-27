@@ -18,6 +18,7 @@ import com.example.woowa.order.review.dto.ReviewFindResponse;
 import com.example.woowa.order.review.dto.ReviewUpdateRequest;
 import com.example.woowa.order.review.enums.ScoreType;
 import com.example.woowa.order.review.repository.ReviewRepository;
+import java.util.List;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -86,28 +87,6 @@ class ReviewServiceTest {
     assertThat(reviewFindResponse.getScoreType(), is(ScoreType.FIVE.getValue()));
   }
 
-//  @Test
-//  @DisplayName("잘못된 리뷰 생성 - 글자 수 부족")
-//  void createReviewFail1() {
-//    String customerId = getCustomerLoginId();
-//    ReviewCreateRequest reviewCreateRequest = new ReviewCreateRequest("맛있습니다.", 5);
-//
-//    assertThrows(AssertionError.class, ()-> {
-//      reviewService.createReview(customerId, null, reviewCreateRequest);
-//    });
-//  }
-//
-//  @Test
-//  @DisplayName("잘못된 리뷰 생성 - 별점 에러")
-//  void createReviewFail2() {
-//    String customerId = getCustomerLoginId();
-//    ReviewCreateRequest reviewCreateRequest = new ReviewCreateRequest("정말정말 맛있습니다.", 0);
-//
-//    assertThrows(AssertionError.class, ()-> {
-//      reviewService.createReview(customerId, null, reviewCreateRequest);
-//    });
-//  }
-
   @Test
   @DisplayName("리뷰 조회")
   void findReview() {
@@ -119,6 +98,19 @@ class ReviewServiceTest {
 
     assertThat(reviewFindResponse.getContent(), is("정말정말 맛있습니다."));
     assertThat(reviewFindResponse.getScoreType(), is(ScoreType.FIVE.getValue()));
+  }
+
+  @Test
+  @DisplayName("유저 리뷰 목록 조회")
+  void findUserReview() {
+    String customerId = getCustomerLoginId();
+    ReviewCreateRequest reviewCreateRequest = new ReviewCreateRequest("정말정말 맛있습니다.", 5);
+    reviewService.createReview(customerId, null, reviewCreateRequest);
+
+    List<ReviewFindResponse> reviews = reviewService.findUserReview(customerId);
+
+    assertThat(reviews.get(0).getContent(), is("정말정말 맛있습니다."));
+    assertThat(reviews.get(0).getScoreType(), is(ScoreType.FIVE.getValue()));
   }
 
   @Test

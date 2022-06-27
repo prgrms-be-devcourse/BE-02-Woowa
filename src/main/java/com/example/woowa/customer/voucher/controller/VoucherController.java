@@ -41,8 +41,13 @@ public class VoucherController {
     }
 
     @GetMapping("/{id}")
-    public VoucherFindResponse readVoucher(@PathVariable Long id) {
+    public VoucherFindResponse findVoucher(@PathVariable Long id) {
         return voucherService.findVoucher(id);
+    }
+
+    @GetMapping("/{loginId}")
+    public List<VoucherFindResponse> findUserVoucher(@PathVariable String loginId) {
+        return voucherService.findUserVoucher(loginId);
     }
 
     @DeleteMapping("/{loginId}/{id}")

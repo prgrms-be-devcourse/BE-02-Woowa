@@ -13,6 +13,7 @@ import com.example.woowa.customer.voucher.repository.VoucherRepository;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -46,7 +47,6 @@ public class VoucherService {
 
     @Transactional
     public VoucherFindResponse registerVoucher(String customerLoginId, String code) {
-        List<VoucherFindResponse> result = new ArrayList<>();
         Voucher voucher = voucherRepository.findByCode(code).orElseThrow(()-> new RuntimeException("voucher not existed"));
         if (LocalDateTime.now().isBefore(voucher.getExpirationDate())) {
             Customer customer = customerService.findCustomerEntity(customerLoginId);
@@ -63,15 +63,24 @@ public class VoucherService {
     }
 
     public VoucherFindResponse findVoucher(Long id) {
-        Voucher voucher = voucherRepository.findById(id).orElseThrow(() -> new RuntimeException("voucher not existed"));
+        Voucher voucher = findVoucherEntity(id);
         return VoucherConverter.toVoucherDto(voucher);
+    }
+
+    public List<VoucherFindResponse> findUserVoucher(String customerLoginId) {
+        Customer customer = customerService.findCustomerEntity(customerLoginId);
+        return customer.getVouchers().stream().map(VoucherConverter::toVoucherDto).collect(Collectors.toList());
     }
 
     @Transactional
     public void deleteVoucher(String customerLoginId, Long id) {
-        Voucher voucher = voucherRepository.findById(id).orElseThrow(() -> new RuntimeException("voucher not existed"));
+        Voucher voucher = findVoucherEntity(id);
         Customer customer = customerService.findCustomerEntity(customerLoginId);
         customer.removeVoucher(voucher);
         voucherRepository.deleteById(id);
+    }
+
+    private Voucher findVoucherEntity(Long id) {
+        return voucherRepository.findById(id).orElseThrow(() -> new RuntimeException("voucher not existed"));
     }
 }

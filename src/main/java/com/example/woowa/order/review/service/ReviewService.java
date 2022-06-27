@@ -8,6 +8,8 @@ import com.example.woowa.order.review.dto.ReviewFindResponse;
 import com.example.woowa.order.review.dto.ReviewUpdateRequest;
 import com.example.woowa.order.review.entity.Review;
 import com.example.woowa.order.review.repository.ReviewRepository;
+import java.util.List;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,6 +24,7 @@ public class ReviewService {
     @Transactional
     public ReviewFindResponse createReview(String loginId, Long orderId, ReviewCreateRequest reviewCreateRequest) {
         Customer customer = customerService.findCustomerEntity(loginId);
+        //order랑 연결 필요!!
         Review review = ReviewConverter.toReview(reviewCreateRequest, customer, null);
         review = reviewRepository.save(review);
         customer.addReview(review);
@@ -31,6 +34,11 @@ public class ReviewService {
     public ReviewFindResponse findReview(Long id) {
         Review review = findReviewEntity(id);
         return ReviewConverter.toReviewDto(review);
+    }
+
+    public List<ReviewFindResponse> findUserReview(String loginId) {
+        Customer customer = customerService.findCustomerEntity(loginId);
+        return customer.getReviews().stream().map(ReviewConverter::toReviewDto).collect(Collectors.toList());
     }
 
     @Transactional

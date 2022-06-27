@@ -93,9 +93,9 @@ class VoucherServiceTest {
         EventType.SPECIAL.toString(), 3000, "2022-12-01 12:00");
     VoucherFindResponse voucherFindResponse = voucherService.createVoucher(voucherCreateRequest);
     String customerId = getCustomerLoginId();
-
     voucherService.registerVoucher(customerId, voucherFindResponse.getCode());
-    List<VoucherFindResponse> vouchers  = customerService.findCustomer(customerId).getVouchers();
+
+    List<VoucherFindResponse> vouchers  = voucherService.findUserVoucher(customerId);
 
     assertThat(vouchers.get(0).getVoucherType(), is(VoucherType.FiXED.toString()));
     assertThat(vouchers.get(0).getEventType(), is(EventType.SPECIAL.toString()));
@@ -131,6 +131,23 @@ class VoucherServiceTest {
     assertThat(voucherFindResponse1.getExpirationDate(), is(LocalDateTime.of(2022, 12, 1, 12, 0)));
   }
 
+
+  @Test
+  @DisplayName("유저 보유 쿠폰 목록 조회")
+  void findUserVoucher() throws Exception {
+    VoucherCreateRequest voucherCreateRequest = new VoucherCreateRequest(VoucherType.FiXED.toString(),
+        EventType.SPECIAL.toString(), 3000, "2022-12-01 12:00");
+    VoucherFindResponse voucherFindResponse = voucherService.createVoucher(voucherCreateRequest);
+    String customerId = getCustomerLoginId();
+    voucherService.registerVoucher(customerId, voucherFindResponse.getCode());
+
+    List<VoucherFindResponse> vouchers  = voucherService.findUserVoucher(customerId);
+
+    assertThat(vouchers.get(0).getVoucherType(), is(VoucherType.FiXED.toString()));
+    assertThat(vouchers.get(0).getEventType(), is(EventType.SPECIAL.toString()));
+    assertThat(vouchers.get(0).getDiscountValue(), is(3000));
+  }
+
   @Test
   @DisplayName("쿠폰 삭제")
   void deleteVoucher() throws Exception {
@@ -145,4 +162,5 @@ class VoucherServiceTest {
 
     assertThat(vouchers.size(), is(0));
   }
+
 }
