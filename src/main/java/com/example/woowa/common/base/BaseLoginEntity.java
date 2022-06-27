@@ -53,4 +53,9 @@ public abstract class BaseLoginEntity extends BaseTimeEntity {
         this.lastLoginedAt = lastLoginedAt;
     }
 
+    public BaseLoginEntity(String loginId, String password) {
+        this.loginId = loginId;
+        this.password = password;
+        this.lastLoginedAt = LocalDateTime.now();
+    }
 }

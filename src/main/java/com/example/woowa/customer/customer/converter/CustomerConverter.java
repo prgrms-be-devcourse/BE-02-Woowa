@@ -2,32 +2,37 @@ package com.example.woowa.customer.customer.converter;
 
 import static java.util.stream.Collectors.toList;
 
-import com.example.woowa.customer.customer.dto.CreateCustomerDto;
-import com.example.woowa.customer.customer.dto.CustomerAddressDto;
-import com.example.woowa.customer.customer.dto.CustomerDto;
-import com.example.woowa.customer.customer.dto.CustomerGradeDto;
+import com.example.woowa.customer.customer.dto.CustomerAddressFindResponse;
+import com.example.woowa.customer.customer.dto.CustomerCreateRequest;
+import com.example.woowa.customer.customer.dto.CustomerFindResponse;
+import com.example.woowa.customer.customer.dto.CustomerGradeFindResponse;
 import com.example.woowa.customer.customer.entity.Customer;
 import com.example.woowa.customer.customer.entity.CustomerGrade;
-import com.example.woowa.order.review.converter.ReviewConverter;
-import com.example.woowa.order.review.dto.ReviewDto;
 import com.example.woowa.customer.voucher.converter.VoucherConverter;
-import com.example.woowa.customer.voucher.dto.VoucherDto;
-
+import com.example.woowa.customer.voucher.dto.VoucherFindResponse;
+import com.example.woowa.order.review.converter.ReviewConverter;
+import com.example.woowa.order.review.dto.ReviewFindResponse;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 public class CustomerConverter {
 
-    public static Customer toCustomer(CreateCustomerDto createCustomerDto, CustomerGrade customerGrade) {
-        return new Customer(createCustomerDto.getLoginId(), createCustomerDto.getLoginPassword(),
-                createCustomerDto.getBirthdate(), customerGrade);
+    public static Customer toCustomer(CustomerCreateRequest customerCreateRequest, CustomerGrade customerGrade) {
+        LocalDate localDate = LocalDate.parse(customerCreateRequest.getBirthdate(), DateTimeFormatter.ISO_DATE);
+        Customer customer = new Customer(customerCreateRequest.getLoginId(), customerCreateRequest.getLoginPassword(),
+            localDate, customerGrade);
+        return customer;
     }
-
-    public static CustomerDto toCustomerDto(Customer customer) {
-        CustomerGradeDto customerGradeDto = CustomerGradeConverter.toCustomerGradeDto(customer.getCustomerGrade());
-        List<CustomerAddressDto> customerAddressDtoList = customer.getCustomerAddresses().stream().map(CustomerAddressConverter::toCustomerAddressDto).collect(toList());
-        List<ReviewDto> reviewDtoList = customer.getReviews().stream().map(ReviewConverter::toReviewDto).collect(toList());
-        List<VoucherDto> voucherDtoList = customer.getVouchers().stream().map(VoucherConverter::toVoucherDto).collect(toList());
-        return new CustomerDto(customer.getLoginId(), customer.getBirthdate().toString(),
-                customer.getOrderPerMonth(), customer.getPoint(), customerGradeDto, reviewDtoList, customerAddressDtoList, voucherDtoList);
+    public static CustomerFindResponse toCustomerDto(Customer customer) {
+        //order 엔티티에 대한 dto 변환 미구현
+        CustomerGradeFindResponse customerGradeFindResponse = CustomerGradeConverter.toCustomerGradeDto(customer.getCustomerGrade());
+        List<CustomerAddressFindResponse> customerAddressFindResponseList = customer.getCustomerAddresses().stream().map(CustomerAddressConverter::toCustomerAddressDto).collect(toList());
+        List<ReviewFindResponse> reviewFindResponseList = customer.getReviews().stream().map(ReviewConverter::toReviewDto).collect(toList());
+        List<VoucherFindResponse> voucherFindResponseList = customer.getVouchers().stream().map(VoucherConverter::toVoucherDto).collect(toList());
+        return new CustomerFindResponse(customer.getLoginId(), customer.getBirthdate().toString(),
+                customer.getOrderPerMonth(), customer.getPoint(), customer.getIsIssued(),
+            customerGradeFindResponse, reviewFindResponseList,
+            customerAddressFindResponseList, voucherFindResponseList);
     }
 }

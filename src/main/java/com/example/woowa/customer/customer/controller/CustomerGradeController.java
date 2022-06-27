@@ -1,8 +1,8 @@
 package com.example.woowa.customer.customer.controller;
 
-import com.example.woowa.customer.customer.dto.CreateCustomerGradeDto;
-import com.example.woowa.customer.customer.dto.CustomerGradeDto;
-import com.example.woowa.customer.customer.dto.UpdateCustomerGradeDto;
+import com.example.woowa.customer.customer.dto.CustomerGradeCreateRequest;
+import com.example.woowa.customer.customer.dto.CustomerGradeFindResponse;
+import com.example.woowa.customer.customer.dto.CustomerGradeUpdateRequest;
 import com.example.woowa.customer.customer.service.CustomerGradeService;
 
 import javax.validation.Valid;
@@ -21,20 +21,20 @@ import org.springframework.web.bind.annotation.RestController;
 @AllArgsConstructor
 @RequestMapping("/api/v1/customers/grades")
 public class CustomerGradeController {
-    private CustomerGradeService customerGradeService;
+    private final CustomerGradeService customerGradeService;
 
     @PostMapping
-    public CustomerGradeDto createCustomerGrade(@RequestBody @Valid CreateCustomerGradeDto createCustomerGradeDto) {
-        return customerGradeService.createCustomerGrade(createCustomerGradeDto);
+    public CustomerGradeFindResponse createCustomerGrade(@RequestBody @Valid CustomerGradeCreateRequest customerGradeCreateRequest) {
+        return customerGradeService.createCustomerGrade(customerGradeCreateRequest);
     }
 
     @GetMapping("/{id}")
-    public CustomerGradeDto readCustomerGrade(@PathVariable Long id) {
+    public CustomerGradeFindResponse readCustomerGrade(@PathVariable Long id) {
         return customerGradeService.findCustomerGrade(id);
     }
 
     @PutMapping("/{id}")
-    public CustomerGradeDto updateCustomerGrade(@PathVariable Long id, @RequestBody @Valid UpdateCustomerGradeDto updateCustomerGradeDto) {
+    public CustomerGradeFindResponse updateCustomerGrade(@PathVariable Long id, @RequestBody @Valid CustomerGradeUpdateRequest updateCustomerGradeDto) {
         return customerGradeService.updateCustomerGrade(id, updateCustomerGradeDto);
     }
 

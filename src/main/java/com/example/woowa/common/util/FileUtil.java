@@ -3,6 +3,7 @@ package com.example.woowa.common.util;
 import com.example.woowa.delivery.entity.AreaCode;
 
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -17,14 +18,12 @@ public class FileUtil {
 
         try {
             File file = new File(fileUrl);
-            reader = new BufferedReader(new InputStreamReader(new FileInputStream(file), "euc-kr"));
+            reader = new BufferedReader(new InputStreamReader(new FileInputStream(file), StandardCharsets.UTF_8));
             reader.readLine();
             while ((line = reader.readLine()) != null) {
                 String[] split = line.split("\t");
                 areaCodeList.add(new AreaCode(split[0], split[1], parseAbolish(split[2])));
             }
-        } catch (FileNotFoundException | UnsupportedEncodingException e) {
-            e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
         }

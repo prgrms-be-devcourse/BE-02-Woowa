@@ -1,10 +1,15 @@
 package com.example.woowa.restaurant.restaurant.entity;
 
+import com.example.woowa.delivery.entity.AreaCode;
+import com.example.woowa.delivery.entity.DeliveryArea;
 import com.example.woowa.restaurant.menucategory.entity.MenuCategory;
 
+import com.example.woowa.restaurant.menugroup.entity.MenuGroup;
+import com.example.woowa.restaurant.restaurntat_category.entity.RestaurantCategory;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -12,7 +17,6 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
-
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -28,7 +32,13 @@ public class Restaurant {
     private Long id;
 
     @OneToMany(mappedBy = "restaurant")
-    private List<MenuCategory> menuCategories = new ArrayList<>();
+    private List<MenuGroup> menuGroups = new ArrayList<>();
+
+    @OneToMany(mappedBy = "restaurant", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<RestaurantCategory> restaurantCategories = new ArrayList<>();
+
+    @OneToMany(mappedBy = "restaurant")
+    private List<DeliveryArea> deliveryAreas = new ArrayList<>();
 
     @Column(nullable = false)
     private String name;
@@ -57,9 +67,10 @@ public class Restaurant {
     @Column(nullable = false)
     private String address;
 
+
     private Restaurant(String name, String businessNumber, LocalTime openingTime,
-                      LocalTime closingTime,
-                      Boolean isOpen, String phoneNumber, String description, String address) {
+            LocalTime closingTime,
+            Boolean isOpen, String phoneNumber, String description, String address) {
         this.name = name;
         this.businessNumber = businessNumber;
         this.openingTime = openingTime;
@@ -72,23 +83,29 @@ public class Restaurant {
         this.averageReviewScore = 0.0D;
     }
 
+
     public static Restaurant createRestaurant(String name, String businessNumber,
-                                       LocalTime openingTime, LocalTime closingTime, Boolean isOpen, String phoneNumber,
-                                       String description, String address) {
+            LocalTime openingTime, LocalTime closingTime, Boolean isOpen, String phoneNumber,
+            String description, String address) throws IllegalArgumentException {
+        validateBusinessHours(openingTime, closingTime);
+
         return new Restaurant(name, businessNumber, openingTime, closingTime, isOpen, phoneNumber,
                 description, address);
     }
 
-    public void changeOpiningTime(LocalTime openingTime) {
+    public void updateBusinessHours(LocalTime openingTime, LocalTime closingTime)
+            throws IllegalArgumentException {
+        validateBusinessHours(openingTime, closingTime);
         this.openingTime = openingTime;
-    }
-
-    public void changeClosingTime(LocalTime closingTime) {
         this.closingTime = closingTime;
     }
 
-    public void changeOpenStatus(Boolean isOpen) {
-        this.isOpen = isOpen;
+    public void openRestaurant() {
+        this.isOpen = true;
+    }
+
+    public void closeRestaurant() {
+        this.isOpen = false;
     }
 
     public void changePhoneNumber(String phoneNumber) {
@@ -106,5 +123,20 @@ public class Restaurant {
     public void changeReviewInfo(Double averageReviewScore, Integer reviewCount) {
         this.averageReviewScore = averageReviewScore;
         this.reviewCount = reviewCount;
+    }
+
+    public void addDeliveryArea(DeliveryArea deliveryArea) {
+        deliveryAreas.add(deliveryArea);
+    }
+  
+    public void addRestaurantCategory(RestaurantCategory restaurantCategory) {
+        restaurantCategories.add(restaurantCategory);
+    }
+
+    private static void validateBusinessHours(LocalTime openingTime, LocalTime closingTime)
+            throws IllegalArgumentException {
+        if (closingTime.equals(openingTime)) {
+            throw new IllegalArgumentException("openingTime 과 closingTime 은 같을 수 없습니다.");
+        }
     }
 }

@@ -2,6 +2,7 @@ package com.example.woowa.customer.customer.entity;
 
 import static lombok.AccessLevel.PROTECTED;
 
+import com.example.woowa.order.order.entity.Order;
 import com.example.woowa.order.review.entity.Review;
 import com.example.woowa.customer.voucher.entity.Voucher;
 
@@ -42,6 +43,12 @@ public class Customer {
     @Column(columnDefinition = "INT DEFAULT 0")
     private Integer orderPerMonth;
 
+    @Column(columnDefinition = "INT DEFAULT 0")
+    private Integer orderPerLastMonth;
+
+    @Column(nullable = false, columnDefinition = "BOOLEAN DEFAULT FALSE")
+    private Boolean isIssued;
+
     @Column(nullable = false)
     private LocalDate birthdate;
 
@@ -52,25 +59,26 @@ public class Customer {
     @JoinColumn(name = "customer_grade_id", nullable = false)
     private CustomerGrade customerGrade;
 
-    @OneToMany(mappedBy = "customer")
+    @OneToMany(mappedBy = "customer", orphanRemoval = true)
     private List<Review> reviews = new ArrayList<>();
 
-    @OneToMany(mappedBy = "customer")
+    @OneToMany(mappedBy = "customer", orphanRemoval = true)
     private List<CustomerAddress> customerAddresses = new ArrayList<>();
 
-    @OneToMany
+    @OneToMany(orphanRemoval = true)
     private List<Voucher> vouchers = new ArrayList<>();
 
-    public Customer(String loginId, String loginPassword, String birthdate,
+    @OneToMany(mappedBy = "customer")
+    private List<Order> orders = new ArrayList<>();
+
+    public Customer(String loginId, String loginPassword, LocalDate birthdate,
                     CustomerGrade customerGrade) {
-        assert Pattern.matches("^(?=.*\\d)(?=.*[a-zA-Z])[a-zA-z0-9]{5,10}$", loginId);
-        assert Pattern.matches("^(?=.*\\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[!,@,#,$,%]).{8,}$", loginPassword);
-        assert Pattern.matches("^(19|20)\\d{2}[-](0?[1-9]|1[0-2])[-](0?[1-9]|[12]\\d|3[01])$", birthdate);
-        assert customerGrade != null;
         this.loginId = loginId;
         this.loginPassword = loginPassword;
         this.orderPerMonth = 0;
-        this.birthdate = LocalDate.parse(birthdate, DateTimeFormatter.ISO_DATE);
+        this.orderPerLastMonth = 0;
+        this.isIssued = false;
+        this.birthdate = birthdate;
         this.point = 0;
         this.customerGrade = customerGrade;
     }
@@ -80,12 +88,32 @@ public class Customer {
         this.loginPassword = loginPassword;
     }
 
-    public void initOrderPerMonth() {
+    public void updateCustomerStatusOnFirstDay() {
+        this.orderPerLastMonth = this.orderPerMonth;
         this.orderPerMonth = 0;
+        this.isIssued = false;
+    }
+
+    public void updateCustomerStatusWhenOrder(int plusPoint) {
+        addOrderPerMonth();
+        addPoint(plusPoint);
+    }
+
+    public void updateCustomerStatusWhenOrderCancel(int minusPoint) {
+        minusOrderPerMonth();
+        usePoint(minusPoint);
     }
 
     public void addOrderPerMonth() {
-        this.orderPerMonth += 1;
+        ++this.orderPerMonth;
+    }
+
+    public void minusOrderPerMonth() {
+        --this.orderPerMonth;
+    }
+
+    public void useMonthlyCoupon() {
+        this.isIssued = true;
     }
 
     public void usePoint(int point) {
@@ -101,12 +129,21 @@ public class Customer {
         this.customerGrade = customerGrade;
     }
 
+    public void setIsIssued(boolean value) {
+        this.isIssued = value;
+    }
+
     public void addReview(Review review) {
         this.reviews.add(review);
     }
 
     public void removeReview(Review review) {
         this.reviews.remove(review);
+    }
+
+    public List<CustomerAddress> getCustomerAddresses() {
+        //주문 엔티티 목록을 발생 시간 순서로 정렬하고 거기에서 차례대로 주소 목록을 가져온다.
+        return customerAddresses;
     }
 
     public void addCustomerAddress(CustomerAddress customerAddress) {
@@ -123,5 +160,9 @@ public class Customer {
 
     public void removeVoucher(Voucher voucher) {
         this.vouchers.remove(voucher);
+    }
+
+    public void addOrder(Order order) {
+        this.customerAddresses.remove(order);
     }
 }
