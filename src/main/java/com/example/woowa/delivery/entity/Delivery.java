@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "delivery")
@@ -35,7 +36,7 @@ public class Delivery {
     private DeliveryStatus deliveryStatus;
 
     @Column(nullable = false)
-    private LocalDate arrivalTime;
+    private int arrivalTime;
 
     @OneToOne(fetch = FetchType.LAZY)
     private Order order;
