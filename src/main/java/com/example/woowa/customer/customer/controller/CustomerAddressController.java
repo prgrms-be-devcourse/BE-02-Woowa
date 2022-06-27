@@ -1,8 +1,8 @@
 package com.example.woowa.customer.customer.controller;
 
-import com.example.woowa.customer.customer.dto.UpdateCustomerAddressDto;
-import com.example.woowa.customer.customer.dto.CreateCustomerAddressDto;
-import com.example.woowa.customer.customer.dto.CustomerAddressDto;
+import com.example.woowa.customer.customer.dto.CustomerAddressUpdateRequest;
+import com.example.woowa.customer.customer.dto.CustomerAddressCreateRequest;
+import com.example.woowa.customer.customer.dto.CustomerAddressFindResponse;
 import com.example.woowa.customer.customer.service.CustomerAddressService;
 import com.example.woowa.customer.customer.service.CustomerService;
 
@@ -25,27 +25,27 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/customers/addresses")
 public class CustomerAddressController {
-    private CustomerAddressService customerAddressService;
-    private CustomerService customerService;
+    private final CustomerAddressService customerAddressService;
+    private final CustomerService customerService;
 
     @PostMapping("/{loginId}")
-    public CustomerAddressDto createCustomerAddress(@PathVariable String loginId, @RequestBody @Valid CreateCustomerAddressDto createCustomerAddressDto) {
-        return customerAddressService.createCustomerAddress(loginId, createCustomerAddressDto);
+    public CustomerAddressFindResponse createCustomerAddress(@PathVariable String loginId, @RequestBody @Valid CustomerAddressCreateRequest customerAddressCreateRequest) {
+        return customerAddressService.createCustomerAddress(loginId, customerAddressCreateRequest);
     }
 
     @GetMapping("/{loginId}")
-    public List<CustomerAddressDto> readCustomerAddress(@PathVariable String loginId) {
-        return customerAddressService.findCustomerAddress(loginId);
+    public List<CustomerAddressFindResponse> readCustomerAddresses(@PathVariable String loginId) {
+        return customerAddressService.findCustomerAddresses(loginId);
     }
 
-    @PutMapping("/{loginId}/{addressId}")
-    public CustomerAddressDto updateCustomerAddress(@PathVariable String loginId, @PathVariable Long addressId, @RequestBody @Valid UpdateCustomerAddressDto updateCustomerAddressDto) {
-        return customerAddressService.updateCustomerAddress(loginId, addressId, updateCustomerAddressDto);
+    @PutMapping("/{id}")
+    public CustomerAddressFindResponse updateCustomerAddress(@PathVariable Long id, @RequestBody @Valid CustomerAddressUpdateRequest customerAddressUpdateRequest) {
+        return customerAddressService.updateCustomerAddress(id, customerAddressUpdateRequest);
     }
 
-    @DeleteMapping("/{loginId}/{addressId}")
-    public String deleteCustomerAddress(@PathVariable String loginId, @PathVariable Long addressId) {
-        customerAddressService.deleteCustomerAddress(loginId, addressId);
-        return "delete id - " + addressId;
+    @DeleteMapping("/{id}")
+    public String deleteCustomerAddress(@PathVariable Long id) {
+        customerAddressService.deleteCustomerAddress(id);
+        return "delete id - " + id;
     }
 }

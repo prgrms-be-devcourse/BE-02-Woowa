@@ -2,8 +2,8 @@ package com.example.woowa.customer.voucher.entity;
 
 import static lombok.AccessLevel.PROTECTED;
 
+import com.example.woowa.customer.voucher.enums.EventType;
 import com.example.woowa.customer.voucher.enums.VoucherType;
-
 import java.time.LocalDateTime;
 import java.util.UUID;
 import javax.persistence.Column;
@@ -14,7 +14,6 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
-
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -23,6 +22,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor(access = PROTECTED)
 public class Voucher {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -30,6 +30,10 @@ public class Voucher {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private VoucherType voucherType;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private EventType eventType;
 
     @Column(nullable = false)
     private Integer discountValue;
@@ -43,21 +47,25 @@ public class Voucher {
     @Column(nullable = false, unique = true)
     private String code;
 
-    public Voucher(VoucherType voucherType, Integer discountValue, LocalDateTime expirationDate) {
-        assert voucherType.isValidAmount(discountValue);
-        assert expirationDate != null;
-        assert !code.isBlank();
+    public Voucher(VoucherType voucherType, EventType eventType, Integer discountValue, LocalDateTime expirationDate) {
         this.voucherType = voucherType;
+        this.eventType = eventType;
         this.discountValue = discountValue;
         this.expirationDate = expirationDate;
         this.code = UUID.randomUUID().toString();
+        this.isUse = false;
     }
 
-    public String getVoucherType() {
-        return voucherType.toString();
+    public EventType getEventType() {
+        return eventType;
+    }
+
+    public VoucherType getVoucherType() {
+        return voucherType;
     }
 
     public void setVoucherType(VoucherType voucherType) {
+        assert voucherType != null;
         this.voucherType = voucherType;
     }
 
@@ -67,6 +75,7 @@ public class Voucher {
     }
 
     public void setExpirationDate(LocalDateTime expirationDate) {
+        assert expirationDate != null;
         assert expirationDate.isAfter(LocalDateTime.now());
         this.expirationDate = expirationDate;
     }

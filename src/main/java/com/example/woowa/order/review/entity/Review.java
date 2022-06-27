@@ -2,6 +2,7 @@ package com.example.woowa.order.review.entity;
 
 import static lombok.AccessLevel.PROTECTED;
 
+import com.example.woowa.order.order.entity.Order;
 import com.example.woowa.order.review.enums.ScoreType;
 import com.example.woowa.customer.customer.entity.Customer;
 
@@ -37,13 +38,18 @@ public class Review {
     private ScoreType scoreType;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(nullable = false)
+    @JoinColumn(nullable = true)
     private Customer customer;
 
-    public Review(String content, int scoreType, Customer customer) {
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(nullable = true)
+    private Order order;
+
+    public Review(String content, ScoreType scoreType, Customer customer, Order order) {
         this.content = content;
-        this.scoreType = ScoreType.of(scoreType);
+        this.scoreType = scoreType;
         this.customer = customer;
+        this.order = order;
     }
 
     public int getScoreType() {

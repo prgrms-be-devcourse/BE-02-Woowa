@@ -1,20 +1,14 @@
 package com.example.woowa.customer.customer.dto;
 
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.Positive;
-
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public class UpdateCustomerGradeDto {
-    @Positive
+public class CustomerGradeFindResponse {
+    private Long id;
     private Integer orderCount;
-    @NotBlank
     private String grade;
-    @Positive
     private Integer discountPrice;
-    @Positive
     private Integer voucherCount;
 }
