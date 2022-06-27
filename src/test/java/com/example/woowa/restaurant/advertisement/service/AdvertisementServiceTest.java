@@ -64,7 +64,7 @@ class AdvertisementServiceTest {
         Long advertisementId = advertisementService.createAdvertisement("울트라콜", UnitType.PER_ORDER,
             RateType.PERCENT, 7, "test ad");
 
-        Advertisement advertisement = advertisementService.findAdvertisementByName("울트라콜");
+        Advertisement advertisement = advertisementService.findAdvertisementByTitle("울트라콜");
 
         assertThat(advertisement.getId()).isEqualTo(advertisementId);
     }
@@ -95,7 +95,7 @@ class AdvertisementServiceTest {
 
         advertisementService.includeRestaurantInAdvertisement(advertisementId, restaurant.getId());
 
-        List<Restaurant> restaurants = advertisementService.findRestaurantByAdvertisementName("울트라콜");
+        List<Restaurant> restaurants = advertisementService.findRestaurantByAdvertisementTitle("울트라콜");
         assertThat(restaurants.get(0).getId()).isEqualTo(restaurant.getId());
     }
 
@@ -105,11 +105,11 @@ class AdvertisementServiceTest {
         Long advertisementId = advertisementService.createAdvertisement("울트라콜", UnitType.PER_ORDER,
             RateType.PERCENT, 7, "test ad");
 
-        advertisementService.changeAdvertisementName(advertisementId, "오픈리스트");
+        advertisementService.changeAdvertisementTitle(advertisementId, "오픈리스트");
         Advertisement advertisement = advertisementService.findAdvertisementById(
             advertisementId);
 
-        assertThat(advertisement.getName()).isEqualTo("오픈리스트");
+        assertThat(advertisement.getTitle()).isEqualTo("오픈리스트");
     }
 
     @Test

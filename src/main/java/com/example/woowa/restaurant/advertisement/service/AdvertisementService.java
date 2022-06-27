@@ -25,8 +25,8 @@ public class AdvertisementService {
     private final RestaurantService restaurantService;
 
     @Transactional
-    public Long createAdvertisement(String name, UnitType unitType, RateType rateType, Integer rate, String description) {
-        return advertisementRepository.save(new Advertisement(name, unitType, rateType, rate, description)).getId();
+    public Long createAdvertisement(String title, UnitType unitType, RateType rateType, Integer rate, String description) {
+        return advertisementRepository.save(new Advertisement(title, unitType, rateType, rate, description)).getId();
     }
 
     public List<Advertisement> findAdvertisements() {
@@ -38,8 +38,8 @@ public class AdvertisementService {
             .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 광고 아이디입니다."));
     }
 
-    public Advertisement findAdvertisementByName(String advertisementName) {
-        return advertisementRepository.findAdvertisementByName(advertisementName)
+    public Advertisement findAdvertisementByTitle(String advertisementTitle) {
+        return advertisementRepository.findAdvertisementByTitle(advertisementTitle)
             .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 광고 이름입니다."));
     }
 
@@ -49,20 +49,20 @@ public class AdvertisementService {
             .collect(Collectors.toList());
     }
 
-    public List<Restaurant> findRestaurantByAdvertisementName(String advertisementName) {
-        return findAdvertisementByName(advertisementName).getRestaurantAdvertisements().stream()
+    public List<Restaurant> findRestaurantByAdvertisementTitle(String advertisementTitle) {
+        return findAdvertisementByTitle(advertisementTitle).getRestaurantAdvertisements().stream()
             .map(RestaurantAdvertisement::getRestaurant)
             .collect(Collectors.toList());
     }
 
     @Transactional
-    public void changeAdvertisementName(Long advertisementId, String advertisementName) {
-        findAdvertisementById(advertisementId).changeName(advertisementName);
+    public void changeAdvertisementTitle(Long advertisementId, String advertisementTitle) {
+        findAdvertisementById(advertisementId).changeTitle(advertisementTitle);
     }
 
     @Transactional
-    public void changeAdvertisementName(String oldName, String newName) {
-        findAdvertisementByName(oldName).changeName(newName);
+    public void changeAdvertisementTitle(String oldTitle, String newTitle) {
+        findAdvertisementByTitle(oldTitle).changeTitle(newTitle);
     }
 
     @Transactional

@@ -34,7 +34,7 @@ public class Advertisement {
     private List<RestaurantAdvertisement> restaurantAdvertisements = new ArrayList<>();
 
     @Column(unique = true, nullable = false, length = 10)
-    private String name;
+    private String title;
 
     @Convert(converter = UnitTypeConverter.class)
     @Column(nullable = false)
@@ -50,8 +50,8 @@ public class Advertisement {
     @Column(columnDefinition = "TEXT")
     private String description;
 
-    public Advertisement(String name, UnitType unitType, RateType rateType, Integer rate, String description) {
-        this.name = name;
+    public Advertisement(String title, UnitType unitType, RateType rateType, Integer rate, String description) {
+        this.title = title;
         this.unitType = unitType;
         this.rateType = rateType;
         this.rate = rate;
@@ -64,8 +64,8 @@ public class Advertisement {
         }
     }
 
-    public void changeName(String name) {
-        this.name = name;
+    public void changeTitle(String title) {
+        this.title = title;
     }
 
     public void changeUnitType(UnitType unitType) {

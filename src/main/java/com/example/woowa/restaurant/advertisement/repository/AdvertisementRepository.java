@@ -6,6 +6,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface AdvertisementRepository extends JpaRepository<Advertisement, Long> {
 
-    Optional<Advertisement> findAdvertisementByName(String name);
+    Optional<Advertisement> findAdvertisementByTitle(String title);
 
 }
