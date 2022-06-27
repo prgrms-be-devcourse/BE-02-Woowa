@@ -36,7 +36,7 @@ public class Delivery {
     private DeliveryStatus deliveryStatus;
 
     @Column(nullable = false)
-    private int arrivalTime;
+    private LocalDateTime arrivalTime;
 
     @OneToOne(fetch = FetchType.LAZY)
     private Order order;
