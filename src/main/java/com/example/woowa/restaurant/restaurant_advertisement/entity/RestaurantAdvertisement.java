@@ -16,9 +16,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Getter
-@AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@IdClass(RestaurnatAdvertisementId.class)
+@IdClass(RestaurantAdvertisementId.class)
 @Table(name = "restaurant_advertisement")
 @Entity
 public class RestaurantAdvertisement {
@@ -32,6 +31,11 @@ public class RestaurantAdvertisement {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "advertisement_id", nullable = false)
     private Advertisement advertisement;
+
+    public RestaurantAdvertisement(Restaurant restaurant, Advertisement advertisement) {
+        setRestaurant(restaurant);
+        setAdvertisement(advertisement);
+    }
 
     public void setRestaurant(Restaurant restaurant) {
         if (Objects.nonNull(this.restaurant)) {
