@@ -41,4 +41,8 @@ public class Cart {
         this.menu = menu;
         this.quantity = quantity;
     }
+
+    public void setOrder(Order order) {
+        this.order = order;
+    }
 }
