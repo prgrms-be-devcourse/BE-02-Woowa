@@ -110,7 +110,7 @@ class OrderServiceTest {
         // Then
         Order findOrder = orderService.findOrderById(orderId);
         assertThat(findOrder.getBeforeDiscountTotalPrice()).isEqualTo(beforeDiscountPrice);
-        assertThat(findOrder.getDiscountPrice()).isEqualTo(usePoint);
+        assertThat(findOrder.getVoucherDiscountPrice()).isEqualTo(0);
         assertThat(findOrder.getAfterDiscountTotalPrice()).isEqualTo(
                 beforeDiscountPrice - usePoint);
         assertThat(findOrder.getOrderStatus()).isEqualTo(OrderStatus.PAYMENT_COMPLETED);

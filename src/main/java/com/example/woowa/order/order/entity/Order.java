@@ -61,7 +61,7 @@ public class Order extends BaseTimeEntity {
     private Integer afterDiscountTotalPrice;
 
     @Column(columnDefinition = "DEFAULT 0")
-    private Integer discountPrice;
+    private Integer voucherDiscountPrice;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
@@ -77,14 +77,14 @@ public class Order extends BaseTimeEntity {
 
     private Order(Voucher voucher, Customer customer, Restaurant restaurant,
             Integer beforeDiscountTotalPrice, Integer afterDiscountTotalPrice,
-            Integer discountPrice,
+            Integer voucherDiscountPrice,
             PaymentType paymentType, Integer usedPoint, OrderStatus orderStatus) {
         this.voucher = voucher;
         this.customer = customer;
         this.restaurant = restaurant;
         this.beforeDiscountTotalPrice = beforeDiscountTotalPrice;
         this.afterDiscountTotalPrice = afterDiscountTotalPrice;
-        this.discountPrice = discountPrice;
+        this.voucherDiscountPrice = voucherDiscountPrice;
         this.paymentType = paymentType;
         this.usedPoint = usedPoint;
         this.orderStatus = orderStatus;
@@ -98,13 +98,12 @@ public class Order extends BaseTimeEntity {
         int beforeDiscountTotalPrice = carts.stream()
                 .mapToInt(cart -> cart.getMenu().getPrice() * cart.getQuantity())
                 .sum();
-        int discountPrice =
-                usedPoint + getVoucherDiscountPrice(voucher, beforeDiscountTotalPrice);
-        int afterDiscountTotalPrice = beforeDiscountTotalPrice - discountPrice;
+        int voucherDiscountPrice = getVoucherDiscountPrice(voucher, beforeDiscountTotalPrice);
+        int afterDiscountTotalPrice = beforeDiscountTotalPrice - voucherDiscountPrice;
 
         Order order = new Order(voucher, customer, restaurant, beforeDiscountTotalPrice,
                 afterDiscountTotalPrice,
-                discountPrice, paymentType, usedPoint, OrderStatus.PAYMENT_COMPLETED);
+                voucherDiscountPrice, paymentType, usedPoint, OrderStatus.PAYMENT_COMPLETED);
 
         carts.forEach(order::addCart);
 
