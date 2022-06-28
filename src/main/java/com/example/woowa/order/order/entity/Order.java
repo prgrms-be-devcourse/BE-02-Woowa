@@ -1,5 +1,6 @@
 package com.example.woowa.order.order.entity;
 
+import com.example.woowa.common.base.BaseTimeEntity;
 import com.example.woowa.customer.customer.entity.Customer;
 import com.example.woowa.order.order.enums.OrderStatus;
 import com.example.woowa.order.order.enums.PaymentType;
@@ -32,7 +33,7 @@ import lombok.NoArgsConstructor;
 @Table(name = "orders")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
-public class Order {
+public class Order extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
