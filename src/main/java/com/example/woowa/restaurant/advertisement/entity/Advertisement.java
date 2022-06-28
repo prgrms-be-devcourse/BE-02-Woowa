@@ -7,6 +7,7 @@ import com.example.woowa.restaurant.advertisement.enums.UnitType;
 import com.example.woowa.restaurant.restaurant_advertisement.entity.RestaurantAdvertisement;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Convert;
@@ -47,20 +48,36 @@ public class Advertisement {
     @Column(nullable = false)
     private Integer rate;
 
-    @Column(columnDefinition = "TEXT")
+    @Column(nullable = false, columnDefinition = "TEXT")
     private String description;
 
-    public Advertisement(String title, UnitType unitType, RateType rateType, Integer rate, String description) {
+    @Column(nullable = false)
+    private Integer limitSize;
+
+    @Column(nullable = false)
+    private Integer currentSize;
+
+    public Advertisement(String title, UnitType unitType, RateType rateType, Integer rate,
+        String description, Integer limitSize) {
         this.title = title;
         this.unitType = unitType;
         this.rateType = rateType;
         this.rate = rate;
         this.description = description;
+        this.limitSize = limitSize;
+        this.currentSize = 0;
     }
 
     public void addRestaurantAdvertisement(RestaurantAdvertisement restaurantAdvertisement) {
-        if (restaurantAdvertisement.getAdvertisement() != this) {
+        if (!Objects.equals(restaurantAdvertisement.getAdvertisement().getId(), this.getId())) {
             restaurantAdvertisement.setAdvertisement(this);
+        }
+    }
+
+    public void removeRestaurantAdvertisement(RestaurantAdvertisement restaurantAdvertisement) {
+        if (Objects.equals(restaurantAdvertisement.getAdvertisement().getId(), this.getId())) {
+            this.getRestaurantAdvertisements().remove(restaurantAdvertisement);
+            this.decrementCurrentSize();
         }
     }
 
@@ -82,6 +99,22 @@ public class Advertisement {
 
     public void changeDescription(String description) {
         this.description = description;
+    }
+
+    public void changeLimitSize(Integer limitSize) {
+        this.limitSize = limitSize;
+    }
+
+    public void incrementCurrentSize() {
+        this.currentSize++;
+    }
+
+    public void decrementCurrentSize() {
+        this.currentSize--;
+    }
+
+    public static boolean isAvailable(Advertisement advertisement) {
+        return advertisement.currentSize < advertisement.limitSize;
     }
 
 }
