@@ -6,16 +6,22 @@ import com.example.woowa.delivery.entity.DeliveryArea;
 
 
 import com.example.woowa.restaurant.menugroup.entity.MenuGroup;
+import com.example.woowa.restaurant.owner.entity.Owner;
+import com.example.woowa.restaurant.restaurant_advertisement.entity.RestaurantAdvertisement;
 import com.example.woowa.restaurant.restaurntat_category.entity.RestaurantCategory;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import lombok.AccessLevel;
@@ -38,8 +44,15 @@ public class Restaurant {
     @OneToMany(mappedBy = "restaurant", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<RestaurantCategory> restaurantCategories = new ArrayList<>();
 
+    @OneToMany(mappedBy = "restaurant", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<RestaurantAdvertisement> restaurantAdvertisements = new ArrayList<>();
+
     @OneToMany(mappedBy = "restaurant")
     private List<DeliveryArea> deliveryAreas = new ArrayList<>();
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "owner_id")
+    private Owner owner;
 
     @Column(nullable = false)
     private String name;
@@ -68,7 +81,6 @@ public class Restaurant {
     @Column(nullable = false)
     private String address;
 
-
     private Restaurant(String name, String businessNumber, LocalTime openingTime,
             LocalTime closingTime,
             Boolean isOpen, String phoneNumber, String description, String address) {
@@ -83,7 +95,6 @@ public class Restaurant {
         this.reviewCount = 0;
         this.averageReviewScore = 0.0D;
     }
-
 
     public static Restaurant createRestaurant(String name, String businessNumber,
             LocalTime openingTime, LocalTime closingTime, Boolean isOpen, String phoneNumber,
@@ -131,7 +142,17 @@ public class Restaurant {
     }
   
     public void addRestaurantCategory(RestaurantCategory restaurantCategory) {
-        restaurantCategories.add(restaurantCategory);
+        if (!Objects.equals(restaurantCategory.getRestaurant().getId(), this.getId())) {
+            restaurantCategory.setRestaurant(this);
+        }
+    }
+
+    public void setOwner(Owner owner) {
+        if (Objects.nonNull(this.owner)) {
+            this.owner.getRestaurants().remove(this);
+        }
+        this.owner = owner;
+        this.owner.getRestaurants().add(this);
     }
 
     private static void validateBusinessHours(LocalTime openingTime, LocalTime closingTime)
