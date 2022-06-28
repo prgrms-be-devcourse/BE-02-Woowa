@@ -2,12 +2,15 @@ package com.example.woowa.restaurant.restaurntat_category.entity;
 
 import com.example.woowa.restaurant.category.entity.Category;
 import com.example.woowa.restaurant.restaurant.entity.Restaurant;
-
 import java.util.Objects;
-import javax.persistence.*;
-
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.Id;
+import javax.persistence.IdClass;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
 import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
