@@ -3,6 +3,7 @@ package com.example.woowa.restaurant.owner.entity;
 import com.example.woowa.restaurant.restaurant.entity.Restaurant;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -26,8 +27,7 @@ public class Owner {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-//    @OneToMany(mappedBy = "owner", cascade = CascadeType.ALL, orphanRemoval = true)
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "owner", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Restaurant> restaurants = new ArrayList<>();
 
     @Column(unique = true, nullable = false, updatable = false, length = 45)
@@ -49,11 +49,11 @@ public class Owner {
         this.phoneNumber = phoneNumber;
     }
 
-//    public void addRestaurant(Restaurant restaurant) {
-//        if (restaurant.getOwner() != this) {
-//            restaurant.setOwner(this);
-//        }
-//    }
+    public void addRestaurant(Restaurant restaurant) {
+        if (!Objects.equals(restaurant.getOwner().getId(), this.getId())) {
+            restaurant.setOwner(this);
+        }
+    }
 
     public void changeLoginPassword(String loginPassword) {
         this.loginPassword = loginPassword;
