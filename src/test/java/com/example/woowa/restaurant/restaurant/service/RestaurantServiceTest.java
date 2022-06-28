@@ -3,11 +3,13 @@ package com.example.woowa.restaurant.restaurant.service;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import com.example.woowa.restaurant.category.service.CategoryService;
 import com.example.woowa.restaurant.menu.entity.Menu;
 import com.example.woowa.restaurant.menu.enums.MenuStatus;
 import com.example.woowa.restaurant.menugroup.entity.MenuGroup;
 import com.example.woowa.restaurant.restaurant.entity.Restaurant;
 import com.example.woowa.restaurant.restaurant.repository.RestaurantRepository;
+import com.example.woowa.restaurant.restaurntat_category.repository.RestaurantCategoryRepository;
 import java.time.LocalTime;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
@@ -24,6 +26,12 @@ class RestaurantServiceTest {
     @Mock
     RestaurantRepository restaurantRepository;
 
+    @Mock
+    RestaurantCategoryRepository restaurantCategoryRepository;
+
+    @Mock
+    CategoryService categoryService;
+
     RestaurantService restaurantService;
 
     Restaurant restaurant;
@@ -32,7 +40,7 @@ class RestaurantServiceTest {
 
     @BeforeEach
     void beforeEach() {
-        restaurantService = new RestaurantService(restaurantRepository);
+        restaurantService = new RestaurantService(restaurantRepository, restaurantCategoryRepository, categoryService);
 
         String name = "김밥나라";
         String businessNumber = "000-00-00000";
