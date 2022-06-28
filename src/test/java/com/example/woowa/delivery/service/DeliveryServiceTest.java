@@ -1,7 +1,6 @@
 package com.example.woowa.delivery.service;
 
-import com.example.woowa.customer.customer.dto.CreateCustomerDto;
-import com.example.woowa.customer.customer.dto.CreateCustomerGradeDto;
+
 import com.example.woowa.customer.customer.entity.Customer;
 import com.example.woowa.customer.customer.entity.CustomerGrade;
 import com.example.woowa.customer.voucher.entity.Voucher;
@@ -33,8 +32,8 @@ class DeliveryServiceTest {
 
         for (int i = 0; i < 100; i++) {
             CustomerGrade customerGrade = new CustomerGrade(5, "일반", 3000, 2);
-            Customer customer = new Customer("dev12","Programmers123!", "2000-01-01",customerGrade);
-            Voucher voucher = new Voucher(VoucherType.PERCENT, 2, LocalDateTime.now());
+//            Customer customer = new Customer("dev12","Programmers123!", "2000-01-01",customerGrade);
+//            Voucher voucher = new Voucher(VoucherType.PERCENT, 2, LocalDateTime.now());
             /**
              *      Order order = Order.createOrder()
              *      오더 생성

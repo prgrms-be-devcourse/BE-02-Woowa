@@ -1,8 +1,9 @@
 package com.example.woowa.restaurant.restaurant.entity;
 
+
 import com.example.woowa.delivery.entity.AreaCode;
 import com.example.woowa.delivery.entity.DeliveryArea;
-import com.example.woowa.restaurant.menucategory.entity.MenuCategory;
+
 
 import com.example.woowa.restaurant.menugroup.entity.MenuGroup;
 import com.example.woowa.restaurant.restaurntat_category.entity.RestaurantCategory;

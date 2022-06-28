@@ -1,8 +1,8 @@
 package com.example.woowa.customer.customer.controller;
 
-import com.example.woowa.customer.customer.dto.UpdateCustomerDto;
-import com.example.woowa.customer.customer.dto.CreateCustomerDto;
-import com.example.woowa.customer.customer.dto.CustomerDto;
+import com.example.woowa.customer.customer.dto.CustomerUpdateRequest;
+import com.example.woowa.customer.customer.dto.CustomerCreateRequest;
+import com.example.woowa.customer.customer.dto.CustomerFindResponse;
 import com.example.woowa.customer.customer.service.CustomerGradeService;
 import com.example.woowa.customer.customer.service.CustomerService;
 
@@ -22,22 +22,26 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/customers")
 public class CustomerController {
-    private CustomerService customerService;
-    private CustomerGradeService customerGradeService;
+    private final CustomerService customerService;
 
-    @PostMapping()
-    public CustomerDto createCustomer(@RequestBody @Valid CreateCustomerDto createCustomerDto) {
-        return customerService.createCustomer(createCustomerDto);
+    @PostMapping
+    public CustomerFindResponse createCustomer(@RequestBody @Valid CustomerCreateRequest customerCreateRequest) {
+        return customerService.createCustomer(customerCreateRequest);
     }
 
     @GetMapping("/{loginId}")
-    public CustomerDto readCustomer(@PathVariable String loginId) {
+    public CustomerFindResponse readCustomer(@PathVariable String loginId) {
         return customerService.findCustomer(loginId);
     }
 
     @PutMapping("/{loginId}")
-    public CustomerDto updateCustomer(@PathVariable String loginId, @RequestBody @Valid UpdateCustomerDto updateCustomerDto) {
-        return customerService.updateCustomer(loginId, updateCustomerDto);
+    public CustomerFindResponse updateCustomer(@RequestBody @Valid CustomerUpdateRequest customerUpdateRequest, @PathVariable String loginId) {
+        return customerService.updateCustomer(loginId, customerUpdateRequest);
+    }
+
+    @PutMapping("/firstday/{loginId}")
+    public CustomerFindResponse updateCustomerOnFirstDay(@PathVariable String loginId) {
+        return customerService.updateCustomerStatusOnFirstDay(loginId);
     }
 
     @DeleteMapping("/{loginId}")
