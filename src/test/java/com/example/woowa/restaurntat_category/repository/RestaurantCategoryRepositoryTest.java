@@ -33,11 +33,9 @@ class RestaurantCategoryRepositoryTest {
     @DisplayName("restaurant과 category의 기본키를 복합키로 가진 restaurant_category테이블을 생성한다.")
     public void testSaveRestaurantCategory() {
         // Given
-        Restaurant restaurant = restaurantRepository.save(
-
-        Restaurant.createRestaurant("테스트 레스토랑", "1234567890",
-                LocalTime.now(), LocalTime.now(), true,
-                "010-123-4567", "테스트용 임시 레스토랑 생성입니다.", "서울시 종로구"));
+        Restaurant restaurant = restaurantRepository.save(Restaurant.createRestaurant("테스트 레스토랑1", "1234567890",
+        LocalTime.now(), LocalTime.now().plusHours(10), true,
+        "010-123-4567", "테스트용 임시 레스토랑 생성입니다.", "서울시 종로구"));
 
         Category category = categoryRepository.save(new Category("한식"));
 
