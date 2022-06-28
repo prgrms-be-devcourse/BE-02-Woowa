@@ -1,9 +1,10 @@
 package com.example.woowa.customer.voucher.enums;
 
+import com.example.woowa.common.EnumFindable;
 import java.util.Arrays;
 import java.util.Optional;
 
-public enum VoucherType {
+public enum VoucherType implements EnumFindable {
     FiXED("fixed") {
         @Override
         public boolean isValidAmount(int amount) {
@@ -35,6 +36,16 @@ public enum VoucherType {
 
     private final String type;
 
+    @Override
+    public String getType() {
+        return type;
+    }
+
+    @Override
+    public String toString() {
+        return getType();
+    }
+
     VoucherType(String type) {
         this.type = type;
     }
@@ -49,18 +60,5 @@ public enum VoucherType {
 
     public boolean isOkayToDiscount(int currentPrice, int amount) {
         return true;
-    }
-
-    @Override
-    public String toString() {
-        return type;
-    }
-
-    public static VoucherType of(String value) throws Exception {
-        return Optional.ofNullable(find(value)).orElseThrow(() -> new RuntimeException("not valid voucher type"));
-    }
-
-    private static VoucherType find(String value) {
-        return Arrays.stream(values()).filter(type -> type.toString().equals(value)).findFirst().orElse(null);
     }
 }

@@ -13,7 +13,7 @@ public class ReviewConverter {
     }
 
     public static Review toReview(ReviewCreateRequest reviewCreateRequest, Customer customer, Order order) {
-        return new Review(reviewCreateRequest.getContent(), ScoreType.of(
+        return new Review(reviewCreateRequest.getContent(), ScoreType.find(
             reviewCreateRequest.getScoreType()), customer, order);
     }
 }

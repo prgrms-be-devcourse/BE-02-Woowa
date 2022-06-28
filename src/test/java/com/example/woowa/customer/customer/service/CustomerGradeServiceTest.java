@@ -1,7 +1,5 @@
 package com.example.woowa.customer.customer.service;
 
-import static org.hamcrest.Matchers.is;
-
 import com.example.woowa.customer.customer.dto.CustomerGradeCreateRequest;
 import com.example.woowa.customer.customer.dto.CustomerGradeFindResponse;
 import com.example.woowa.customer.customer.dto.CustomerGradeUpdateRequest;

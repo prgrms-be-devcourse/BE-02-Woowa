@@ -61,6 +61,6 @@ public class Review extends BaseTimeEntity {
     }
 
     public void setScoreType(int scoreType) {
-        this.scoreType = ScoreType.of(scoreType);
+        this.scoreType = ScoreType.find(scoreType);
     }
 }

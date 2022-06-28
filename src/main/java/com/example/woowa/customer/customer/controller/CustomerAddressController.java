@@ -26,7 +26,6 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/v1/customers/addresses")
 public class CustomerAddressController {
     private final CustomerAddressService customerAddressService;
-    private final CustomerService customerService;
 
     @PostMapping("/{loginId}")
     public CustomerAddressFindResponse createCustomerAddress(@PathVariable String loginId, @RequestBody @Valid CustomerAddressCreateRequest customerAddressCreateRequest) {
