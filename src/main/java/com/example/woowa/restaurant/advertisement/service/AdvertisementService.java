@@ -25,8 +25,10 @@ public class AdvertisementService {
     private final RestaurantService restaurantService;
 
     @Transactional
-    public Long createAdvertisement(String title, UnitType unitType, RateType rateType, Integer rate, String description) {
-        return advertisementRepository.save(new Advertisement(title, unitType, rateType, rate, description)).getId();
+    public Long createAdvertisement(String title, UnitType unitType, RateType rateType, Integer rate,
+        String description, Integer limitSize) {
+        return advertisementRepository.save(new Advertisement(title, unitType, rateType, rate, description,
+            limitSize)).getId();
     }
 
     public List<Advertisement> findAdvertisements() {
@@ -86,25 +88,33 @@ public class AdvertisementService {
     }
 
     @Transactional
+    public void changeAdvertisementLimitSize(Long advertisementId, Integer limitSize) {
+        findAdvertisementById(advertisementId).changeLimitSize(limitSize);
+    }
+
+    @Transactional
     public void deleteAdvertisement(Long advertisementId) {
         advertisementRepository.deleteById(advertisementId);
     }
 
-//    @Transactional
-//    public void includeRestaurantInAdvertisement(Long advertisementId, Long restaurantId) {
-//        Advertisement advertisement = findAdvertisementById(advertisementId);
-//        Restaurant restaurant = restaurantService.findRestaurantById(restaurantId);
-//        restaurantAdvertisementRepository.save(new RestaurantAdvertisement(restaurant, advertisement));
-//    }
+    @Transactional
+    public void includeRestaurantInAdvertisement(Long advertisementId, Long restaurantId) {
+        Advertisement advertisement = findAdvertisementById(advertisementId);
+        Restaurant restaurant = restaurantService.findRestaurantById(restaurantId);
+
+        RestaurantAdvertisement restaurantAdvertisement = new RestaurantAdvertisement(restaurant, advertisement);
+    }
 
     @Transactional
     public void excludeRestaurantInAdvertisement(Long advertisementId, Long restaurantId) {
-        RestaurantAdvertisement restaurantAdvertisement = restaurantAdvertisementRepository.findById(
-                new RestaurantAdvertisementId(restaurantId, advertisementId))
-            .orElseThrow(() -> new IllegalArgumentException("부적절한 정보입니다."));
+        Advertisement advertisement = findAdvertisementById(advertisementId);
+        Restaurant restaurant = restaurantService.findRestaurantById(restaurantId);
 
-        findAdvertisementById(advertisementId).getRestaurantAdvertisements().remove(restaurantAdvertisement);
-//        restaurantService.findRestaurantById(restaurantId).getRestaurantAdvertisements().remove(restaurantAdvertisement);
+        RestaurantAdvertisement restaurantAdvertisement = restaurantAdvertisementRepository.findById(
+                new RestaurantAdvertisementId(restaurantId, advertisementId)).get();
+
+        advertisement.removeRestaurantAdvertisement(restaurantAdvertisement);
+        restaurant.getRestaurantAdvertisements().remove(restaurantAdvertisement);
     }
 
 }
