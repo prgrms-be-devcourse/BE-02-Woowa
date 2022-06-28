@@ -1,5 +1,7 @@
 package com.example.woowa.restaurant.restaurant.entity;
 
+
+import com.example.woowa.delivery.entity.AreaCode;
 import com.example.woowa.delivery.entity.DeliveryArea;
 
 
