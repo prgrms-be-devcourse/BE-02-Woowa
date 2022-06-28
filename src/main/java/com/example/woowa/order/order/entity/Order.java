@@ -60,15 +60,16 @@ public class Order extends BaseTimeEntity {
     @Column(nullable = false)
     private Integer afterDiscountTotalPrice;
 
-    @Column(columnDefinition = "DEFAULT 0")
+    @Column(columnDefinition = "INTEGER DEFAULT 0")
     private Integer voucherDiscountPrice;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private PaymentType paymentType;
 
-    @Column(columnDefinition = "DEFAULT 0")
+    @Column(columnDefinition = "INTEGER DEFAULT 0")
     private Integer usedPoint;
+
     private Integer cookingTime;
 
     @Enumerated(EnumType.STRING)
