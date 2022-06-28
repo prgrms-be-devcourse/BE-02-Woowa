@@ -22,12 +22,6 @@ public class Rider extends BaseLoginEntity {
     @Column(columnDefinition = "BOOLEAN DEFAULT FALSE")
     private Boolean isDelivery;
 
-    @Column(nullable = false)
-    private String name;
-
-    @Column(nullable = false)
-    private String phoneNumber;
-
     @OneToMany
     private List<Delivery> deliveryList = new ArrayList<>();
 
@@ -36,9 +30,8 @@ public class Rider extends BaseLoginEntity {
 
     public Rider(String loginId, String loginPassword, String name, String phoneNumber) {
         super(loginId, loginPassword);
+        //super(loginId, loginPassword, name, phoneNumber);
         this.isDelivery = false;
-        this.name = name;
-        this.phoneNumber = phoneNumber;
     }
 
     public void changeIsDelivery(boolean isDelivery) {
