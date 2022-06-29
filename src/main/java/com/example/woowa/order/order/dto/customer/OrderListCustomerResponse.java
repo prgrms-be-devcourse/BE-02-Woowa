@@ -12,5 +12,5 @@ public class OrderListCustomerResponse {
 
     private Integer size;
 
-    private List<OrderCustomerResponse> menus;
+    private List<OrderSummeryResponse> menus;
 }

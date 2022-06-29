@@ -1,8 +1,10 @@
 package com.example.woowa.order.order.converter;
 
 import com.example.woowa.order.order.dto.cart.CartResponse;
+import com.example.woowa.order.order.dto.cart.CartSummeryResponse;
 import com.example.woowa.order.order.dto.customer.OrderCustomerResponse;
 import com.example.woowa.order.order.dto.customer.OrderListCustomerResponse;
+import com.example.woowa.order.order.dto.customer.OrderSummeryResponse;
 import com.example.woowa.order.order.dto.restaurant.OrderListRestaurantResponse;
 import com.example.woowa.order.order.dto.restaurant.OrderRestaurantResponse;
 import com.example.woowa.order.order.dto.statistics.OrderStatistics;
@@ -40,12 +42,23 @@ public abstract class OrderConverter {
     }
 
     public static OrderListCustomerResponse toOrderListCustomerResponse(Slice<Order> orderSlice) {
-        List<OrderCustomerResponse> responses = orderSlice.getContent().stream()
-                .map(OrderConverter::toOrderCustomerResponse).collect(
+        List<OrderSummeryResponse> responses = orderSlice.getContent().stream()
+                .map(OrderConverter::toOrderSummeryResponse).collect(
                         Collectors.toList());
 
         return new OrderListCustomerResponse(orderSlice.hasNext(), orderSlice.getNumberOfElements(),
                 responses);
+    }
+
+    public static OrderSummeryResponse toOrderSummeryResponse(Order order) {
+        List<CartSummeryResponse> carts = order.getCarts().stream()
+                .map(cart -> new CartSummeryResponse(cart.getMenu().getTitle(),
+                        cart.getQuantity()))
+                .collect(Collectors.toList());
+
+        return new OrderSummeryResponse(order.getId(), order.getCreatedAt(),
+                getOrderStatusStringForCustomer(order), order.getRestaurant().getName(),
+                order.getAfterDiscountTotalPrice(), carts);
     }
 
     public static OrderCustomerResponse toOrderCustomerResponse(Order order) {

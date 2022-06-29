@@ -246,7 +246,7 @@ class OrderServiceTest {
         assertThat(response.getHasNextPage()).isFalse();
         assertThat(response.getSize()).isEqualTo(1);
         assertThat(response.getMenus()).usingRecursiveFieldByFieldElementComparator()
-                .contains(OrderConverter.toOrderCustomerResponse(order));
+                .contains(OrderConverter.toOrderSummeryResponse(order));
     }
 
     @Test

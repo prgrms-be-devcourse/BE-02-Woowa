@@ -19,7 +19,7 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
             @Param("from") LocalDateTime from, @Param("end") LocalDateTime end,
             Pageable pageable);
 
-    @Query(value = "SELECT o FROM Order o WHERE o.customer = :customer AND o.createdAt BETWEEN :from AND :end ORDER BY o.createdAt desc")
+    @Query(value = "SELECT o FROM Order o JOIN FETCH o.restaurant r WHERE o.customer = :customer AND o.createdAt BETWEEN :from AND :end ORDER BY o.createdAt desc")
     Slice<Order> findByCustomer(@Param("customer") Customer customer,
             @Param("from") LocalDateTime from, @Param("end") LocalDateTime end, Pageable pageable);
 
