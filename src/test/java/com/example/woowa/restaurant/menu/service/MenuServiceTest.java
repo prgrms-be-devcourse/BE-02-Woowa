@@ -6,6 +6,10 @@ import static org.mockito.BDDMockito.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 
+import com.example.woowa.restaurant.menu.dto.MenuResponse;
+import com.example.woowa.restaurant.menu.dto.MenuSaveRequest;
+import com.example.woowa.restaurant.menu.dto.MenuStatusUpdateRequest;
+import com.example.woowa.restaurant.menu.dto.MenuUpdateRequest;
 import com.example.woowa.restaurant.menu.entity.Menu;
 import com.example.woowa.restaurant.menu.enums.MenuStatus;
 import com.example.woowa.restaurant.menu.repository.MenuRepository;
@@ -54,7 +58,7 @@ class MenuServiceTest {
         given(menuGroupService.findMenuGroupById(menuGroupId)).willReturn(menuGroup);
 
         // When
-        menuService.addMenu(menuGroupId, title, description, price);
+        menuService.addMenu(new MenuSaveRequest(menuGroupId, title, description, price));
 
         // Then
         then(menuRepository).should().save(any());
@@ -68,10 +72,13 @@ class MenuServiceTest {
         given(menuRepository.findById(menuId)).willReturn(Optional.of(menu));
 
         // When
-        Menu findMenu = menuService.findMenuById(menuId);
+        MenuResponse response = menuService.findMenuById(menuId);
 
         // Then
-        assertThat(findMenu).usingRecursiveComparison().isEqualTo(menu);
+        assertThat(response.getId()).isEqualTo(menu.getId());
+        assertThat(response.getPrice()).isEqualTo(menu.getPrice());
+        assertThat(response.getTitle()).isEqualTo(menu.getTitle());
+        assertThat(response.getDescription()).isEqualTo(menu.getDescription());
     }
 
     @Test
@@ -82,7 +89,7 @@ class MenuServiceTest {
         given(menuRepository.findById(menuId)).willReturn(Optional.empty());
 
         // When // Then
-        assertThatThrownBy(() -> menuService.findMenuById(menuId))
+        assertThatThrownBy(() -> menuService.findMenuEntityById(menuId))
                 .isExactlyInstanceOf(IllegalArgumentException.class);
     }
 
@@ -97,10 +104,10 @@ class MenuServiceTest {
         given(menuRepository.findById(menuId)).willReturn(Optional.of(menu));
 
         // When
-        menuService.updateMenu(menuId, newTitle, newDescription, newPrice);
+        menuService.updateMenu(menuId, new MenuUpdateRequest(newTitle, newDescription, newPrice));
 
         // Then
-        Menu findMenu = menuService.findMenuById(menuId);
+        Menu findMenu = menuService.findMenuEntityById(menuId);
         assertThat(findMenu.getTitle()).isEqualTo(newTitle);
         assertThat(findMenu.getDescription()).isEqualTo(newDescription);
         assertThat(findMenu.getPrice()).isEqualTo(newPrice);
@@ -118,7 +125,8 @@ class MenuServiceTest {
 
         // When // Then
         assertThatThrownBy(
-                () -> menuService.updateMenu(wrongMenuId, newTitle, newDescription, newPrice))
+                () -> menuService.updateMenu(
+                        wrongMenuId, new MenuUpdateRequest(newTitle, newDescription, newPrice)))
                 .isExactlyInstanceOf(IllegalArgumentException.class);
     }
 
@@ -159,7 +167,7 @@ class MenuServiceTest {
         menuService.setMainMenu(menuId);
 
         // Then
-        Menu findMenu = menuService.findMenuById(menuId);
+        Menu findMenu = menuService.findMenuEntityById(menuId);
         assertThat(findMenu.getIsMain()).isTrue();
     }
 
@@ -186,7 +194,7 @@ class MenuServiceTest {
         menuService.cancelMainMenu(menuId);
 
         // Then
-        Menu findMenu = menuService.findMenuById(menuId);
+        Menu findMenu = menuService.findMenuEntityById(menuId);
         assertThat(findMenu.getIsMain()).isFalse();
     }
 
@@ -210,10 +218,10 @@ class MenuServiceTest {
         given(menuRepository.findById(menuId)).willReturn(Optional.of(menu));
 
         // When
-        menuService.changeMenuStatus(menuId, MenuStatus.SALE);
+        menuService.changeMenuStatus(menuId, new MenuStatusUpdateRequest(MenuStatus.SALE));
 
         // Then
-        Menu findMenu = menuService.findMenuById(menuId);
+        Menu findMenu = menuService.findMenuEntityById(menuId);
         assertThat(findMenu.getMenuStatus()).isEqualTo(MenuStatus.SALE);
     }
 
@@ -225,10 +233,10 @@ class MenuServiceTest {
         given(menuRepository.findById(menuId)).willReturn(Optional.of(menu));
 
         // When
-        menuService.changeMenuStatus(menuId, MenuStatus.HIDDEN);
+        menuService.changeMenuStatus(menuId, new MenuStatusUpdateRequest(MenuStatus.HIDDEN));
 
         // Then
-        Menu findMenu = menuService.findMenuById(menuId);
+        Menu findMenu = menuService.findMenuEntityById(menuId);
         assertThat(findMenu.getMenuStatus()).isEqualTo(MenuStatus.HIDDEN);
     }
 
@@ -240,10 +248,10 @@ class MenuServiceTest {
         given(menuRepository.findById(menuId)).willReturn(Optional.of(menu));
 
         // When
-        menuService.changeMenuStatus(menuId, MenuStatus.SOLD_OUT);
+        menuService.changeMenuStatus(menuId, new MenuStatusUpdateRequest(MenuStatus.SOLD_OUT));
 
         // Then
-        Menu findMenu = menuService.findMenuById(menuId);
+        Menu findMenu = menuService.findMenuEntityById(menuId);
         assertThat(findMenu.getMenuStatus()).isEqualTo(MenuStatus.SOLD_OUT);
     }
 
@@ -255,7 +263,8 @@ class MenuServiceTest {
         given(menuRepository.findById(wrongMenuId)).willReturn(Optional.empty());
 
         // When // Then
-        assertThatThrownBy(() -> menuService.changeMenuStatus(wrongMenuId, MenuStatus.SALE))
+        assertThatThrownBy(() -> menuService.changeMenuStatus(
+                wrongMenuId, new MenuStatusUpdateRequest(MenuStatus.SALE)))
                 .isExactlyInstanceOf(IllegalArgumentException.class);
     }
 }

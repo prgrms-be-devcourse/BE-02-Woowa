@@ -107,8 +107,8 @@ class OrderServiceTest {
         given(customerService.findCustomerEntity(any())).willReturn(customer);
         given(restaurantService.findRestaurantById(any())).willReturn(restaurant);
         given(orderRepository.save(any())).willReturn(order);
-        given(menuService.findMenuById(menuId2)).willReturn(menu2);
-        given(menuService.findMenuById(menuId1)).willReturn(menu1);
+        given(menuService.findMenuEntityById(menuId2)).willReturn(menu2);
+        given(menuService.findMenuEntityById(menuId1)).willReturn(menu1);
         given(orderRepository.findById(orderId)).willReturn(Optional.of(order));
 
         List<CartSaveRequest> cartSaveRequests = List.of(

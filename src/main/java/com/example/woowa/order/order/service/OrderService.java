@@ -129,7 +129,7 @@ public class OrderService {
     }
 
     private Cart toCart(CartSaveRequest request) {
-        Menu menu = menuService.findMenuById(request.getMenuId());
+        Menu menu = menuService.findMenuEntityById(request.getMenuId());
         return new Cart(menu, request.getQuantity());
     }
 }
