@@ -9,11 +9,15 @@ import com.example.woowa.customer.customer.entity.Customer;
 import com.example.woowa.customer.customer.entity.CustomerGrade;
 import com.example.woowa.customer.customer.service.CustomerService;
 import com.example.woowa.customer.voucher.service.VoucherEntityService;
+import com.example.woowa.delivery.enums.DeliveryStatus;
 import com.example.woowa.order.order.converter.OrderConverter;
 import com.example.woowa.order.order.dto.customer.OrderListCustomerRequest;
 import com.example.woowa.order.order.dto.customer.OrderListCustomerResponse;
 import com.example.woowa.order.order.dto.restaurant.OrderListRestaurantRequest;
 import com.example.woowa.order.order.dto.restaurant.OrderListRestaurantResponse;
+import com.example.woowa.order.order.dto.statistics.OrderStatistics;
+import com.example.woowa.order.order.dto.statistics.OrderStatisticsRequest;
+import com.example.woowa.order.order.dto.statistics.OrderStatisticsResponse;
 import com.example.woowa.order.order.entity.Cart;
 import com.example.woowa.order.order.entity.Order;
 import com.example.woowa.order.order.enums.OrderStatus;
@@ -273,6 +277,68 @@ class OrderServiceTest {
                 new OrderListCustomerRequest(longinId, 0, 3, from, end)))
                 .isExactlyInstanceOf(IllegalArgumentException.class);
     }
+
+    @Test
+    @DisplayName("가게의 기간별 매출 정보를 조회한다.")
+    void findOrderStatisticsTest() {
+        // Given
+        Long restaurantId = 1L;
+        LocalDate from = LocalDate.now().minusMonths(1);
+        LocalDate end = LocalDate.now();
+        long orderCount = 100L;
+        long orderPrice = 1_000_000L;
+        long voucherDiscountPrice = 100_000L;
+        long usedPoint = 10_000L;
+
+        given(restaurantService.findRestaurantById(restaurantId)).willReturn(restaurant);
+        given(orderRepository.findOrderStatistics(restaurant,
+                LocalDateTime.of(from, LocalTime.of(0, 0)),
+                LocalDateTime.of(end, LocalTime.of(23, 59)),
+                DeliveryStatus.DELIVERY_FINISH))
+                .willReturn(new OrderStatistics(orderCount, orderPrice, voucherDiscountPrice,
+                        usedPoint));
+
+        // When
+        OrderStatisticsResponse statistics = orderService.findOrderStatistics(
+                new OrderStatisticsRequest(restaurantId, from, end));
+
+        // Then
+        assertThat(statistics.getOrderCount()).isEqualTo(orderCount);
+        assertThat(statistics.getOrderPrice()).isEqualTo(orderPrice);
+        assertThat(statistics.getDiscountPrice()).isEqualTo(voucherDiscountPrice + usedPoint);
+    }
+
+    @Test
+    @DisplayName("존재하지 않는 가게의 기간별 매출 정보를 조회하려 하면 예외가 발생한다.")
+    void findOrderStatisticsNotExistsRestaurantTest() {
+        // Given
+        Long wrongRestaurantId = -1L;
+        LocalDate from = LocalDate.now().minusMonths(1);
+        LocalDate end = LocalDate.now();
+
+        given(restaurantService.findRestaurantById(wrongRestaurantId)).willThrow(
+                IllegalArgumentException.class);
+
+        // When // Then
+        assertThatThrownBy(() -> orderService.findOrderStatistics(
+                new OrderStatisticsRequest(wrongRestaurantId, from, end)))
+                .isExactlyInstanceOf(IllegalArgumentException.class);
+    }
+
+    @Test
+    @DisplayName("가게의 기간별 매출 정보를 조회할 떄 조회 기간의 시작일이 마감일보다 이전이 아니면 예외가 발생한다.")
+    void findOrderStatisticsInvalidPeriodTest() {
+        // Given
+        Long restaurantId = 1L;
+        LocalDate from = LocalDate.now();
+        LocalDate end = LocalDate.now().minusMonths(1);
+
+        // When // Then
+        assertThatThrownBy(() -> orderService.findOrderStatistics(
+                new OrderStatisticsRequest(restaurantId, from, end)))
+                .isExactlyInstanceOf(IllegalArgumentException.class);
+    }
+
 
     @Test
     @DisplayName("주문을 취소한다.")

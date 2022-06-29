@@ -4,7 +4,9 @@ import com.example.woowa.customer.customer.entity.Customer;
 import com.example.woowa.customer.customer.entity.CustomerGrade;
 import com.example.woowa.customer.customer.repository.CustomerGradeRepository;
 import com.example.woowa.customer.customer.repository.CustomerRepository;
+import com.example.woowa.delivery.enums.DeliveryStatus;
 import com.example.woowa.delivery.repository.DeliveryRepository;
+import com.example.woowa.order.order.dto.statistics.OrderStatistics;
 import com.example.woowa.order.order.entity.Cart;
 import com.example.woowa.order.order.entity.Order;
 import com.example.woowa.order.order.enums.PaymentType;
@@ -97,6 +99,21 @@ class OrderRepositoryTest {
         // Then
 //        assertThat(orderSlice.getContent().size()).isEqualTo(1);
 //        assertThat(orderSlice.getContent()).containsExactly(order);
+    }
+
+    @Test
+    @DisplayName("기간별 가게의 매출 정보를 조회힌다.")
+    void findOrderStatisticsTest() {
+        // Given
+        Optional<Restaurant> restaurant = restaurantRepository.findById(restaurantId);
+
+        // When
+        OrderStatistics orderStatistics = orderRepository.findOrderStatistics(restaurant.get(),
+                LocalDateTime.now().minusDays(1),
+                LocalDateTime.now(),
+                DeliveryStatus.DELIVERY_FINISH);
+
+        // Then
     }
 
     @BeforeEach

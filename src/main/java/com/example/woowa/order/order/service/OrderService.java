@@ -5,11 +5,15 @@ import com.example.woowa.customer.customer.entity.Customer;
 import com.example.woowa.customer.customer.service.CustomerService;
 import com.example.woowa.customer.voucher.entity.Voucher;
 import com.example.woowa.customer.voucher.service.VoucherEntityService;
+import com.example.woowa.delivery.enums.DeliveryStatus;
 import com.example.woowa.order.order.converter.OrderConverter;
 import com.example.woowa.order.order.dto.customer.OrderListCustomerRequest;
 import com.example.woowa.order.order.dto.customer.OrderListCustomerResponse;
 import com.example.woowa.order.order.dto.restaurant.OrderListRestaurantRequest;
 import com.example.woowa.order.order.dto.restaurant.OrderListRestaurantResponse;
+import com.example.woowa.order.order.dto.statistics.OrderStatistics;
+import com.example.woowa.order.order.dto.statistics.OrderStatisticsRequest;
+import com.example.woowa.order.order.dto.statistics.OrderStatisticsResponse;
 import com.example.woowa.order.order.entity.Cart;
 import com.example.woowa.order.order.entity.Order;
 import com.example.woowa.order.order.enums.PaymentType;
@@ -78,6 +82,17 @@ public class OrderService {
                 PageRequest.of(request.getPageNum(), request.getSize()));
 
         return OrderConverter.toOrderListCustomerResponse(orderSlice);
+    }
+
+    public OrderStatisticsResponse findOrderStatistics(OrderStatisticsRequest request) {
+        validatePeriod(request.getFrom(), request.getEnd());
+        Restaurant findRestaurant = restaurantService.findRestaurantById(request.getRestaurantId());
+        OrderStatistics orderStatistics = orderRepository.findOrderStatistics(findRestaurant,
+                LocalDateTime.of(request.getFrom(), LocalTime.of(0, 0)),
+                LocalDateTime.of(request.getEnd(), LocalTime.of(23, 59)),
+                DeliveryStatus.DELIVERY_FINISH);
+
+        return OrderConverter.toOrderStatisticsResponse(orderStatistics);
     }
 
     @Transactional
