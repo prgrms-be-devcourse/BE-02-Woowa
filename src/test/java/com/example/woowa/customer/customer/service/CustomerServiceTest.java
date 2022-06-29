@@ -149,8 +149,8 @@ class CustomerServiceTest {
     customerGradeService.createCustomerGrade(customerGradeCreateRequest2);
     String customerId = getCustomerLoginId();
     Customer customer = customerService.findCustomerEntity(customerId);
-    customer.updateCustomerStatusWhenOrder(3000);
-    customer.updateCustomerStatusWhenOrder(2000);
+    customer.updateCustomerStatusWhenOrder(0,3000);
+    customer.updateCustomerStatusWhenOrder(0,2000);
 
     CustomerGrade customerGrade = customerGradeService.findCustomerGradeByOrderPerMonthCount(customer.getOrderPerMonth());
 
@@ -166,8 +166,8 @@ class CustomerServiceTest {
   void updateCustomerStatusOn() {
     String customerId = getCustomerLoginId();
     Customer customer = customerService.findCustomerEntity(customerId);
-    customer.updateCustomerStatusWhenOrder(3000);
-    customer.updateCustomerStatusWhenOrder(2000);
+    customer.updateCustomerStatusWhenOrder(0, 3000);
+    customer.updateCustomerStatusWhenOrder(0,2000);
 
     CustomerFindResponse customerFindResponse = customerService.updateCustomerStatusOnFirstDay(customerId);
 

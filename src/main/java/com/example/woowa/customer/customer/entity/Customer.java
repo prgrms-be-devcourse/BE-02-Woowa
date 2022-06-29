@@ -81,14 +81,14 @@ public class Customer extends BaseLoginEntity {
         this.isIssued = false;
     }
 
-    public void updateCustomerStatusWhenOrder(int plusPoint) {
+    public void updateCustomerStatusWhenOrder(int usedPoint, int plusPoint) {
         addOrderPerMonth();
-        addPoint(plusPoint);
+        usePoint(usedPoint - plusPoint);
     }
 
-    public void updateCustomerStatusWhenOrderCancel(int minusPoint) {
+    public void updateCustomerStatusWhenOrderCancel(int usedPoint, int minusPoint) {
         minusOrderPerMonth();
-        usePoint(minusPoint);
+        addPoint(usedPoint - minusPoint);
     }
 
     public void addOrderPerMonth() {
