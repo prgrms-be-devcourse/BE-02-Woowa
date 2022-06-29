@@ -11,8 +11,10 @@ import com.example.woowa.customer.customer.service.CustomerService;
 import com.example.woowa.customer.voucher.service.VoucherEntityService;
 import com.example.woowa.delivery.enums.DeliveryStatus;
 import com.example.woowa.order.order.converter.OrderConverter;
+import com.example.woowa.order.order.dto.cart.CartSaveRequest;
 import com.example.woowa.order.order.dto.customer.OrderListCustomerRequest;
 import com.example.woowa.order.order.dto.customer.OrderListCustomerResponse;
+import com.example.woowa.order.order.dto.customer.OrderSaveRequest;
 import com.example.woowa.order.order.dto.restaurant.OrderListRestaurantRequest;
 import com.example.woowa.order.order.dto.restaurant.OrderListRestaurantResponse;
 import com.example.woowa.order.order.dto.statistics.OrderStatistics;
@@ -33,9 +35,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -99,11 +99,8 @@ class OrderServiceTest {
         Menu menu1 = menus.get(0);
         Menu menu2 = menus.get(1);
 
-        int menu1Quantity = 1;
-        int menu2Quantity = 2;
-
         int beforeDiscountPrice =
-                menu1.getPrice() * menu1Quantity + menu2.getPrice() * menu2Quantity;
+                menu1.getPrice() * 1 + menu2.getPrice() * 2;
 
         given(customerService.findCustomerEntity(any())).willReturn(customer);
         given(restaurantService.findRestaurantById(any())).willReturn(restaurant);
@@ -112,13 +109,17 @@ class OrderServiceTest {
         given(menuService.findMenuById(menuId1)).willReturn(menu1);
         given(orderRepository.findById(orderId)).willReturn(Optional.of(order));
 
-        Map<Long, Integer> cartMap = new HashMap<>();
-        cartMap.put(menuId1, menu1Quantity);
-        cartMap.put(menuId2, menu2Quantity);
+        List<CartSaveRequest> cartSaveRequests = List.of(
+                new CartSaveRequest(menuId1, 1),
+                new CartSaveRequest(menuId2, 2));
+
+        OrderSaveRequest orderSaveRequest = new OrderSaveRequest(customer.getLoginId(),
+                restaurantId, null, usePoint, paymentType,
+                cartSaveRequests
+        );
 
         // When
-        orderService.addOrder(customer.getLoginId(), restaurantId, null, usePoint, paymentType,
-                cartMap);
+        orderService.addOrder(orderSaveRequest);
 
         // Then
         Order findOrder = orderService.findOrderById(orderId);

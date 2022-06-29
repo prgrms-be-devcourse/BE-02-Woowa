@@ -7,8 +7,10 @@ import com.example.woowa.customer.voucher.entity.Voucher;
 import com.example.woowa.customer.voucher.service.VoucherEntityService;
 import com.example.woowa.delivery.enums.DeliveryStatus;
 import com.example.woowa.order.order.converter.OrderConverter;
+import com.example.woowa.order.order.dto.cart.CartSaveRequest;
 import com.example.woowa.order.order.dto.customer.OrderListCustomerRequest;
 import com.example.woowa.order.order.dto.customer.OrderListCustomerResponse;
+import com.example.woowa.order.order.dto.customer.OrderSaveRequest;
 import com.example.woowa.order.order.dto.restaurant.OrderListRestaurantRequest;
 import com.example.woowa.order.order.dto.restaurant.OrderListRestaurantResponse;
 import com.example.woowa.order.order.dto.statistics.OrderStatistics;
@@ -16,7 +18,6 @@ import com.example.woowa.order.order.dto.statistics.OrderStatisticsRequest;
 import com.example.woowa.order.order.dto.statistics.OrderStatisticsResponse;
 import com.example.woowa.order.order.entity.Cart;
 import com.example.woowa.order.order.entity.Order;
-import com.example.woowa.order.order.enums.PaymentType;
 import com.example.woowa.order.order.repository.OrderRepository;
 import com.example.woowa.restaurant.menu.entity.Menu;
 import com.example.woowa.restaurant.menu.service.MenuService;
@@ -26,7 +27,6 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
@@ -47,17 +47,19 @@ public class OrderService {
     private final MenuService menuService;
 
     @Transactional
-    public Long addOrder(String loginId, Long restaurantId, Long voucherId, int usePoint,
-            PaymentType paymentType, Map<Long, Integer> cartMap) {
-        List<Cart> carts = convertToCarts(cartMap);
-        Customer findCustomer = customerService.findCustomerEntity(loginId);
-        Restaurant findRestaurant = restaurantService.findRestaurantById(restaurantId);
+    public Long addOrder(OrderSaveRequest request) {
+        Customer findCustomer = customerService.findCustomerEntity(request.getLoginId());
+        Restaurant findRestaurant = restaurantService.findRestaurantById(request.getRestaurantId());
+        Long voucherId = request.getVoucherId();
         Voucher findVoucher =
                 Objects.isNull(voucherId) ? null : voucherEntityService.findVoucherById(voucherId);
 
-        Order order = Order.createOrder(findCustomer, findRestaurant, findVoucher, usePoint,
-                paymentType,
-                carts);
+        List<Cart> carts = request.getCarts().stream().map(this::toCart)
+                .collect(Collectors.toList());
+
+        Order order = Order.createOrder(findCustomer, findRestaurant, findVoucher,
+                request.getUsePoint(),
+                request.getPaymentType(), carts);
 
         return orderRepository.save(order).getId();
     }
@@ -110,17 +112,14 @@ public class OrderService {
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 orderId 입니다."));
     }
 
-    private List<Cart> convertToCarts(Map<Long, Integer> cartMap) {
-        return cartMap.keySet().stream().map(menuId -> {
-            Menu findMenu = menuService.findMenuById(menuId);
-            int quantity = cartMap.get(menuId);
-            return new Cart(findMenu, quantity);
-        }).collect(Collectors.toList());
-    }
-
     private void validatePeriod(LocalDate from, LocalDate end) {
         if (from.isAfter(end)) {
             throw new IllegalArgumentException(ErrorMessage.INVALID_PERIOD_VALUE.getMessage());
         }
+    }
+
+    private Cart toCart(CartSaveRequest request) {
+        Menu menu = menuService.findMenuById(request.getMenuId());
+        return new Cart(menu, request.getQuantity());
     }
 }
