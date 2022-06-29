@@ -1,7 +1,6 @@
 package com.example.woowa.customer.customer.service;
 
-import com.example.woowa.customer.customer.converter.CustomerAddressConverter;
-import com.example.woowa.customer.customer.converter.CustomerConverter;
+import com.example.woowa.customer.customer.converter.CustomerMapper;
 import com.example.woowa.customer.customer.dto.CustomerCreateRequest;
 import com.example.woowa.customer.customer.dto.CustomerFindResponse;
 import com.example.woowa.customer.customer.dto.CustomerUpdateRequest;
@@ -23,21 +22,22 @@ public class CustomerService {
     private final CustomerRepository customerRepository;
     private final CustomerGradeService customerGradeService;
     private final AreaCodeService areaCodeService;
+    private final CustomerMapper customerMapper;
 
     @Transactional
     public CustomerFindResponse createCustomer(CustomerCreateRequest customerCreateRequest) {
-        Customer customer = CustomerConverter.toCustomer(customerCreateRequest, customerGradeService.findDefaultCustomerGrade());
+        Customer customer = customerMapper.toCustomer(customerCreateRequest, customerGradeService.findDefaultCustomerGrade());
         customerRepository.save(customer);
         AreaCode areaCode = areaCodeService.findByAddress(customerCreateRequest.getAddress().getDefaultAddress());
-        CustomerAddress customerAddress = CustomerAddressConverter.toCustomerAddress(areaCode, customerCreateRequest.getAddress(), customer);
+        CustomerAddress customerAddress = customerMapper.toCustomerAddress(areaCode, customerCreateRequest.getAddress(), customer);
         customerAddressRepository.save(customerAddress);
         customer.addCustomerAddress(customerAddress);
-        return CustomerConverter.toCustomerDto(customer);
+        return customerMapper.toCustomerDto(customer);
     }
 
     public CustomerFindResponse findCustomer(String loginId) {
         Customer customer = findCustomerEntity(loginId);
-        return CustomerConverter.toCustomerDto(customer);
+        return customerMapper.toCustomerDto(customer);
     }
 
     @Transactional
@@ -46,7 +46,7 @@ public class CustomerService {
         if (customerUpdateRequest.getLoginPassword() != null) {
             customer.changePassword(customerUpdateRequest.getLoginPassword());
         }
-        return CustomerConverter.toCustomerDto(customer);
+        return customerMapper.toCustomerDto(customer);
     }
 
     @Transactional
@@ -70,6 +70,6 @@ public class CustomerService {
     public CustomerFindResponse updateCustomerStatusOnFirstDay(String loginId) {
         Customer customer = findCustomerEntity(loginId);
         customer.updateCustomerStatusOnFirstDay();
-        return CustomerConverter.toCustomerDto(customer);
+        return customerMapper.toCustomerDto(customer);
     }
 }

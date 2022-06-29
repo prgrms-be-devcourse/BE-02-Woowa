@@ -1,9 +1,9 @@
 package com.example.woowa.customer.voucher.service;
 
+import com.example.woowa.customer.customer.converter.CustomerMapper;
 import com.example.woowa.customer.customer.entity.Customer;
 import com.example.woowa.customer.customer.entity.CustomerGrade;
 import com.example.woowa.customer.customer.service.CustomerService;
-import com.example.woowa.customer.voucher.converter.VoucherConverter;
 import com.example.woowa.customer.voucher.dto.VoucherCreateRequest;
 import com.example.woowa.customer.voucher.dto.VoucherFindResponse;
 import com.example.woowa.customer.voucher.entity.Voucher;
@@ -24,6 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class VoucherService {
     private final VoucherRepository voucherRepository;
     private final CustomerService customerService;
+    private final CustomerMapper customerMapper;
 
     @Transactional
     public List<VoucherFindResponse> registerMonthlyVoucher(String customerLoginId) {
@@ -38,7 +39,7 @@ public class VoucherService {
                 Voucher voucher = new Voucher(VoucherType.FiXED, EventType.MONTH, disountPrice, time);
                 voucherRepository.save(voucher);
                 customer.addVoucher(voucher);
-                result.add(VoucherConverter.toVoucherDto(voucher));
+                result.add(customerMapper.toVoucherDto(voucher));
             }
             customer.setIsIssued(true);
         }
@@ -52,24 +53,24 @@ public class VoucherService {
             Customer customer = customerService.findCustomerEntity(customerLoginId);
             customer.addVoucher(voucher);
         }
-        return VoucherConverter.toVoucherDto(voucher);
+        return customerMapper.toVoucherDto(voucher);
     }
 
     @Transactional
     public VoucherFindResponse createVoucher(VoucherCreateRequest voucherCreateRequest) throws Exception {
-        Voucher voucher = VoucherConverter.toVoucher(voucherCreateRequest);
+        Voucher voucher = customerMapper.toVoucher(voucherCreateRequest);
         voucher = voucherRepository.save(voucher);
-        return VoucherConverter.toVoucherDto(voucher);
+        return customerMapper.toVoucherDto(voucher);
     }
 
     public VoucherFindResponse findVoucher(Long id) {
         Voucher voucher = findVoucherEntity(id);
-        return VoucherConverter.toVoucherDto(voucher);
+        return customerMapper.toVoucherDto(voucher);
     }
 
     public List<VoucherFindResponse> findUserVoucher(String customerLoginId) {
         Customer customer = customerService.findCustomerEntity(customerLoginId);
-        return customer.getVouchers().stream().map(VoucherConverter::toVoucherDto).collect(Collectors.toList());
+        return customer.getVouchers().stream().map(customerMapper::toVoucherDto).collect(Collectors.toList());
     }
 
     @Transactional

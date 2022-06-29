@@ -9,7 +9,7 @@ import com.example.woowa.order.review.enums.ScoreType;
 
 public class ReviewConverter {
     public static ReviewFindResponse toReviewDto(Review review) {
-        return new ReviewFindResponse(review.getId(), review.getContent(), review.getScoreType());
+        return new ReviewFindResponse(review.getId(), review.getContent(), review.getScoreType().getValue());
     }
 
     public static Review toReview(ReviewCreateRequest reviewCreateRequest, Customer customer, Order order) {

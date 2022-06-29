@@ -1,6 +1,6 @@
 package com.example.woowa.customer.customer.service;
 
-import com.example.woowa.customer.customer.converter.CustomerGradeConverter;
+import com.example.woowa.customer.customer.converter.CustomerMapper;
 import com.example.woowa.customer.customer.dto.CustomerGradeCreateRequest;
 import com.example.woowa.customer.customer.dto.CustomerGradeFindResponse;
 import com.example.woowa.customer.customer.dto.CustomerGradeUpdateRequest;
@@ -15,19 +15,20 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class CustomerGradeService {
     private final CustomerGradeRepository customerGradeRepository;
+    private final CustomerMapper customerMapper;
 
     @Transactional
     public CustomerGradeFindResponse createCustomerGrade(
         CustomerGradeCreateRequest customerGradeCreateRequest) {
-        CustomerGrade customerGrade = CustomerGradeConverter.toCustomerGrade(
+        CustomerGrade customerGrade = customerMapper.toCustomerGrade(
             customerGradeCreateRequest);
         customerGrade = customerGradeRepository.save(customerGrade);
-        return CustomerGradeConverter.toCustomerGradeDto(customerGrade);
+        return customerMapper.toCustomerGradeDto(customerGrade);
     }
 
     public CustomerGradeFindResponse findCustomerGrade(Long id) {
         CustomerGrade customerGrade = customerGradeRepository.findById(id).orElseThrow(() -> new RuntimeException("customer grade not existed"));
-        return CustomerGradeConverter.toCustomerGradeDto(customerGrade);
+        return customerMapper.toCustomerGradeDto(customerGrade);
     }
 
     @Transactional
@@ -45,7 +46,7 @@ public class CustomerGradeService {
         if (updateCustomerGradeDto.getVoucherCount() != null) {
             customerGrade.setVoucherCount(updateCustomerGradeDto.getVoucherCount());
         }
-        return CustomerGradeConverter.toCustomerGradeDto(customerGrade);
+        return customerMapper.toCustomerGradeDto(customerGrade);
     }
 
     public void deleteCustomerGrade(Long id) {

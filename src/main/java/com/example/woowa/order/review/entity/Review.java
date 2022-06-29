@@ -51,10 +51,6 @@ public class Review extends BaseTimeEntity {
         this.order = order;
     }
 
-    public int getScoreType() {
-        return this.scoreType.getValue();
-    }
-
     public void setContent(String content) {
         assert !content.isBlank();
         this.content = content;

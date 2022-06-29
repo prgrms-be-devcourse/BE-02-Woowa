@@ -1,8 +1,5 @@
 package com.example.woowa.customer.customer.service;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.is;
-
 import com.example.woowa.customer.customer.dto.CustomerAddressCreateRequest;
 import com.example.woowa.customer.customer.dto.CustomerAddressFindResponse;
 import com.example.woowa.customer.customer.dto.CustomerAddressUpdateRequest;

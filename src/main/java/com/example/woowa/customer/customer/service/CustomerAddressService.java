@@ -1,6 +1,6 @@
 package com.example.woowa.customer.customer.service;
 
-import com.example.woowa.customer.customer.converter.CustomerAddressConverter;
+import com.example.woowa.customer.customer.converter.CustomerMapper;
 import com.example.woowa.customer.customer.dto.CustomerAddressCreateRequest;
 import com.example.woowa.customer.customer.dto.CustomerAddressFindResponse;
 import com.example.woowa.customer.customer.dto.CustomerAddressUpdateRequest;
@@ -23,15 +23,16 @@ public class CustomerAddressService {
     private final CustomerAddressRepository customerAddressRepository;
     private final CustomerService customerService;
     private final AreaCodeService areaCodeService;
+    private final CustomerMapper customerMapper;
 
     @Transactional
     public CustomerAddressFindResponse createCustomerAddress(String loginId, CustomerAddressCreateRequest customerAddressCreateRequest) {
         Customer customer = customerService.findCustomerEntity(loginId);
         AreaCode areaCode = areaCodeService.findByAddress(customerAddressCreateRequest.getDefaultAddress());
-        CustomerAddress customerAddress = CustomerAddressConverter.toCustomerAddress(areaCode, customerAddressCreateRequest, customer);
+        CustomerAddress customerAddress = customerMapper.toCustomerAddress(areaCode, customerAddressCreateRequest, customer);
         customerAddress = customerAddressRepository.save(customerAddress);
         customer.addCustomerAddress(customerAddress);
-        return CustomerAddressConverter.toCustomerAddressDto(customerAddress);
+        return customerMapper.toCustomerAddressDto(customerAddress);
     }
 
     public List<CustomerAddressFindResponse> findCustomerAddresses(String loginId) {
@@ -39,7 +40,7 @@ public class CustomerAddressService {
         if (customer.getCustomerAddresses().isEmpty()) {
             return new ArrayList<>();
         }
-        return customer.getCustomerAddresses().stream().map(CustomerAddressConverter::toCustomerAddressDto).collect(
+        return customer.getCustomerAddresses().stream().map(customerMapper::toCustomerAddressDto).collect(
             Collectors.toList());
     }
 
@@ -54,7 +55,7 @@ public class CustomerAddressService {
         if (customerAddressUpdateRequest.getNickname() != null) {
             customerAddress.setNickname(customerAddressUpdateRequest.getNickname());
         }
-        return CustomerAddressConverter.toCustomerAddressDto(customerAddress);
+        return customerMapper.toCustomerAddressDto(customerAddress);
     }
 
     @Transactional

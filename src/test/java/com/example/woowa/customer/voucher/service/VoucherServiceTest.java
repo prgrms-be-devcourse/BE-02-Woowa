@@ -129,7 +129,6 @@ class VoucherServiceTest {
     Assertions.assertThat(voucherFindResponse1.getExpirationDate()).isEqualTo(LocalDateTime.of(2022, 12, 1, 12, 0));
   }
 
-
   @Test
   @DisplayName("유저 보유 쿠폰 목록 조회")
   void findUserVoucher() throws Exception {
