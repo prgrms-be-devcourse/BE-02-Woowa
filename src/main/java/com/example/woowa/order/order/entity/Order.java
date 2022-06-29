@@ -2,6 +2,7 @@ package com.example.woowa.order.order.entity;
 
 import com.example.woowa.common.base.BaseTimeEntity;
 import com.example.woowa.customer.customer.entity.Customer;
+import com.example.woowa.delivery.entity.Delivery;
 import com.example.woowa.order.order.enums.OrderStatus;
 import com.example.woowa.order.order.enums.PaymentType;
 import com.example.woowa.restaurant.restaurant.entity.Restaurant;
@@ -62,6 +63,9 @@ public class Order extends BaseTimeEntity {
 
     @Column(columnDefinition = "INTEGER DEFAULT 0")
     private Integer voucherDiscountPrice;
+
+    @OneToOne(mappedBy = "order")
+    private Delivery delivery;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
@@ -128,6 +132,10 @@ public class Order extends BaseTimeEntity {
     public void addCart(Cart cart) {
         carts.add(cart);
         cart.setOrder(this);
+    }
+
+    public void setDelivery(Delivery delivery) {
+        this.delivery = delivery;
     }
 
     private static int getVoucherDiscountPrice(Voucher voucher, int beforeDiscountTotalPrice) {
