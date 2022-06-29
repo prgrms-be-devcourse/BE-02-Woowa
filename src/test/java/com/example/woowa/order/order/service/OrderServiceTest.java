@@ -9,6 +9,11 @@ import com.example.woowa.customer.customer.entity.Customer;
 import com.example.woowa.customer.customer.entity.CustomerGrade;
 import com.example.woowa.customer.customer.service.CustomerService;
 import com.example.woowa.customer.voucher.service.VoucherEntityService;
+import com.example.woowa.order.order.converter.OrderConverter;
+import com.example.woowa.order.order.dto.customer.OrderListCustomerRequest;
+import com.example.woowa.order.order.dto.customer.OrderListCustomerResponse;
+import com.example.woowa.order.order.dto.restaurant.OrderListRestaurantRequest;
+import com.example.woowa.order.order.dto.restaurant.OrderListRestaurantResponse;
 import com.example.woowa.order.order.entity.Cart;
 import com.example.woowa.order.order.entity.Order;
 import com.example.woowa.order.order.enums.OrderStatus;
@@ -20,6 +25,8 @@ import com.example.woowa.restaurant.menu.service.MenuService;
 import com.example.woowa.restaurant.menugroup.entity.MenuGroup;
 import com.example.woowa.restaurant.restaurant.entity.Restaurant;
 import com.example.woowa.restaurant.restaurant.service.RestaurantService;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.Collections;
 import java.util.HashMap;
@@ -32,6 +39,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.SliceImpl;
 
 @ExtendWith(MockitoExtension.class)
 class OrderServiceTest {
@@ -153,16 +162,27 @@ class OrderServiceTest {
     void findOrderByRestaurantTest() {
         // Given
         Long restaurantId = 1L;
-        given(restaurantService.findRestaurantById(restaurantId)).willReturn(restaurant);
-        given(orderRepository.findByRestaurant(restaurant)).willReturn(
-                Collections.singletonList(order));
+        LocalDate from = LocalDate.now().minusMonths(1);
+        LocalDate end = LocalDate.now();
+        PageRequest pageable = PageRequest.of(0, 3);
 
+        given(restaurantService.findRestaurantById(restaurantId)).willReturn(restaurant);
+        given(orderRepository.findByRestaurant(restaurant,
+                LocalDateTime.of(from, LocalTime.of(0, 0)),
+                LocalDateTime.of(end, LocalTime.of(23, 59)), pageable)).willReturn(
+                new SliceImpl(Collections.singletonList(order), pageable,
+                        false));
         // When
-        List<Order> orders = orderService.findOrderByRestaurant(restaurantId);
+
+        OrderListRestaurantResponse response = orderService.findOrderByRestaurant(
+                new OrderListRestaurantRequest(restaurantId, 0, 3,
+                        from, end));
 
         // Then
-        assertThat(orders.size()).isEqualTo(1);
-        assertThat(orders).contains(order);
+        assertThat(response.getHasNextPage()).isFalse();
+        assertThat(response.getSize()).isEqualTo(1);
+        assertThat(response.getOrders()).usingRecursiveFieldByFieldElementComparator()
+                .contains(OrderConverter.toOrderRestaurantResponse(order));
     }
 
     @Test
@@ -170,11 +190,28 @@ class OrderServiceTest {
     void findOrderByNotExistsRestaurantTest() {
         // Given
         Long wrongRestaurantId = -1L;
+        LocalDate from = LocalDate.now().minusMonths(1);
+        LocalDate end = LocalDate.now();
         given(restaurantService.findRestaurantById(wrongRestaurantId)).willThrow(
                 IllegalArgumentException.class);
 
         // When // Then
-        assertThatThrownBy(() -> orderService.findOrderByRestaurant(wrongRestaurantId))
+        assertThatThrownBy(() -> orderService.findOrderByRestaurant(
+                new OrderListRestaurantRequest(wrongRestaurantId, 0, 3, from, end)))
+                .isExactlyInstanceOf(IllegalArgumentException.class);
+    }
+
+    @Test
+    @DisplayName("레스토랑의 주문 내역을 조회할 때 조회의 시작일이 마감일보다 이전이 아니면 예외가 발생한다.")
+    void findOrderByRestaurantInvalidPeriodTest() {
+        // Given
+        Long restaurantId = 1L;
+        LocalDate from = LocalDate.now();
+        LocalDate end = LocalDate.now().minusMonths(1);
+
+        // When // Then
+        assertThatThrownBy(() -> orderService.findOrderByRestaurant(
+                new OrderListRestaurantRequest(restaurantId, 0, 3, from, end)))
                 .isExactlyInstanceOf(IllegalArgumentException.class);
     }
 
@@ -183,16 +220,28 @@ class OrderServiceTest {
     void findOrderByCustomerTest() {
         // Given
         String loginId = customer.getLoginId();
+        LocalDate from = LocalDate.now().minusMonths(1);
+        LocalDate end = LocalDate.now();
+        PageRequest pageable = PageRequest.of(0, 3);
+        SliceImpl<Order> orderSlice = new SliceImpl<>(Collections.singletonList(order), pageable,
+                false);
+
         given(customerService.findCustomerEntity(loginId)).willReturn(customer);
-        given(orderRepository.findByCustomer(customer)).willReturn(
-                Collections.singletonList(order));
+        given(orderRepository.findByCustomer(customer, LocalDateTime.of(from, LocalTime.of(0, 0)),
+                LocalDateTime.of(end, LocalTime.of(23, 59)),
+                pageable)).willReturn(orderSlice
+        );
 
         // When
-        List<Order> orders = orderService.findOrderByCustomer(loginId);
+        OrderListCustomerResponse response = orderService.findOrderByCustomer(
+                new OrderListCustomerRequest(loginId, 0, 3,
+                        from, end));
 
         // Then
-        assertThat(orders.size()).isEqualTo(1);
-        assertThat(orders).contains(order);
+        assertThat(response.getHasNextPage()).isFalse();
+        assertThat(response.getSize()).isEqualTo(1);
+        assertThat(response.getMenus()).usingRecursiveFieldByFieldElementComparator()
+                .contains(OrderConverter.toOrderCustomerResponse(order));
     }
 
     @Test
@@ -200,11 +249,29 @@ class OrderServiceTest {
     void findOrderByNotExistsCustomerTest() {
         // Given
         String wrongLoginId = customer.getLoginId();
+        LocalDate from = LocalDate.now().minusMonths(1);
+        LocalDate end = LocalDate.now();
+
         given(customerService.findCustomerEntity(wrongLoginId)).willThrow(RuntimeException.class);
 
         // When // Then
-        assertThatThrownBy(() -> orderService.findOrderByCustomer(wrongLoginId))
+        assertThatThrownBy(() -> orderService.findOrderByCustomer(
+                new OrderListCustomerRequest(wrongLoginId, 0, 3, from, end)))
                 .isExactlyInstanceOf(RuntimeException.class);
+    }
+
+    @Test
+    @DisplayName("회원의 주문을 조회할 때 조회 기간의 시작일이 마감일보다 이전이 아니면 예외가 발생한다.")
+    void findOrderByCustomerInvalidPeriodTest() {
+        // Given
+        String longinId = customer.getLoginId();
+        LocalDate from = LocalDate.now();
+        LocalDate end = LocalDate.now().minusMonths(1);
+
+        // When // Then
+        assertThatThrownBy(() -> orderService.findOrderByCustomer(
+                new OrderListCustomerRequest(longinId, 0, 3, from, end)))
+                .isExactlyInstanceOf(IllegalArgumentException.class);
     }
 
     @Test
@@ -264,8 +331,7 @@ class OrderServiceTest {
 
     private Customer initCustomer() {
         CustomerGrade customerGrade = new CustomerGrade(4, "고마운분", 1000, 1);
-        return null;
-//        return new Customer("dev12", "Programmers123!", "2000-01-01", customerGrade);
+        return new Customer("dev12", "Programmers123!", LocalDate.of(1999, 1, 1), customerGrade);
     }
 
     private Restaurant initRestaurant() {

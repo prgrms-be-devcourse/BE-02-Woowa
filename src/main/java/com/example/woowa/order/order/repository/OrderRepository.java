@@ -3,12 +3,21 @@ package com.example.woowa.order.order.repository;
 import com.example.woowa.customer.customer.entity.Customer;
 import com.example.woowa.order.order.entity.Order;
 import com.example.woowa.restaurant.restaurant.entity.Restaurant;
-import java.util.List;
+import java.time.LocalDateTime;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 public interface OrderRepository extends JpaRepository<Order, Long> {
 
-    List<Order> findByRestaurant(Restaurant restaurant);
+    @Query(value = "SELECT o FROM Order o WHERE o.restaurant = :restaurant AND o.createdAt BETWEEN :from AND :end ORDER BY o.createdAt desc")
+    Slice<Order> findByRestaurant(@Param("restaurant") Restaurant restaurant,
+            @Param("from") LocalDateTime from, @Param("end") LocalDateTime end,
+            Pageable pageable);
 
-    List<Order> findByCustomer(Customer customer);
+    @Query(value = "SELECT o FROM Order o WHERE o.customer = :customer AND o.createdAt BETWEEN :from AND :end ORDER BY o.createdAt desc")
+    Slice<Order> findByCustomer(@Param("customer") Customer customer,
+            @Param("from") LocalDateTime from, @Param("end") LocalDateTime end, Pageable pageable);
 }
