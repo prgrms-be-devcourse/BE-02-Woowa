@@ -12,11 +12,13 @@ import com.example.woowa.customer.voucher.service.VoucherEntityService;
 import com.example.woowa.delivery.enums.DeliveryStatus;
 import com.example.woowa.order.order.converter.OrderConverter;
 import com.example.woowa.order.order.dto.cart.CartSaveRequest;
+import com.example.woowa.order.order.dto.customer.OrderCustomerResponse;
 import com.example.woowa.order.order.dto.customer.OrderListCustomerRequest;
 import com.example.woowa.order.order.dto.customer.OrderListCustomerResponse;
 import com.example.woowa.order.order.dto.customer.OrderSaveRequest;
 import com.example.woowa.order.order.dto.restaurant.OrderListRestaurantRequest;
 import com.example.woowa.order.order.dto.restaurant.OrderListRestaurantResponse;
+import com.example.woowa.order.order.dto.restaurant.OrderRestaurantResponse;
 import com.example.woowa.order.order.dto.statistics.OrderStatistics;
 import com.example.woowa.order.order.dto.statistics.OrderStatisticsRequest;
 import com.example.woowa.order.order.dto.statistics.OrderStatisticsResponse;
@@ -276,6 +278,71 @@ class OrderServiceTest {
         // When // Then
         assertThatThrownBy(() -> orderService.findOrderByCustomer(
                 new OrderListCustomerRequest(longinId, 0, 3, from, end)))
+                .isExactlyInstanceOf(IllegalArgumentException.class);
+    }
+
+    @Test
+    @DisplayName("회원의 특정 주문을 조회한다.")
+    void findDetailOrderCustomerTest() {
+        // Given
+        Long orderId = 1L;
+        given(orderRepository.findById(orderId)).willReturn(Optional.of(order));
+
+        // When
+        OrderCustomerResponse response = orderService.findDetailOrderForCustomer(orderId);
+
+        // Then
+        assertThat(response.getMenus().size()).isEqualTo(carts.size());
+        assertThat(response.getUsedPoint()).isEqualTo(order.getUsedPoint());
+        assertThat(response.getBeforeDiscountTotalPrice()).isEqualTo(
+                order.getBeforeDiscountTotalPrice());
+        assertThat(response.getVoucherDiscountPrice()).isEqualTo(
+                order.getVoucherDiscountPrice());
+    }
+
+    @Test
+    @DisplayName("회원의 존재하지 않는 특정 주문을 조회하려 하면 예외가 발생한다.")
+    void findDetailOrderForCustomerNotExistsTest() {
+        // Given
+        Long wrongOrderId = -1L;
+        given(orderRepository.findById(wrongOrderId)).willReturn(Optional.empty());
+
+        // When // Then
+        assertThatThrownBy(() -> orderService.findDetailOrderForCustomer(wrongOrderId))
+                .isExactlyInstanceOf(IllegalArgumentException.class);
+    }
+
+    @Test
+    @DisplayName("가게의 특정 주문을 조회한다.")
+    void findDetailOrderForRestaurantTest() {
+        // Given
+        Long orderId = 1L;
+        given(orderRepository.findById(orderId)).willReturn(Optional.of(order));
+
+        // When
+        OrderRestaurantResponse response = orderService.findDetailOrderByIdForRestaurant(
+                orderId);
+
+        // Then
+        assertThat(response.getMenus().size()).isEqualTo(carts.size());
+        assertThat(response.getTotalDiscountPrice()).isEqualTo(
+                order.getUsedPoint() + order.getVoucherDiscountPrice());
+        assertThat(response.getBeforeDiscountTotalPrice()).isEqualTo(
+                order.getBeforeDiscountTotalPrice());
+        assertThat(response.getAfterDiscountTotalPrice()).isEqualTo(
+                order.getAfterDiscountTotalPrice());
+    }
+
+    @Test
+    @DisplayName("가게의 존재하지 않는 특정 주문을 조회하려 하면 예외가 발생한다.")
+    void findDetailOrderForRestaurantNotExistsTest() {
+        // Given
+        Long wrongOrderId = -1L;
+        given(orderRepository.findById(wrongOrderId)).willReturn(Optional.empty());
+
+        // When // Then
+        assertThatThrownBy(() -> orderService.findDetailOrderByIdForRestaurant(
+                wrongOrderId))
                 .isExactlyInstanceOf(IllegalArgumentException.class);
     }
 

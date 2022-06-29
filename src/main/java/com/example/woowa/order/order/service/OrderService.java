@@ -8,11 +8,13 @@ import com.example.woowa.customer.voucher.service.VoucherEntityService;
 import com.example.woowa.delivery.enums.DeliveryStatus;
 import com.example.woowa.order.order.converter.OrderConverter;
 import com.example.woowa.order.order.dto.cart.CartSaveRequest;
+import com.example.woowa.order.order.dto.customer.OrderCustomerResponse;
 import com.example.woowa.order.order.dto.customer.OrderListCustomerRequest;
 import com.example.woowa.order.order.dto.customer.OrderListCustomerResponse;
 import com.example.woowa.order.order.dto.customer.OrderSaveRequest;
 import com.example.woowa.order.order.dto.restaurant.OrderListRestaurantRequest;
 import com.example.woowa.order.order.dto.restaurant.OrderListRestaurantResponse;
+import com.example.woowa.order.order.dto.restaurant.OrderRestaurantResponse;
 import com.example.woowa.order.order.dto.statistics.OrderStatistics;
 import com.example.woowa.order.order.dto.statistics.OrderStatisticsRequest;
 import com.example.woowa.order.order.dto.statistics.OrderStatisticsResponse;
@@ -84,6 +86,14 @@ public class OrderService {
                 PageRequest.of(request.getPageNum(), request.getSize()));
 
         return OrderConverter.toOrderListCustomerResponse(orderSlice);
+    }
+
+    public OrderCustomerResponse findDetailOrderForCustomer(Long orderId) {
+        return OrderConverter.toOrderCustomerResponse(findOrderById(orderId));
+    }
+
+    public OrderRestaurantResponse findDetailOrderByIdForRestaurant(Long orderId) {
+        return OrderConverter.toOrderRestaurantResponse(findOrderById(orderId));
     }
 
     public OrderStatisticsResponse findOrderStatistics(OrderStatisticsRequest request) {
