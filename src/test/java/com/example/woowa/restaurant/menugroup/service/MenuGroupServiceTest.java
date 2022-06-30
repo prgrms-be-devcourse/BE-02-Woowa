@@ -9,6 +9,7 @@ import static org.mockito.Mockito.when;
 
 import com.example.woowa.restaurant.menugroup.MenuGroupMapperImpl;
 import com.example.woowa.restaurant.menugroup.dto.MenuGroupListResponse;
+import com.example.woowa.restaurant.menugroup.dto.MenuGroupResponse;
 import com.example.woowa.restaurant.menugroup.dto.MenuGroupSaveRequest;
 import com.example.woowa.restaurant.menugroup.dto.MenuGroupUpdateRequest;
 import com.example.woowa.restaurant.menugroup.entity.MenuGroup;
@@ -122,10 +123,11 @@ class MenuGroupServiceTest {
         when(menuGroupRepository.findById(menuGroupId)).thenReturn(Optional.of(menuGroup));
 
         // When
-        MenuGroup findMenuGroup = menuGroupService.findMenuGroupEntityById(menuGroupId);
+        MenuGroupResponse response = menuGroupService.findMenuById(menuGroupId);
 
         // Then
-        assertThat(findMenuGroup).usingRecursiveComparison().isEqualTo(menuGroup);
+        assertThat(response).usingRecursiveComparison()
+                .isEqualTo(mapper.toMenuGroupResponse(menuGroup));
     }
 
     @Test
@@ -136,7 +138,7 @@ class MenuGroupServiceTest {
         when(menuGroupRepository.findById(wrongMenuGroupId)).thenReturn(Optional.empty());
 
         // When // Then
-        assertThatThrownBy(() -> menuGroupService.findMenuGroupEntityById(wrongMenuGroupId))
+        assertThatThrownBy(() -> menuGroupService.findMenuById(wrongMenuGroupId))
                 .isExactlyInstanceOf(IllegalArgumentException.class);
     }
 
