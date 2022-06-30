@@ -1,7 +1,7 @@
 package com.example.woowa.restaurant.menu.service;
 
-import com.example.woowa.common.base.BaseTimeEntity;
 import com.example.woowa.restaurant.menu.MenuMapper;
+import com.example.woowa.restaurant.menu.dto.MainMenuStatusUpdateRequest;
 import com.example.woowa.restaurant.menu.dto.MenuResponse;
 import com.example.woowa.restaurant.menu.dto.MenuSaveRequest;
 import com.example.woowa.restaurant.menu.dto.MenuStatusUpdateRequest;
@@ -18,7 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
-public class MenuService extends BaseTimeEntity {
+public class MenuService {
 
     private final MenuRepository menuRepository;
     private final MenuGroupService menuGroupService;
@@ -50,13 +50,12 @@ public class MenuService extends BaseTimeEntity {
     }
 
     @Transactional
-    public void setMainMenu(Long menuId) {
-        findMenuEntityById(menuId).setMainMenu();
-    }
-
-    @Transactional
-    public void cancelMainMenu(Long menuId) {
-        findMenuEntityById(menuId).cancelMainMenu();
+    public void changeMainMenuStatus(Long menuId, MainMenuStatusUpdateRequest request) {
+        if (request.getIsMainMenu()) {
+            findMenuEntityById(menuId).setMainMenu();
+        } else {
+            findMenuEntityById(menuId).cancelMainMenu();
+        }
     }
 
     @Transactional

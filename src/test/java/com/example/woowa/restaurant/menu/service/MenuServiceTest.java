@@ -6,6 +6,7 @@ import static org.mockito.BDDMockito.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 
+import com.example.woowa.restaurant.menu.dto.MainMenuStatusUpdateRequest;
 import com.example.woowa.restaurant.menu.dto.MenuResponse;
 import com.example.woowa.restaurant.menu.dto.MenuSaveRequest;
 import com.example.woowa.restaurant.menu.dto.MenuStatusUpdateRequest;
@@ -164,7 +165,7 @@ class MenuServiceTest {
         given(menuRepository.findById(menuId)).willReturn(Optional.of(menu));
 
         // When
-        menuService.setMainMenu(menuId);
+        menuService.changeMainMenuStatus(menuId, new MainMenuStatusUpdateRequest(true));
 
         // Then
         Menu findMenu = menuService.findMenuEntityById(menuId);
@@ -179,7 +180,8 @@ class MenuServiceTest {
         given(menuRepository.findById(wrongMenuId)).willReturn(Optional.empty());
 
         // When // Then
-        assertThatThrownBy(() -> menuService.setMainMenu(wrongMenuId))
+        assertThatThrownBy(() -> menuService.changeMainMenuStatus(wrongMenuId,
+                new MainMenuStatusUpdateRequest(true)))
                 .isExactlyInstanceOf(IllegalArgumentException.class);
     }
 
@@ -191,7 +193,7 @@ class MenuServiceTest {
         given(menuRepository.findById(menuId)).willReturn(Optional.of(menu));
 
         // When
-        menuService.cancelMainMenu(menuId);
+        menuService.changeMainMenuStatus(menuId, new MainMenuStatusUpdateRequest(false));
 
         // Then
         Menu findMenu = menuService.findMenuEntityById(menuId);
@@ -206,7 +208,8 @@ class MenuServiceTest {
         given(menuRepository.findById(wrongMenuId)).willReturn(Optional.empty());
 
         // When // Then
-        assertThatThrownBy(() -> menuService.cancelMainMenu(wrongMenuId))
+        assertThatThrownBy(() -> menuService.changeMainMenuStatus(wrongMenuId,
+                new MainMenuStatusUpdateRequest(false)))
                 .isExactlyInstanceOf(IllegalArgumentException.class);
     }
 
