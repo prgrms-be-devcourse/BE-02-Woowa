@@ -1,9 +1,13 @@
 package com.example.woowa.restaurant.category.service;
 
+import com.example.woowa.restaurant.category.dto.request.CategoryUpdateRequest;
+import com.example.woowa.restaurant.category.dto.response.CategoryCreateResponse;
+import com.example.woowa.restaurant.category.dto.response.CategoryFindResponse;
 import com.example.woowa.restaurant.category.entity.Category;
+import com.example.woowa.restaurant.category.mapper.CategoryMapper;
 import com.example.woowa.restaurant.category.repository.CategoryRepository;
-import com.example.woowa.restaurant.restaurant.entity.Restaurant;
-import com.example.woowa.restaurant.restaurntat_category.entity.RestaurantCategory;
+import com.example.woowa.restaurant.restaurant.dto.response.RestaurantFindResponse;
+import com.example.woowa.restaurant.restaurant.mapper.RestaurantMapper;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
@@ -16,51 +20,46 @@ import org.springframework.transaction.annotation.Transactional;
 public class CategoryService {
 
     private final CategoryRepository categoryRepository;
+    private final CategoryMapper categoryMapper;
+    private final RestaurantMapper restaurantMapper;
 
     @Transactional
-    public Long createCategory(String categoryName) {
-        return categoryRepository.save(new Category(categoryName)).getId();
+    public CategoryCreateResponse createCategory(String name) {
+        Category category = categoryRepository
+            .save(new Category(name));
+        return categoryMapper.toCreateResponseDto(category);
     }
 
-    public List<Category> findCategories() {
-        return categoryRepository.findAll();
-    }
-
-    public Category findCategoryById(Long categoryId) {
-        return categoryRepository.findById(categoryId)
-            .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 카테고리 아이디입니다."));
-    }
-
-    public Category findCategoryByName(String categoryName) {
-        return categoryRepository.findCategoryByName(categoryName)
-            .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 카테고리 이름입니다."));
-    }
-
-    public List<Restaurant> findRestaurantsByCategoryId(Long categoryId) {
-        return findCategoryById(categoryId).getRestaurantCategories().stream()
-            .map(RestaurantCategory::getRestaurant)
+    public List<CategoryFindResponse> findCategories() {
+        return categoryRepository.findAll().stream()
+            .map(categoryMapper::toFindResponseDto)
             .collect(Collectors.toList());
     }
 
-    public List<Restaurant> findRestaurantsByCategoryName(String categoryName) {
-        return findCategoryByName(categoryName).getRestaurantCategories().stream()
-            .map(RestaurantCategory::getRestaurant)
+    public CategoryFindResponse findCategoryById(Long categoryId) {
+        return categoryMapper.toFindResponseDto(categoryRepository.findById(categoryId)
+            .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 카테고리 아이디입니다.")));
+    }
+
+    public List<RestaurantFindResponse> findRestaurantsByCategoryId(Long categoryId) {
+        return findCategoryEntityById(categoryId).getRestaurantCategories().stream()
+            .map(restaurantCategory -> restaurantMapper.toFindResponseDto(restaurantCategory.getRestaurant()))
             .collect(Collectors.toList());
     }
 
     @Transactional
-    public void changeCategoryName(Long categoryId, String newName) {
-        findCategoryById(categoryId).changeName(newName);
-    }
-
-    @Transactional
-    public void changeCategoryName(String oldName, String newName) {
-        findCategoryByName(oldName).changeName(newName);
+    public void changeCategoryName(Long categoryId, CategoryUpdateRequest categoryUpdateRequest) {
+        findCategoryEntityById(categoryId).changeName(categoryUpdateRequest.getName());
     }
 
     @Transactional
     public void deleteCategory(Long categoryId) {
         categoryRepository.deleteById(categoryId);
+    }
+
+    public Category findCategoryEntityById(Long categoryId) {
+        return categoryRepository.findById(categoryId)
+            .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 카테고리 아이디입니다."));
     }
 
 }
