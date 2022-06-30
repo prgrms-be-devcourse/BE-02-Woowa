@@ -49,7 +49,7 @@ public class Customer extends BaseLoginEntity {
     private Integer point;
 
     @OneToOne(fetch = FetchType.LAZY, orphanRemoval = true)
-    @JoinColumn(name = "customer_grade_id", nullable = false)
+    @JoinColumn(name = "customer_grade_id", nullable = true)
     private CustomerGrade customerGrade;
 
     @OneToMany(mappedBy = "customer", orphanRemoval = true)

@@ -77,11 +77,11 @@ class VoucherServiceTest {
     String customerLoginId = getCustomerLoginId();
 
     voucherService.registerMonthlyVoucher(customerLoginId);
-    CustomerFindResponse customerFindResponse = customerService.findCustomer(customerLoginId);
+    List<VoucherFindResponse> vouchers = voucherService.findUserVoucher(customerLoginId);
 
-    Assertions.assertThat(customerFindResponse.getVouchers().get(0).getVoucherType()).isEqualTo(VoucherType.FiXED.toString());
-    Assertions.assertThat(customerFindResponse.getVouchers().get(0).getEventType()).isEqualTo(EventType.MONTH.toString());
-    Assertions.assertThat(customerFindResponse.getVouchers().get(0).getDiscountValue()).isEqualTo(3000);
+    Assertions.assertThat(vouchers.get(0).getVoucherType()).isEqualTo(VoucherType.FiXED.toString());
+    Assertions.assertThat(vouchers.get(0).getEventType()).isEqualTo(EventType.MONTH.toString());
+    Assertions.assertThat(vouchers.get(0).getDiscountValue()).isEqualTo(3000);
   }
 
   @Test
@@ -155,7 +155,7 @@ class VoucherServiceTest {
 
     voucherService.registerVoucher(customerId, voucherFindResponse.getCode());
     voucherService.deleteVoucher(customerId, voucherFindResponse.getId());
-    List<VoucherFindResponse> vouchers  = customerService.findCustomer(customerId).getVouchers();
+    List<VoucherFindResponse> vouchers  = voucherService.findUserVoucher(customerId);
 
     Assertions.assertThat(vouchers.size()).isEqualTo(0);
   }

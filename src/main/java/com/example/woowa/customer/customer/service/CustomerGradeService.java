@@ -49,13 +49,15 @@ public class CustomerGradeService {
         return customerMapper.toCustomerGradeDto(customerGrade);
     }
 
+    @Transactional
     public void deleteCustomerGrade(Long id) {
         CustomerGrade customerGrade = customerGradeRepository.findById(id).orElseThrow(() -> new RuntimeException("customer grade not existed"));
+        System.out.println(customerGrade.getGrade());
         customerGradeRepository.delete(customerGrade);
     }
 
     public CustomerGrade findDefaultCustomerGrade() {
-        return customerGradeRepository.findFirstByOrderByOrderCount().orElseThrow(() -> new RuntimeException("no customer grade existed"));
+        return customerGradeRepository.findFirstByOrderByOrderCount().orElse(null);
     }
 
     public CustomerGrade findCustomerGradeByOrderPerMonthCount(int orderCount) {

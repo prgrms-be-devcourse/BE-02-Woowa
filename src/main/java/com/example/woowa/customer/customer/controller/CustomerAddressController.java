@@ -4,7 +4,6 @@ import com.example.woowa.customer.customer.dto.CustomerAddressUpdateRequest;
 import com.example.woowa.customer.customer.dto.CustomerAddressCreateRequest;
 import com.example.woowa.customer.customer.dto.CustomerAddressFindResponse;
 import com.example.woowa.customer.customer.service.CustomerAddressService;
-import com.example.woowa.customer.customer.service.CustomerService;
 
 import java.util.List;
 import javax.validation.Valid;

@@ -31,7 +31,6 @@ public class CustomerConverter {
         List<VoucherFindResponse> voucherFindResponseList = customer.getVouchers().stream().map(VoucherConverter::toVoucherDto).collect(toList());
         return new CustomerFindResponse(customer.getLoginId(), customer.getBirthdate().toString(),
             customer.getOrderPerMonth(), customer.getPoint(), customer.getIsIssued(),
-            customerGradeFindResponse, reviewFindResponseList,
-            customerAddressFindResponseList, voucherFindResponseList);
+            customerGradeFindResponse);
     }
 }

@@ -48,7 +48,7 @@ public class Review extends BaseTimeEntity {
         this.content = content;
         this.scoreType = scoreType;
         this.customer = customer;
-        this.order = order;
+        this.order = null;
     }
 
     public void setContent(String content) {
