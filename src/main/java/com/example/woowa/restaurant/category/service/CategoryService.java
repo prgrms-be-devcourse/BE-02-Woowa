@@ -1,5 +1,6 @@
 package com.example.woowa.restaurant.category.service;
 
+import com.example.woowa.restaurant.category.dto.request.CategoryCreateRequest;
 import com.example.woowa.restaurant.category.dto.request.CategoryUpdateRequest;
 import com.example.woowa.restaurant.category.dto.response.CategoryCreateResponse;
 import com.example.woowa.restaurant.category.dto.response.CategoryFindResponse;
@@ -24,9 +25,9 @@ public class CategoryService {
     private final RestaurantMapper restaurantMapper;
 
     @Transactional
-    public CategoryCreateResponse createCategory(String name) {
+    public CategoryCreateResponse createCategory(CategoryCreateRequest categoryCreateRequest) {
         Category category = categoryRepository
-            .save(new Category(name));
+            .save(categoryMapper.toEntity(categoryCreateRequest));
         return categoryMapper.toCreateResponseDto(category);
     }
 
