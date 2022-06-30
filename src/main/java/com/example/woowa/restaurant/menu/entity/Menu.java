@@ -1,5 +1,6 @@
 package com.example.woowa.restaurant.menu.entity;
 
+import com.example.woowa.common.base.BaseTimeEntity;
 import com.example.woowa.restaurant.menu.enums.MenuStatus;
 import com.example.woowa.restaurant.menugroup.entity.MenuGroup;
 import javax.persistence.Column;
@@ -22,7 +23,7 @@ import org.springframework.util.StringUtils;
 @Table(name = "menu")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
-public class Menu {
+public class Menu extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
