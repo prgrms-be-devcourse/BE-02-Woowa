@@ -1,13 +1,13 @@
 package com.example.woowa.restaurant.advertisement.entity;
 
-import com.example.woowa.restaurant.advertisement.converter.UnitTypeConverter;
+import com.example.woowa.common.base.BaseTimeEntity;
 import com.example.woowa.restaurant.advertisement.converter.RateTypeConverter;
+import com.example.woowa.restaurant.advertisement.converter.UnitTypeConverter;
 import com.example.woowa.restaurant.advertisement.enums.RateType;
 import com.example.woowa.restaurant.advertisement.enums.UnitType;
 import com.example.woowa.restaurant.restaurant_advertisement.entity.RestaurantAdvertisement;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Convert;
@@ -18,6 +18,7 @@ import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -25,7 +26,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "advertisement")
 @Entity
-public class Advertisement {
+public class Advertisement extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -57,6 +58,7 @@ public class Advertisement {
     @Column(nullable = false)
     private Integer currentSize;
 
+    @Builder
     public Advertisement(String title, UnitType unitType, RateType rateType, Integer rate,
         String description, Integer limitSize) {
         this.title = title;
@@ -69,16 +71,12 @@ public class Advertisement {
     }
 
     public void addRestaurantAdvertisement(RestaurantAdvertisement restaurantAdvertisement) {
-        if (!Objects.equals(restaurantAdvertisement.getAdvertisement().getId(), this.getId())) {
-            restaurantAdvertisement.setAdvertisement(this);
-        }
+        restaurantAdvertisement.setAdvertisement(this);
     }
 
     public void removeRestaurantAdvertisement(RestaurantAdvertisement restaurantAdvertisement) {
-        if (Objects.equals(restaurantAdvertisement.getAdvertisement().getId(), this.getId())) {
-            this.getRestaurantAdvertisements().remove(restaurantAdvertisement);
-            this.decrementCurrentSize();
-        }
+        this.getRestaurantAdvertisements().remove(restaurantAdvertisement);
+        this.decrementCurrentSize();
     }
 
     public void changeTitle(String title) {
