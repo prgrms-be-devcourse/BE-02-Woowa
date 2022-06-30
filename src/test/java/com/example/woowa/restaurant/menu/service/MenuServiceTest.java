@@ -55,7 +55,7 @@ class MenuServiceTest {
         Integer price = 8000;
 
         given(menuRepository.save(any())).willReturn(menu);
-        given(menuGroupService.findMenuGroupById(menuGroupId)).willReturn(menuGroup);
+        given(menuGroupService.findMenuGroupEntityById(menuGroupId)).willReturn(menuGroup);
 
         // When
         menuService.addMenu(new MenuSaveRequest(menuGroupId, title, description, price));

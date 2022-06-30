@@ -1,5 +1,7 @@
 package com.example.woowa.restaurant.menugroup.service;
 
+import com.example.woowa.restaurant.menugroup.dto.MenuGroupSaveRequest;
+import com.example.woowa.restaurant.menugroup.dto.MenuGroupUpdateRequest;
 import com.example.woowa.restaurant.menugroup.entity.MenuGroup;
 import com.example.woowa.restaurant.menugroup.repository.MenuGroupRepository;
 import com.example.woowa.restaurant.restaurant.entity.Restaurant;
@@ -16,26 +18,28 @@ public class MenuGroupService {
     private final MenuGroupRepository menuGroupRepository;
     private final RestaurantService restaurantService;
 
-    public MenuGroup findMenuGroupById(Long menuGroupId) {
+
+    public MenuGroup findMenuGroupEntityById(Long menuGroupId) {
         return menuGroupRepository.findById(menuGroupId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 menuGroupId 입니다."));
     }
 
     @Transactional
-    public Long addMenuGroup(Long restaurantId, String title, String description) {
+    public Long addMenuGroup(Long restaurantId, MenuGroupSaveRequest request) {
         Restaurant findRestaurant = restaurantService.findRestaurantById(restaurantId);
-        MenuGroup menuGroup = MenuGroup.createMenuGroup(findRestaurant, title, description);
+        MenuGroup menuGroup = MenuGroup.createMenuGroup(findRestaurant, request.getTitle(),
+                request.getDescription());
         return menuGroupRepository.save(menuGroup).getId();
     }
 
     @Transactional
-    public void updateMenuGroup(Long menuGroupId, String title, String description) {
-        findMenuGroupById(menuGroupId).update(title, description);
+    public void updateMenuGroup(Long menuGroupId, MenuGroupUpdateRequest request) {
+        findMenuGroupEntityById(menuGroupId).update(request.getTitle(), request.getDescription());
     }
 
     @Transactional
     public void deleteMenuGroup(Long menuGroupId) {
-        MenuGroup findMenuGroup = findMenuGroupById(menuGroupId);
+        MenuGroup findMenuGroup = findMenuGroupEntityById(menuGroupId);
         menuGroupRepository.delete(findMenuGroup);
     }
 }

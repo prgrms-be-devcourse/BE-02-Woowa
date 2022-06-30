@@ -25,7 +25,8 @@ public class MenuService extends BaseTimeEntity {
 
     @Transactional
     public Long addMenu(MenuSaveRequest request) {
-        MenuGroup findMenuGroup = menuGroupService.findMenuGroupById(request.getMenuGroupId());
+        MenuGroup findMenuGroup = menuGroupService.findMenuGroupEntityById(
+                request.getMenuGroupId());
         Menu menu = Menu.createMenu(findMenuGroup, request.getTitle(), request.getPrice(),
                 request.getDescription(), false,
                 MenuStatus.SALE);

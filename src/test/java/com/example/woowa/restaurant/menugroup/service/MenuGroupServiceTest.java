@@ -7,6 +7,8 @@ import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.when;
 
+import com.example.woowa.restaurant.menugroup.dto.MenuGroupSaveRequest;
+import com.example.woowa.restaurant.menugroup.dto.MenuGroupUpdateRequest;
 import com.example.woowa.restaurant.menugroup.entity.MenuGroup;
 import com.example.woowa.restaurant.menugroup.repository.MenuGroupRepository;
 import com.example.woowa.restaurant.restaurant.entity.Restaurant;
@@ -64,8 +66,8 @@ class MenuGroupServiceTest {
         given(restaurantService.findRestaurantById(restaurantId)).willReturn(restaurant);
 
         // When
-        menuGroupService.addMenuGroup(restaurantId, menuGroup.getTitle(),
-                menuGroup.getDescription());
+        menuGroupService.addMenuGroup(restaurantId, new MenuGroupSaveRequest(menuGroup.getTitle(),
+                menuGroup.getDescription()));
 
         // Then
         then(menuGroupRepository).should().save(any());
@@ -81,8 +83,9 @@ class MenuGroupServiceTest {
 
         // When // Then
         assertThatThrownBy(
-                () -> menuGroupService.addMenuGroup(wrongRestaurantId, menuGroup.getTitle(),
-                        menuGroup.getDescription()))
+                () -> menuGroupService.addMenuGroup(wrongRestaurantId,
+                        new MenuGroupSaveRequest(menuGroup.getTitle(),
+                                menuGroup.getDescription())))
                 .isExactlyInstanceOf(IllegalArgumentException.class);
     }
 
@@ -94,7 +97,7 @@ class MenuGroupServiceTest {
         when(menuGroupRepository.findById(menuGroupId)).thenReturn(Optional.of(menuGroup));
 
         // When
-        MenuGroup findMenuGroup = menuGroupService.findMenuGroupById(menuGroupId);
+        MenuGroup findMenuGroup = menuGroupService.findMenuGroupEntityById(menuGroupId);
 
         // Then
         assertThat(findMenuGroup).usingRecursiveComparison().isEqualTo(menuGroup);
@@ -108,7 +111,7 @@ class MenuGroupServiceTest {
         when(menuGroupRepository.findById(wrongMenuGroupId)).thenReturn(Optional.empty());
 
         // When // Then
-        assertThatThrownBy(() -> menuGroupService.findMenuGroupById(wrongMenuGroupId))
+        assertThatThrownBy(() -> menuGroupService.findMenuGroupEntityById(wrongMenuGroupId))
                 .isExactlyInstanceOf(IllegalArgumentException.class);
     }
 
@@ -122,10 +125,11 @@ class MenuGroupServiceTest {
         given(menuGroupRepository.findById(menuGroupId)).willReturn(Optional.of(menuGroup));
 
         // When
-        menuGroupService.updateMenuGroup(menuGroupId, newTitle, newDescription);
+        menuGroupService.updateMenuGroup(menuGroupId,
+                new MenuGroupUpdateRequest(newTitle, newDescription));
 
         // Then
-        MenuGroup findMenuGroup = menuGroupService.findMenuGroupById(menuGroupId);
+        MenuGroup findMenuGroup = menuGroupService.findMenuGroupEntityById(menuGroupId);
         assertThat(findMenuGroup.getTitle()).isEqualTo(newTitle);
         assertThat(findMenuGroup.getDescription()).isEqualTo(null);
     }
@@ -141,7 +145,8 @@ class MenuGroupServiceTest {
 
         // When // Then
         assertThatThrownBy(
-                () -> menuGroupService.updateMenuGroup(wrongMenuGroupId, newTitle, newDescription))
+                () -> menuGroupService.updateMenuGroup(wrongMenuGroupId,
+                        new MenuGroupUpdateRequest(newTitle, newDescription)))
                 .isExactlyInstanceOf(IllegalArgumentException.class);
     }
 
