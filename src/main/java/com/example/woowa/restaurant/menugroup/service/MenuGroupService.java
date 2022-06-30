@@ -1,5 +1,7 @@
 package com.example.woowa.restaurant.menugroup.service;
 
+import com.example.woowa.restaurant.menugroup.MenuGroupMapper;
+import com.example.woowa.restaurant.menugroup.dto.MenuGroupListResponse;
 import com.example.woowa.restaurant.menugroup.dto.MenuGroupSaveRequest;
 import com.example.woowa.restaurant.menugroup.dto.MenuGroupUpdateRequest;
 import com.example.woowa.restaurant.menugroup.entity.MenuGroup;
@@ -17,11 +19,16 @@ public class MenuGroupService {
 
     private final MenuGroupRepository menuGroupRepository;
     private final RestaurantService restaurantService;
-
+    private final MenuGroupMapper mapper;
 
     public MenuGroup findMenuGroupEntityById(Long menuGroupId) {
         return menuGroupRepository.findById(menuGroupId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 menuGroupId 입니다."));
+    }
+
+    public MenuGroupListResponse findMenuGroupByRestaurant(Long restaurantId) {
+        Restaurant findRestaurant = restaurantService.findRestaurantById(restaurantId);
+        return mapper.toMenuGroupListResponse(menuGroupRepository.findByRestaurant(findRestaurant));
     }
 
     @Transactional
