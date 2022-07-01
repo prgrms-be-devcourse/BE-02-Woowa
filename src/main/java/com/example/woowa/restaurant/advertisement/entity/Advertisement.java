@@ -99,10 +99,6 @@ public class Advertisement extends BaseTimeEntity {
         this.description = description;
     }
 
-    public void changeLimitSize(Integer limitSize) {
-        this.limitSize = limitSize;
-    }
-
     public void incrementCurrentSize() {
         this.currentSize++;
     }
