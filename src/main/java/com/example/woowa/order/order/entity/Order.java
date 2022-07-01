@@ -56,7 +56,9 @@ public class Order extends BaseTimeEntity {
     private List<Cart> carts = new ArrayList<>();
 
     @Column(nullable = false)
-    private Integer beforeDiscountTotalPrice;
+    private Integer orderPrice;
+    @Column(nullable = false)
+    private Integer deliveryFee;
 
     @Column(nullable = false)
     private Integer afterDiscountTotalPrice;
@@ -83,39 +85,40 @@ public class Order extends BaseTimeEntity {
     private OrderStatus orderStatus;
 
     private Order(Voucher voucher, Customer customer, Restaurant restaurant,
-            Integer beforeDiscountTotalPrice, Integer afterDiscountTotalPrice,
+            Integer orderPrice, Integer afterDiscountTotalPrice,
             Integer voucherDiscountPrice,
             PaymentType paymentType, Integer usedPoint, OrderStatus orderStatus,
-            String deliveryAddress) {
+            String deliveryAddress, int deliveryFee) {
         this.voucher = voucher;
         this.customer = customer;
         this.restaurant = restaurant;
-        this.beforeDiscountTotalPrice = beforeDiscountTotalPrice;
+        this.orderPrice = orderPrice;
         this.afterDiscountTotalPrice = afterDiscountTotalPrice;
         this.voucherDiscountPrice = voucherDiscountPrice;
         this.paymentType = paymentType;
         this.usedPoint = usedPoint;
         this.orderStatus = orderStatus;
         this.deliveryAddress = deliveryAddress;
+        this.deliveryFee = deliveryFee;
     }
 
     public static Order createOrder(Customer customer, Restaurant restaurant, Voucher voucher,
             String deliveryAddress,
-            Integer usedPoint, PaymentType paymentType, List<Cart> carts) {
+            Integer usedPoint, PaymentType paymentType, List<Cart> carts, int deliveryFee) {
 
-        int beforeDiscountTotalPrice = carts.stream()
+        int orderPrice = carts.stream()
                 .mapToInt(cart -> cart.getMenu().getPrice() * cart.getQuantity())
                 .sum();
-        int voucherDiscountPrice = getVoucherDiscountPrice(voucher, beforeDiscountTotalPrice);
-        int afterDiscountTotalPrice = beforeDiscountTotalPrice - voucherDiscountPrice;
+        int voucherDiscountPrice = getVoucherDiscountPrice(voucher, orderPrice + deliveryFee);
+        int afterDiscountTotalPrice = orderPrice + deliveryFee - voucherDiscountPrice;
 
         customer.updateCustomerStatusWhenOrder(usedPoint,
                 calculatePlusPoint(afterDiscountTotalPrice));
 
-        Order order = new Order(voucher, customer, restaurant, beforeDiscountTotalPrice,
+        Order order = new Order(voucher, customer, restaurant, orderPrice,
                 afterDiscountTotalPrice,
                 voucherDiscountPrice, paymentType, usedPoint, OrderStatus.PAYMENT_COMPLETED,
-                deliveryAddress);
+                deliveryAddress, deliveryFee);
 
         carts.forEach(order::addCart);
 

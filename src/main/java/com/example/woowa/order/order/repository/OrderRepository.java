@@ -23,7 +23,7 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
     Slice<Order> findByCustomer(@Param("customer") Customer customer,
             @Param("from") LocalDateTime from, @Param("end") LocalDateTime end, Pageable pageable);
 
-    @Query(value = "SELECT new com.example.woowa.order.order.dto.statistics.OrderStatistics(count(o), sum(o.beforeDiscountTotalPrice), sum(o.voucherDiscountPrice), sum(o.usedPoint)) FROM Order o WHERE o.restaurant = :restaurant AND o.delivery.deliveryStatus = :deliveryStatus AND o.createdAt BETWEEN :from AND :end")
+    @Query(value = "SELECT new com.example.woowa.order.order.dto.statistics.OrderStatistics(count(o), sum(o.orderPrice), sum(o.voucherDiscountPrice), sum(o.usedPoint)) FROM Order o WHERE o.restaurant = :restaurant AND o.delivery.deliveryStatus = :deliveryStatus AND o.createdAt BETWEEN :from AND :end")
     OrderStatistics findOrderStatistics(@Param("restaurant") Restaurant restaurant, @Param("from")
     LocalDateTime from, @Param("end") LocalDateTime end,
             @Param("deliveryStatus") DeliveryStatus deliveryStatus);

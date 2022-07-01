@@ -10,6 +10,7 @@ import com.example.woowa.customer.customer.entity.CustomerGrade;
 import com.example.woowa.customer.customer.service.CustomerService;
 import com.example.woowa.customer.voucher.service.VoucherEntityService;
 import com.example.woowa.delivery.enums.DeliveryStatus;
+import com.example.woowa.delivery.service.DeliveryAreaService;
 import com.example.woowa.order.order.converter.OrderConverter;
 import com.example.woowa.order.order.dto.cart.CartSaveRequest;
 import com.example.woowa.order.order.dto.customer.OrderCustomerResponse;
@@ -64,6 +65,9 @@ class OrderServiceTest {
     VoucherEntityService voucherEntityService;
 
     @Mock
+    DeliveryAreaService deliveryAreaService;
+
+    @Mock
     MenuService menuService;
 
     OrderService orderService;
@@ -78,7 +82,7 @@ class OrderServiceTest {
     @BeforeEach
     void init() {
         orderService = new OrderService(orderRepository, customerService, restaurantService,
-                voucherEntityService, menuService);
+                voucherEntityService, deliveryAreaService, menuService);
         customer = initCustomer();
         restaurant = initRestaurant();
         menus = initMenus();
@@ -94,6 +98,7 @@ class OrderServiceTest {
         int usePoint = 0;
         Long orderId = 1L;
         Long restaurantId = 1L;
+        int deliveryFee = 3000;
 
         Long menuId1 = 1L;
         Long menuId2 = 2L;
@@ -101,7 +106,7 @@ class OrderServiceTest {
         Menu menu1 = menus.get(0);
         Menu menu2 = menus.get(1);
 
-        int beforeDiscountPrice =
+        int orderPrice =
                 menu1.getPrice() * 1 + menu2.getPrice() * 2;
 
         given(customerService.findCustomerEntity(any())).willReturn(customer);
@@ -110,6 +115,7 @@ class OrderServiceTest {
         given(menuService.findMenuEntityById(menuId2)).willReturn(menu2);
         given(menuService.findMenuEntityById(menuId1)).willReturn(menu1);
         given(orderRepository.findById(orderId)).willReturn(Optional.of(order));
+        given(deliveryAreaService.getDeliveryFee(restaurant, "서울특별시 강남구")).willReturn(deliveryFee);
 
         List<CartSaveRequest> cartSaveRequests = List.of(
                 new CartSaveRequest(menuId1, 1),
@@ -125,10 +131,10 @@ class OrderServiceTest {
 
         // Then
         Order findOrder = orderService.findOrderById(orderId);
-        assertThat(findOrder.getBeforeDiscountTotalPrice()).isEqualTo(beforeDiscountPrice);
+        assertThat(findOrder.getOrderPrice()).isEqualTo(orderPrice);
         assertThat(findOrder.getVoucherDiscountPrice()).isEqualTo(0);
         assertThat(findOrder.getAfterDiscountTotalPrice()).isEqualTo(
-                beforeDiscountPrice - usePoint);
+                orderPrice + deliveryFee - usePoint);
         assertThat(findOrder.getOrderStatus()).isEqualTo(OrderStatus.PAYMENT_COMPLETED);
         assertThat(findOrder.getPaymentType()).isEqualTo(paymentType);
         assertThat(findOrder.getUsedPoint()).isEqualTo(usePoint);
@@ -294,8 +300,8 @@ class OrderServiceTest {
         // Then
         assertThat(response.getMenus().size()).isEqualTo(carts.size());
         assertThat(response.getUsedPoint()).isEqualTo(order.getUsedPoint());
-        assertThat(response.getBeforeDiscountTotalPrice()).isEqualTo(
-                order.getBeforeDiscountTotalPrice());
+        assertThat(response.getOrderPrice()).isEqualTo(
+                order.getOrderPrice());
         assertThat(response.getVoucherDiscountPrice()).isEqualTo(
                 order.getVoucherDiscountPrice());
     }
@@ -327,8 +333,8 @@ class OrderServiceTest {
         assertThat(response.getMenus().size()).isEqualTo(carts.size());
         assertThat(response.getTotalDiscountPrice()).isEqualTo(
                 order.getUsedPoint() + order.getVoucherDiscountPrice());
-        assertThat(response.getBeforeDiscountTotalPrice()).isEqualTo(
-                order.getBeforeDiscountTotalPrice());
+        assertThat(response.getOrderPrice()).isEqualTo(
+                order.getOrderPrice());
         assertThat(response.getAfterDiscountTotalPrice()).isEqualTo(
                 order.getAfterDiscountTotalPrice());
     }
@@ -489,6 +495,6 @@ class OrderServiceTest {
 
     private Order initOrder() {
         return Order.createOrder(customer, restaurant, null, "서울특별시 강남구", 0,
-                PaymentType.CREDIT_CARD, carts);
+                PaymentType.CREDIT_CARD, carts, 3000);
     }
 }

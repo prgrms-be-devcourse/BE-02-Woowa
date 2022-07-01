@@ -24,7 +24,7 @@ public abstract class OrderConverter {
                 .collect(Collectors.toList());
 
         return new OrderRestaurantResponse(order.getCreatedAt(), menus,
-                order.getBeforeDiscountTotalPrice(), order.getAfterDiscountTotalPrice(),
+                order.getOrderPrice(), order.getDeliveryFee(), order.getAfterDiscountTotalPrice(),
                 order.getVoucherDiscountPrice() + order.getUsedPoint(),
                 getOrderStatusStringForRestaurant(order));
     }
@@ -67,7 +67,7 @@ public abstract class OrderConverter {
                 .collect(Collectors.toList());
 
         return new OrderCustomerResponse(order.getCreatedAt(), menus,
-                order.getBeforeDiscountTotalPrice(),
+                order.getOrderPrice(), order.getDeliveryFee(),
                 order.getVoucherDiscountPrice(), order.getUsedPoint(),
                 getOrderStatusStringForCustomer(order),
                 order.getDeliveryAddress());

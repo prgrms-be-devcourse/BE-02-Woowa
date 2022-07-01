@@ -14,7 +14,9 @@ public class OrderCustomerResponse {
 
     private List<CartResponse> menus;
 
-    private Integer beforeDiscountTotalPrice;
+    private Integer orderPrice;
+
+    private Integer deliveryFee;
 
     private Integer voucherDiscountPrice;
 

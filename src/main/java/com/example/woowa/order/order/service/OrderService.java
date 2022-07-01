@@ -6,6 +6,7 @@ import com.example.woowa.customer.customer.service.CustomerService;
 import com.example.woowa.customer.voucher.entity.Voucher;
 import com.example.woowa.customer.voucher.service.VoucherEntityService;
 import com.example.woowa.delivery.enums.DeliveryStatus;
+import com.example.woowa.delivery.service.DeliveryAreaService;
 import com.example.woowa.order.order.converter.OrderConverter;
 import com.example.woowa.order.order.dto.cart.CartSaveRequest;
 import com.example.woowa.order.order.dto.customer.OrderCustomerResponse;
@@ -46,6 +47,7 @@ public class OrderService {
     private final CustomerService customerService;
     private final RestaurantService restaurantService;
     private final VoucherEntityService voucherEntityService;
+    private final DeliveryAreaService deliveryAreaService;
     private final MenuService menuService;
 
     @Transactional
@@ -59,10 +61,13 @@ public class OrderService {
         List<Cart> carts = request.getCarts().stream().map(this::toCart)
                 .collect(Collectors.toList());
 
+        int deliveryFee = deliveryAreaService.getDeliveryFee(findRestaurant,
+                request.getDeliveryAddress());
+
         Order order = Order.createOrder(findCustomer, findRestaurant, findVoucher,
                 request.getDeliveryAddress(),
                 request.getUsePoint(),
-                request.getPaymentType(), carts);
+                request.getPaymentType(), carts, deliveryFee);
 
         return orderRepository.save(order).getId();
     }
