@@ -49,8 +49,9 @@ public class CategoryService {
     }
 
     @Transactional
-    public void changeCategoryName(Long categoryId, CategoryUpdateRequest categoryUpdateRequest) {
-        findCategoryEntityById(categoryId).changeName(categoryUpdateRequest.getName());
+    public void updateCategoryById(Long categoryId, CategoryUpdateRequest categoryUpdateRequest) {
+        Category category = findCategoryEntityById(categoryId);
+        categoryMapper.updateEntity(categoryUpdateRequest, category);
     }
 
     @Transactional

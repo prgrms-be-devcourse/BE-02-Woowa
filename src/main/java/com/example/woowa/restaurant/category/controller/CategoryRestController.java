@@ -29,7 +29,7 @@ public class CategoryRestController {
     private final CategoryService categoryService;
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<CategoryCreateResponse> createCategory(@Valid @RequestBody CategoryCreateRequest categoryCreateRequest) {
+    public ResponseEntity<CategoryCreateResponse> createCategory(@Valid @RequestBody final CategoryCreateRequest categoryCreateRequest) {
         CategoryCreateResponse newCategory = categoryService.createCategory(categoryCreateRequest);
         return new ResponseEntity<>(newCategory, HttpStatus.OK);
     }
@@ -41,26 +41,27 @@ public class CategoryRestController {
     }
 
     @GetMapping(value = "{categoryId}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<CategoryFindResponse> findCategory(@PathVariable Long categoryId) {
+    public ResponseEntity<CategoryFindResponse> findCategoryById(@PathVariable final Long categoryId) {
         CategoryFindResponse category = categoryService.findCategoryById(categoryId);
         return new ResponseEntity<>(category, HttpStatus.OK);
     }
 
     @GetMapping(value = "{categoryId}/restaurants", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<RestaurantFindResponse>> findRestaurantByCategoryId(@PathVariable Long categoryId) {
+    public ResponseEntity<List<RestaurantFindResponse>> findRestaurantByCategoryId(@PathVariable final Long categoryId) {
         List<RestaurantFindResponse> restaurants = categoryService.findRestaurantsByCategoryId(categoryId);
         return new ResponseEntity<>(restaurants, HttpStatus.OK);
     }
 
+
     @PutMapping(value = "/{categoryId}", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Void> changeCategoryName(@PathVariable Long categoryId,
-        @RequestBody @Valid CategoryUpdateRequest categoryUpdateRequest) {
-        categoryService.changeCategoryName(categoryId, categoryUpdateRequest);
+    public ResponseEntity<Void> updateCategoryById(@PathVariable final Long categoryId,
+        @RequestBody @Valid final CategoryUpdateRequest categoryUpdateRequest) {
+        categoryService.updateCategoryById(categoryId, categoryUpdateRequest);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @DeleteMapping(value = "/{categoryId}")
-    public ResponseEntity<Void> deleteCategory(@PathVariable Long categoryId) {
+    public ResponseEntity<Void> deleteCategoryById(@PathVariable final Long categoryId) {
         categoryService.deleteCategory(categoryId);
         return new ResponseEntity<>(HttpStatus.OK);
     }
