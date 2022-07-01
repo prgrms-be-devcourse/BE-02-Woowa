@@ -98,13 +98,14 @@ public class Order extends BaseTimeEntity {
     public static Order createOrder(Customer customer, Restaurant restaurant, Voucher voucher,
             Integer usedPoint, PaymentType paymentType, List<Cart> carts) {
 
-        customer.usePoint(usedPoint);
-
         int beforeDiscountTotalPrice = carts.stream()
                 .mapToInt(cart -> cart.getMenu().getPrice() * cart.getQuantity())
                 .sum();
         int voucherDiscountPrice = getVoucherDiscountPrice(voucher, beforeDiscountTotalPrice);
         int afterDiscountTotalPrice = beforeDiscountTotalPrice - voucherDiscountPrice;
+
+        customer.updateCustomerStatusWhenOrder(usedPoint,
+                calculatePlusPoint(afterDiscountTotalPrice));
 
         Order order = new Order(voucher, customer, restaurant, beforeDiscountTotalPrice,
                 afterDiscountTotalPrice,
@@ -126,6 +127,9 @@ public class Order extends BaseTimeEntity {
             voucher = null;
         }
 
+        customer.updateCustomerStatusWhenOrderCancel(usedPoint,
+                calculatePlusPoint(afterDiscountTotalPrice));
+
         orderStatus = OrderStatus.CANCEL;
     }
 
@@ -140,5 +144,9 @@ public class Order extends BaseTimeEntity {
 
     private static int getVoucherDiscountPrice(Voucher voucher, int beforeDiscountTotalPrice) {
         return Objects.isNull(voucher) ? 0 : voucher.getDiscountPrice(beforeDiscountTotalPrice);
+    }
+
+    private static int calculatePlusPoint(Integer afterDiscountTotalPrice) {
+        return (int) Math.round(afterDiscountTotalPrice * 0.5D);
     }
 }
