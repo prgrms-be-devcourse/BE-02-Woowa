@@ -7,9 +7,9 @@ import lombok.Getter;
 @Getter
 public class MenuGroupResponse {
 
-    private Long id;
+    private final Long id;
 
-    private String title;
+    private final String title;
 
-    private String description;
+    private final String description;
 }

@@ -7,11 +7,11 @@ import lombok.Getter;
 @Getter
 public class MenuResponse {
 
-    Long id;
+    private final Long id;
 
-    String title;
+    private final String title;
 
-    String description;
+    private final String description;
 
-    Integer price;
+    private Integer price;
 }

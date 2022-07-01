@@ -12,11 +12,11 @@ public class MenuUpdateRequest {
 
     @NotBlank(message = "메뉴명은 필수입니다.")
     @Length(max = 100, message = "메뉴명은 최대 100자까지 입력할 수 있습니다.")
-    private String title;
+    private final String title;
 
     @Length(max = 1000, message = "메뉴 설명은 최대 1000자까지 입력할 수 있습니다.")
-    private String description;
+    private final String description;
 
     @Positive(message = "메뉴 가격은 0보다 큰 값이어야 합니다.")
-    private Integer price;
+    private final Integer price;
 }

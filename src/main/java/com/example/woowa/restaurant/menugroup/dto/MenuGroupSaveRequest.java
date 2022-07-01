@@ -11,8 +11,8 @@ public class MenuGroupSaveRequest {
 
     @NotBlank
     @Length(max = 100)
-    private String title;
+    private final String title;
 
     @Length(max = 500)
-    private String description;
+    private final String description;
 }

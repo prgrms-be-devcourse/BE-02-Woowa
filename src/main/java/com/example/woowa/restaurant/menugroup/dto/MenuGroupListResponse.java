@@ -8,5 +8,5 @@ import lombok.Getter;
 @Getter
 public class MenuGroupListResponse {
 
-    private List<MenuGroupResponse> menuGroups;
+    private final List<MenuGroupResponse> menuGroups;
 }
