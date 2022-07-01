@@ -76,6 +76,8 @@ public class Order extends BaseTimeEntity {
 
     private Integer cookingTime;
 
+    private String deliveryAddress;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private OrderStatus orderStatus;
@@ -83,7 +85,8 @@ public class Order extends BaseTimeEntity {
     private Order(Voucher voucher, Customer customer, Restaurant restaurant,
             Integer beforeDiscountTotalPrice, Integer afterDiscountTotalPrice,
             Integer voucherDiscountPrice,
-            PaymentType paymentType, Integer usedPoint, OrderStatus orderStatus) {
+            PaymentType paymentType, Integer usedPoint, OrderStatus orderStatus,
+            String deliveryAddress) {
         this.voucher = voucher;
         this.customer = customer;
         this.restaurant = restaurant;
@@ -93,9 +96,11 @@ public class Order extends BaseTimeEntity {
         this.paymentType = paymentType;
         this.usedPoint = usedPoint;
         this.orderStatus = orderStatus;
+        this.deliveryAddress = deliveryAddress;
     }
 
     public static Order createOrder(Customer customer, Restaurant restaurant, Voucher voucher,
+            String deliveryAddress,
             Integer usedPoint, PaymentType paymentType, List<Cart> carts) {
 
         int beforeDiscountTotalPrice = carts.stream()
@@ -109,7 +114,8 @@ public class Order extends BaseTimeEntity {
 
         Order order = new Order(voucher, customer, restaurant, beforeDiscountTotalPrice,
                 afterDiscountTotalPrice,
-                voucherDiscountPrice, paymentType, usedPoint, OrderStatus.PAYMENT_COMPLETED);
+                voucherDiscountPrice, paymentType, usedPoint, OrderStatus.PAYMENT_COMPLETED,
+                deliveryAddress);
 
         carts.forEach(order::addCart);
 

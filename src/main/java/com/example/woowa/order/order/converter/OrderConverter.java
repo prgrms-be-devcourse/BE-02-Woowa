@@ -69,7 +69,8 @@ public abstract class OrderConverter {
         return new OrderCustomerResponse(order.getCreatedAt(), menus,
                 order.getBeforeDiscountTotalPrice(),
                 order.getVoucherDiscountPrice(), order.getUsedPoint(),
-                getOrderStatusStringForCustomer(order));
+                getOrderStatusStringForCustomer(order),
+                order.getDeliveryAddress());
     }
 
     public static OrderStatisticsResponse toOrderStatisticsResponse(

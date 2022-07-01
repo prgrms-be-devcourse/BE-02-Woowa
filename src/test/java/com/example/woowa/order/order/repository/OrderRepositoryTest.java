@@ -163,7 +163,8 @@ class OrderRepositoryTest {
                 new Cart(menu4, 1));
 
         order = orderRepository.save(
-                Order.createOrder(customer, restaurant, null, 0, PaymentType.CREDIT_CARD,
+                Order.createOrder(customer, restaurant, null, "서을 특별시 강남구", 0,
+                        PaymentType.CREDIT_CARD,
                         carts));
     }
 }

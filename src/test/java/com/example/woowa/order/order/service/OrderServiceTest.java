@@ -116,7 +116,7 @@ class OrderServiceTest {
                 new CartSaveRequest(menuId2, 2));
 
         OrderSaveRequest orderSaveRequest = new OrderSaveRequest(customer.getLoginId(),
-                restaurantId, null, usePoint, paymentType,
+                restaurantId, null, usePoint, paymentType, "서울특별시 강남구",
                 cartSaveRequests
         );
 
@@ -488,6 +488,7 @@ class OrderServiceTest {
     }
 
     private Order initOrder() {
-        return Order.createOrder(customer, restaurant, null, 0, PaymentType.CREDIT_CARD, carts);
+        return Order.createOrder(customer, restaurant, null, "서울특별시 강남구", 0,
+                PaymentType.CREDIT_CARD, carts);
     }
 }

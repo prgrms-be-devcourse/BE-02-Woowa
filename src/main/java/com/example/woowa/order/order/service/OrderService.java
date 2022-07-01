@@ -60,6 +60,7 @@ public class OrderService {
                 .collect(Collectors.toList());
 
         Order order = Order.createOrder(findCustomer, findRestaurant, findVoucher,
+                request.getDeliveryAddress(),
                 request.getUsePoint(),
                 request.getPaymentType(), carts);
 

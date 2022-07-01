@@ -21,4 +21,6 @@ public class OrderCustomerResponse {
     private Integer usedPoint;
 
     private String orderStatus;
+
+    private String deliveryAddress;
 }
