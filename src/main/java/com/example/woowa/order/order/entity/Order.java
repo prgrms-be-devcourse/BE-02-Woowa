@@ -125,8 +125,9 @@ public class Order extends BaseTimeEntity {
         return order;
     }
 
-    public void acceptOrder(int cookingTime) {
+    public void acceptOrder(int cookingTime, Delivery delivery) {
         orderStatus = OrderStatus.ACCEPTED;
+        this.delivery = delivery;
         this.cookingTime = cookingTime;
     }
 

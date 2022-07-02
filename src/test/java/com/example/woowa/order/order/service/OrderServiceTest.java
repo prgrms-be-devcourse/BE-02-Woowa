@@ -4,13 +4,16 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.then;
 
 import com.example.woowa.customer.customer.entity.Customer;
 import com.example.woowa.customer.customer.entity.CustomerGrade;
 import com.example.woowa.customer.customer.service.CustomerService;
 import com.example.woowa.customer.voucher.service.VoucherEntityService;
+import com.example.woowa.delivery.entity.Delivery;
 import com.example.woowa.delivery.enums.DeliveryStatus;
 import com.example.woowa.delivery.service.DeliveryAreaService;
+import com.example.woowa.delivery.service.DeliveryEntityService;
 import com.example.woowa.order.order.converter.OrderConverter;
 import com.example.woowa.order.order.dto.cart.CartSaveRequest;
 import com.example.woowa.order.order.dto.customer.OrderCustomerResponse;
@@ -70,6 +73,9 @@ class OrderServiceTest {
     @Mock
     MenuService menuService;
 
+    @Mock
+    DeliveryEntityService deliveryEntityService;
+
     OrderService orderService;
 
     Order order;
@@ -78,16 +84,20 @@ class OrderServiceTest {
     List<Menu> menus;
     List<Cart> carts;
 
+    Delivery delivery;
+
 
     @BeforeEach
     void init() {
         orderService = new OrderService(orderRepository, customerService, restaurantService,
-                voucherEntityService, deliveryAreaService, menuService);
+                voucherEntityService, deliveryAreaService, menuService, deliveryEntityService);
         customer = initCustomer();
         restaurant = initRestaurant();
         menus = initMenus();
         carts = initCarts();
         order = initOrder();
+        delivery = Delivery.createDelivery(order, order.getRestaurant().getAddress(),
+                order.getDeliveryAddress(), order.getDeliveryFee());
     }
 
     @Test
@@ -447,11 +457,14 @@ class OrderServiceTest {
         Long orderId = 1L;
         int cookingTime = 30;
         given(orderRepository.findById(orderId)).willReturn(Optional.of(order));
+        given(deliveryEntityService.saveDelivery(order)).willReturn(delivery);
 
         // When
         orderService.acceptOrder(orderId, cookingTime);
 
         // Then
+        then(deliveryEntityService).should().saveDelivery(order);
+        assertThat(order.getDelivery()).isEqualTo(delivery);
         assertThat(order.getOrderStatus()).isEqualTo(OrderStatus.ACCEPTED);
         assertThat(order.getCookingTime()).isEqualTo(30);
     }
