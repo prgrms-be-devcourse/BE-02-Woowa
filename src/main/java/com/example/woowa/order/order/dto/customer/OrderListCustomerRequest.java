@@ -12,19 +12,19 @@ import lombok.Getter;
 public class OrderListCustomerRequest {
 
     @NotNull
-    private String loginId;
+    private final String loginId;
 
     @NotNull
     @PositiveOrZero
-    private Integer pageNum;
+    private final Integer pageNum;
 
     @NotNull
     @Positive
-    private Integer size;
+    private final Integer size;
 
     @NotNull
-    private LocalDate from;
+    private final LocalDate from;
 
     @NotNull
-    private LocalDate end;
+    private final LocalDate end;
 }

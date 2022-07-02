@@ -10,15 +10,10 @@ import lombok.Getter;
 @Getter
 public class OrderSummeryResponse {
 
-    private Long orderId;
-
-    private LocalDateTime createdAt;
-
-    private String orderStatus;
-
-    private String restaurantName;
-
-    private Integer afterDiscountPrice;
-
-    private List<CartSummeryResponse> carts;
+    private final Long orderId;
+    private final LocalDateTime createdAt;
+    private final String orderStatus;
+    private final String restaurantName;
+    private final Integer afterDiscountPrice;
+    private final List<CartSummeryResponse> carts;
 }

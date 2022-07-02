@@ -10,12 +10,12 @@ import lombok.Getter;
 public class OrderStatisticsRequest {
 
     @NotNull
-    Long restaurantId;
+    private final Long restaurantId;
 
     @NotNull
-    LocalDate from;
+    private final LocalDate from;
 
     @NotNull
-    LocalDate end;
+    private final LocalDate end;
 
 }

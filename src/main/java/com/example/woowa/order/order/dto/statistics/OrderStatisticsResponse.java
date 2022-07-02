@@ -7,10 +7,8 @@ import lombok.Getter;
 @Getter
 public class OrderStatisticsResponse {
 
-    private Long orderCount;
-
-    private Long orderPrice;
-
-    private Long discountPrice;
+    private final Long orderCount;
+    private final Long orderPrice;
+    private final Long discountPrice;
 
 }

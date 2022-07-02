@@ -7,11 +7,8 @@ import lombok.Getter;
 @Getter
 public class OrderStatistics {
 
-    private Long orderCount;
-
-    private Long orderPrice;
-
-    private Long voucherDiscountPrice;
-
-    private Long usedPoint;
+    private final Long orderCount;
+    private final Long orderPrice;
+    private final Long voucherDiscountPrice;
+    private final Long usedPoint;
 }

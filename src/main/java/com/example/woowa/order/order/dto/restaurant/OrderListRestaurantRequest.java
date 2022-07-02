@@ -12,19 +12,19 @@ import lombok.Getter;
 public class OrderListRestaurantRequest {
 
     @NotNull
-    private Long restaurantId;
+    private final Long restaurantId;
 
     @NotNull
     @PositiveOrZero
-    private Integer pageNum;
+    private final Integer pageNum;
 
     @NotNull
     @Positive
-    private Integer size;
+    private final Integer size;
 
     @NotNull
-    private LocalDate from;
+    private final LocalDate from;
 
     @NotNull
-    private LocalDate end;
+    private final LocalDate end;
 }

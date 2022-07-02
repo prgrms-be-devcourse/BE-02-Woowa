@@ -10,17 +10,11 @@ import lombok.Getter;
 @Getter
 public class OrderRestaurantResponse {
 
-    private LocalDateTime createdAt;
-
-    List<CartResponse> menus;
-
-    Integer orderPrice;
-
-    Integer deliveryFee;
-
-    Integer afterDiscountTotalPrice;
-
-    Integer totalDiscountPrice;
-
-    String orderStatus;
+    private final LocalDateTime createdAt;
+    private final List<CartResponse> menus;
+    private final Integer orderPrice;
+    private final Integer deliveryFee;
+    private final Integer afterDiscountTotalPrice;
+    private final Integer totalDiscountPrice;
+    private final String orderStatus;
 }

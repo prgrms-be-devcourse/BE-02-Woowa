@@ -8,9 +8,9 @@ import lombok.Getter;
 @Getter
 public class OrderListCustomerResponse {
 
-    private Boolean hasNextPage;
+    private final Boolean hasNextPage;
 
-    private Integer size;
+    private final Integer size;
 
-    private List<OrderSummeryResponse> menus;
+    private final List<OrderSummeryResponse> menus;
 }

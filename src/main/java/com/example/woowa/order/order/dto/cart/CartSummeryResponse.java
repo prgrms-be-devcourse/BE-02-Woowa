@@ -7,7 +7,6 @@ import lombok.Getter;
 @Getter
 public class CartSummeryResponse {
 
-    private String menuTitle;
-
-    private Integer quantity;
+    private final String menuTitle;
+    private final Integer quantity;
 }

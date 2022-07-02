@@ -10,9 +10,9 @@ import lombok.Getter;
 public class CartSaveRequest {
 
     @NotNull
-    Long menuId;
+    private final Long menuId;
 
     @NotNull
     @Positive
-    Integer quantity;
+    private final Integer quantity;
 }

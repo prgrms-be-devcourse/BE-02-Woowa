@@ -8,10 +8,10 @@ import lombok.Getter;
 @Getter
 public class OrderListRestaurantResponse {
 
-    private Boolean hasNextPage;
+    private final Boolean hasNextPage;
 
-    private Integer size;
+    private final Integer size;
 
-    private List<OrderRestaurantResponse> orders;
+    private final List<OrderRestaurantResponse> orders;
 
 }
