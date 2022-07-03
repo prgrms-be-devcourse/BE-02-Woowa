@@ -1,16 +1,13 @@
 package com.example.woowa.restaurant.menu.service;
 
-import com.example.woowa.restaurant.menu.MenuMapper;
 import com.example.woowa.restaurant.menu.dto.MainMenuStatusUpdateRequest;
 import com.example.woowa.restaurant.menu.dto.MenuResponse;
 import com.example.woowa.restaurant.menu.dto.MenuSaveRequest;
 import com.example.woowa.restaurant.menu.dto.MenuStatusUpdateRequest;
 import com.example.woowa.restaurant.menu.dto.MenuUpdateRequest;
 import com.example.woowa.restaurant.menu.entity.Menu;
-import com.example.woowa.restaurant.menu.enums.MenuStatus;
+import com.example.woowa.restaurant.menu.mapper.MenuMapper;
 import com.example.woowa.restaurant.menu.repository.MenuRepository;
-import com.example.woowa.restaurant.menugroup.entity.MenuGroup;
-import com.example.woowa.restaurant.menugroup.service.MenuGroupService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,20 +18,15 @@ import org.springframework.transaction.annotation.Transactional;
 public class MenuService {
 
     private final MenuRepository menuRepository;
-    private final MenuGroupService menuGroupService;
+    private final MenuMapper menuMapper;
 
     @Transactional
     public Long addMenu(MenuSaveRequest request) {
-        MenuGroup findMenuGroup = menuGroupService.findMenuGroupEntityById(
-                request.getMenuGroupId());
-        Menu menu = Menu.createMenu(findMenuGroup, request.getTitle(), request.getPrice(),
-                request.getDescription(), false,
-                MenuStatus.SALE);
-        return menuRepository.save(menu).getId();
+        return menuRepository.save(menuMapper.toMenu(request)).getId();
     }
 
     public MenuResponse findMenuById(Long menuId) {
-        return MenuMapper.INSTANCE.toMenuResponse(findMenuEntityById(menuId));
+        return menuMapper.toMenuResponse(findMenuEntityById(menuId));
     }
 
     @Transactional

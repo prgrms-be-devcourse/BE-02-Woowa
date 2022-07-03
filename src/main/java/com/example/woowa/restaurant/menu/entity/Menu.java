@@ -15,6 +15,8 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.util.StringUtils;
@@ -22,7 +24,9 @@ import org.springframework.util.StringUtils;
 @Entity
 @Table(name = "menu")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Getter
+@Builder
 public class Menu extends BaseTimeEntity {
 
     @Id
@@ -49,22 +53,12 @@ public class Menu extends BaseTimeEntity {
     @Column(nullable = false)
     private MenuStatus menuStatus;
 
-    private Menu(MenuGroup menuGroup, String title, Integer price, String description,
-            Boolean isMain,
-            MenuStatus menuStatus) {
-        this.menuGroup = menuGroup;
-        this.title = title;
-        this.price = price;
-        this.description = description;
-        this.isMain = isMain;
-        this.menuStatus = menuStatus;
-    }
-
     public static Menu createMenu(MenuGroup menuGroup, String title, Integer price,
             String description,
             Boolean isMain,
             MenuStatus menuStatus) {
-        Menu menu = new Menu(menuGroup, title, price, convertToNullIfEmptyDescription(description),
+        Menu menu = new Menu(null, menuGroup, title, price,
+                convertToNullIfEmptyDescription(description),
                 isMain,
                 menuStatus);
         menuGroup.addMenu(menu);

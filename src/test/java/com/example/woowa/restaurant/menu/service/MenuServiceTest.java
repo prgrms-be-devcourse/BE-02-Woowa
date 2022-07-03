@@ -13,9 +13,9 @@ import com.example.woowa.restaurant.menu.dto.MenuStatusUpdateRequest;
 import com.example.woowa.restaurant.menu.dto.MenuUpdateRequest;
 import com.example.woowa.restaurant.menu.entity.Menu;
 import com.example.woowa.restaurant.menu.enums.MenuStatus;
+import com.example.woowa.restaurant.menu.mapper.MenuMapper;
 import com.example.woowa.restaurant.menu.repository.MenuRepository;
 import com.example.woowa.restaurant.menugroup.entity.MenuGroup;
-import com.example.woowa.restaurant.menugroup.service.MenuGroupService;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -29,20 +29,17 @@ class MenuServiceTest {
 
     @Mock
     MenuRepository menuRepository;
-
-    @Mock
-    MenuGroupService menuGroupService;
-
     @Mock
     MenuGroup menuGroup;
-
+    @Mock
+    MenuMapper menuMapper;
     MenuService menuService;
 
     Menu menu;
 
     @BeforeEach
     void init() {
-        menuService = new MenuService(menuRepository, menuGroupService);
+        menuService = new MenuService(menuRepository, menuMapper);
         menu = Menu.createMenu(menuGroup, "김치볶음밥", 8000, "맛있어요", false, MenuStatus.SALE);
     }
 
@@ -56,7 +53,6 @@ class MenuServiceTest {
         Integer price = 8000;
 
         given(menuRepository.save(any())).willReturn(menu);
-        given(menuGroupService.findMenuGroupEntityById(menuGroupId)).willReturn(menuGroup);
 
         // When
         menuService.addMenu(new MenuSaveRequest(menuGroupId, title, description, price));
@@ -71,6 +67,9 @@ class MenuServiceTest {
         // Given
         Long menuId = 1L;
         given(menuRepository.findById(menuId)).willReturn(Optional.of(menu));
+        given(menuMapper.toMenuResponse(menu)).willReturn(
+                new MenuResponse(menu.getId(), menu.getTitle(), menu.getDescription(),
+                        menu.getPrice()));
 
         // When
         MenuResponse response = menuService.findMenuById(menuId);
