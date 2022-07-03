@@ -1,14 +1,24 @@
 package com.example.woowa.restaurant.menu.controller;
 
+import static org.springframework.restdocs.headers.HeaderDocumentation.headerWithName;
+import static org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders;
+import static org.springframework.restdocs.headers.HeaderDocumentation.responseHeaders;
+import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.delete;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.patch;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.post;
+import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
+import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
+import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
+import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
+import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import com.example.woowa.RestDocsConfiguration;
 import com.example.woowa.restaurant.menu.dto.MainMenuStatusUpdateRequest;
 import com.example.woowa.restaurant.menu.dto.MenuSaveRequest;
 import com.example.woowa.restaurant.menu.dto.MenuUpdateRequest;
@@ -27,16 +37,21 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.restdocs.payload.JsonFieldType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
 @SpringBootTest
 @AutoConfigureMockMvc
+@AutoConfigureRestDocs
 @Transactional
+@Import(RestDocsConfiguration.class)
 class MenuApiControllerTest {
 
     @Autowired
@@ -82,11 +97,34 @@ class MenuApiControllerTest {
                 savedMenu.getPrice());
 
         mockMvc.perform(post("/api/v1/menus")
-                        .contentType(MediaType.APPLICATION_JSON)
+                        .contentType(MediaType.APPLICATION_JSON_VALUE)
+                        .accept(MediaType.APPLICATION_JSON_VALUE)
                         .content(objectMapper.writeValueAsString(menuSaveRequest)))
                 .andDo(print())
                 .andExpect(status().isCreated())
-                .andExpect(header().exists(HttpHeaders.LOCATION));
+                .andExpect(header().exists(HttpHeaders.LOCATION))
+                .andDo(document("add-menu",
+                        requestHeaders(
+                                headerWithName(HttpHeaders.CONTENT_TYPE).description(
+                                        MediaType.APPLICATION_JSON_VALUE),
+                                headerWithName(HttpHeaders.ACCEPT).description(
+                                        MediaType.APPLICATION_JSON_VALUE)
+                        ),
+                        requestFields(
+                                fieldWithPath("menuGroupId").type(JsonFieldType.NUMBER)
+                                        .description("메뉴 그룹 ID"),
+                                fieldWithPath("title").type(JsonFieldType.STRING)
+                                        .description("메뉴명(최대 100자)"),
+                                fieldWithPath("description").type(JsonFieldType.STRING)
+                                        .description("메뉴 설명(선택, 최대 1000자)"),
+                                fieldWithPath("price").type(JsonFieldType.NUMBER)
+                                        .description("메뉴 가격")
+                        ),
+                        responseHeaders(
+                                headerWithName(HttpHeaders.LOCATION).description("생성된 메뉴의 위치")
+                        )
+                ));
+
     }
 
     @Test
@@ -107,14 +145,33 @@ class MenuApiControllerTest {
     @Test
     @DisplayName("메뉴를 단건 조회한다.")
     void findDetailMenuOkTest() throws Exception {
-        mockMvc.perform(get("/api/v1/menus/" + savedMenu.getId())
+        mockMvc.perform(get("/api/v1/menus/{menuId}", savedMenu.getId())
                         .accept(MediaType.APPLICATION_JSON_VALUE))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("id").value(savedMenu.getId()))
                 .andExpect(jsonPath("title").value(savedMenu.getTitle()))
                 .andExpect(jsonPath("description").value(savedMenu.getDescription()))
-                .andExpect(jsonPath("price").value(savedMenu.getPrice()));
+                .andExpect(jsonPath("price").value(savedMenu.getPrice()))
+                .andDo(document("find-detail-menu",
+                        requestHeaders(
+                                headerWithName(HttpHeaders.ACCEPT).description(
+                                        MediaType.APPLICATION_JSON_VALUE)
+                        ),
+                        responseHeaders(
+                                headerWithName(HttpHeaders.CONTENT_TYPE).description(
+                                        MediaType.APPLICATION_JSON_VALUE)
+                        ),
+                        responseFields(
+                                fieldWithPath("id").type(JsonFieldType.NUMBER).description("메뉴 ID"),
+                                fieldWithPath("title").type(JsonFieldType.STRING)
+                                        .description("메뉴명"),
+                                fieldWithPath("description").type(JsonFieldType.STRING)
+                                        .description("메뉴 설명"),
+                                fieldWithPath("price").type(JsonFieldType.NUMBER)
+                                        .description("메뉴 가격")
+                        )
+                ));
     }
 
     @Test
@@ -136,7 +193,21 @@ class MenuApiControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(menuUpdateRequest)))
                 .andDo(print())
-                .andExpect(status().isOk());
+                .andExpect(status().isOk())
+                .andDo(document("update-menu",
+                        requestHeaders(
+                                headerWithName(HttpHeaders.CONTENT_TYPE).description(
+                                        MediaType.APPLICATION_JSON_VALUE)
+                        ),
+                        requestFields(
+                                fieldWithPath("title").type(JsonFieldType.STRING)
+                                        .description("메뉴명(필수, 최대 100자)"),
+                                fieldWithPath("description").type(JsonFieldType.STRING)
+                                        .description("메뉴 설명(선택, 최대 1000자)"),
+                                fieldWithPath("price").type(JsonFieldType.NUMBER)
+                                        .description("메뉴 가격(필수)")
+                        )
+                ));
     }
 
     @Test
@@ -162,7 +233,17 @@ class MenuApiControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(mainMenuStatusUpdateRequest)))
                 .andDo(print())
-                .andExpect(status().isOk());
+                .andExpect(status().isOk())
+                .andDo(document("change-main-menu-status",
+                        requestHeaders(
+                                headerWithName(HttpHeaders.CONTENT_TYPE).description(
+                                        MediaType.APPLICATION_JSON_VALUE)
+                        ),
+                        requestFields(
+                                fieldWithPath("isMainMenu").type(JsonFieldType.BOOLEAN)
+                                        .description("대표 메뉴 설정 여부(boolean)")
+                        )
+                ));
     }
 
     @Test
@@ -187,7 +268,17 @@ class MenuApiControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(menuStatusUpdateRequest)))
                 .andDo(print())
-                .andExpect(status().isOk());
+                .andExpect(status().isOk())
+                .andDo(document("change-menu-status",
+                        requestHeaders(
+                                headerWithName(HttpHeaders.CONTENT_TYPE).description(
+                                        MediaType.APPLICATION_JSON_VALUE)
+                        ),
+                        requestFields(
+                                fieldWithPath("menuStatus").type(JsonFieldType.STRING)
+                                        .description("변경할 메뉴 상태(sale, sold_out, hidden 중 하나)")
+                        )
+                ));
     }
 
     @Test
@@ -206,9 +297,14 @@ class MenuApiControllerTest {
     @Test
     @DisplayName("메뉴를 삭제한다.")
     void deleteMenuOkTest() throws Exception {
-        mockMvc.perform(delete("/api/v1/menus/" + savedMenu.getId()))
+        mockMvc.perform(delete("/api/v1/menus/{menuId}", savedMenu.getId()))
                 .andDo(print())
-                .andExpect(status().isOk());
+                .andExpect(status().isOk())
+                .andDo(document("delete-menu",
+                        pathParameters(
+                                parameterWithName("menuId").description("삭제할 메뉴 ID")
+                        )
+                ));
     }
 
     @Test
