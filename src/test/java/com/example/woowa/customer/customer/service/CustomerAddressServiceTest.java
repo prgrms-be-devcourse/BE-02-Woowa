@@ -43,10 +43,10 @@ class CustomerAddressServiceTest {
   @Autowired
   private AreaCodeService areaCodeService;
 
-//  @Test
-//  void init() {
-//    areaCodeService.init();
-//  }
+  @Test
+  void init() {
+    areaCodeService.init();
+  }
 
   public void makeDefaultCustomerGrade() {
     CustomerGradeCreateRequest customerGradeCreateRequest = new CustomerGradeCreateRequest(5, "일반", 3000, 2);

@@ -73,7 +73,7 @@ class CustomerServiceTest {
     Assertions.assertThat(customerFindResponse.getPoint()).isEqualTo(0);
     Assertions.assertThat(customerFindResponse.getBirthdate()).isEqualTo(LocalDate.of(2000,1,1).toString());
     Assertions.assertThat(customerFindResponse.getCustomerGrade().getOrderCount()).isEqualTo(1);
-    Assertions.assertThat(customerFindResponse.getCustomerGrade().getGrade()).isEqualTo("일반");
+    Assertions.assertThat(customerFindResponse.getCustomerGrade().getTitle()).isEqualTo("일반");
     Assertions.assertThat(customerFindResponse.getCustomerGrade().getDiscountPrice()).isEqualTo(3000);
     Assertions.assertThat(customerFindResponse.getCustomerGrade().getVoucherCount()).isEqualTo(2);
   }
@@ -89,7 +89,7 @@ class CustomerServiceTest {
     Assertions.assertThat(customerFindResponse.getPoint()).isEqualTo(0);
     Assertions.assertThat(customerFindResponse.getBirthdate()).isEqualTo(LocalDate.of(2000,1,1).toString());
     Assertions.assertThat(customerFindResponse.getCustomerGrade().getOrderCount()).isEqualTo(1);
-    Assertions.assertThat(customerFindResponse.getCustomerGrade().getGrade()).isEqualTo("일반");
+    Assertions.assertThat(customerFindResponse.getCustomerGrade().getTitle()).isEqualTo("일반");
     Assertions.assertThat(customerFindResponse.getCustomerGrade().getDiscountPrice()).isEqualTo(3000);
     Assertions.assertThat(customerFindResponse.getCustomerGrade().getVoucherCount()).isEqualTo(2);
   }
@@ -108,7 +108,7 @@ class CustomerServiceTest {
     Assertions.assertThat(customerFindResponse.getPoint()).isEqualTo(0);
     Assertions.assertThat(customerFindResponse.getBirthdate()).isEqualTo(LocalDate.of(2000,1,1).toString());
     Assertions.assertThat(customerFindResponse.getCustomerGrade().getOrderCount()).isEqualTo(1);
-    Assertions.assertThat(customerFindResponse.getCustomerGrade().getGrade()).isEqualTo("일반");
+    Assertions.assertThat(customerFindResponse.getCustomerGrade().getTitle()).isEqualTo("일반");
     Assertions.assertThat(customerFindResponse.getCustomerGrade().getDiscountPrice()).isEqualTo(3000);
     Assertions.assertThat(customerFindResponse.getCustomerGrade().getVoucherCount()).isEqualTo(2);
   }
@@ -135,7 +135,7 @@ class CustomerServiceTest {
     CustomerGrade customerGrade = customerGradeService.findDefaultCustomerGrade();
 
     Assertions.assertThat(customerGrade.getOrderCount()).isEqualTo(1);
-    Assertions.assertThat(customerGrade.getGrade()).isEqualTo("일반");
+    Assertions.assertThat(customerGrade.getTitle()).isEqualTo("일반");
     Assertions.assertThat(customerGrade.getDiscountPrice()).isEqualTo(3000);
     Assertions.assertThat(customerGrade.getVoucherCount()).isEqualTo(2);
   }
@@ -155,7 +155,7 @@ class CustomerServiceTest {
     CustomerGrade customerGrade = customerGradeService.findCustomerGradeByOrderPerMonthCount(customer.getOrderPerMonth());
 
     Assertions.assertThat(customerGrade.getOrderCount()).isEqualTo(2);
-    Assertions.assertThat(customerGrade.getGrade()).isEqualTo("실버");
+    Assertions.assertThat(customerGrade.getTitle()).isEqualTo("실버");
     Assertions.assertThat(customerGrade.getDiscountPrice()).isEqualTo(3000);
     Assertions.assertThat(customerGrade.getVoucherCount()).isEqualTo(2);
   }

@@ -34,8 +34,8 @@ public class CustomerGradeService {
     @Transactional
     public CustomerGradeFindResponse updateCustomerGrade(Long id, CustomerGradeUpdateRequest updateCustomerGradeDto) {
         CustomerGrade customerGrade = customerGradeRepository.findById(id).orElseThrow(() -> new RuntimeException("customer grade not existed"));
-        if (updateCustomerGradeDto.getGrade() != null) {
-            customerGrade.setGrade(updateCustomerGradeDto.getGrade());
+        if (updateCustomerGradeDto.getTitle() != null) {
+            customerGrade.setGrade(updateCustomerGradeDto.getTitle());
         }
         if (updateCustomerGradeDto.getOrderCount() != null) {
             customerGrade.setOrderCount(updateCustomerGradeDto.getOrderCount());
@@ -52,7 +52,6 @@ public class CustomerGradeService {
     @Transactional
     public void deleteCustomerGrade(Long id) {
         CustomerGrade customerGrade = customerGradeRepository.findById(id).orElseThrow(() -> new RuntimeException("customer grade not existed"));
-        System.out.println(customerGrade.getGrade());
         customerGradeRepository.delete(customerGrade);
     }
 

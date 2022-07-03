@@ -69,6 +69,7 @@ class ReviewServiceTest {
   private RestaurantService restaurantService;
 
   public Long getOrderId(String loginId) {
+    //제대로된 주문 객체 db에 등록하는 메소드 필요
     Customer customer = customerService.findCustomerEntity(loginId);
     Restaurant restaurant = Restaurant.createRestaurant("가게", "1234567890", LocalTime.now(), LocalTime.now().plusHours(1), false, "123-2322-2322", "설명", "서울특별시 서초구 서초동");
     List<Cart> carts = new ArrayList<>();

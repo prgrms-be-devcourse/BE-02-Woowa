@@ -5,16 +5,18 @@ import javax.validation.constraints.Positive;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import org.hibernate.validator.constraints.Length;
 
 @Getter
 @AllArgsConstructor
 public class CustomerGradeCreateRequest {
     @Positive
-    private Integer orderCount;
+    private final Integer orderCount;
     @NotBlank
-    private String grade;
+    @Length(max = 10)
+    private final String title;
     @Positive
-    private Integer discountPrice;
+    private final Integer discountPrice;
     @Positive
-    private Integer voucherCount;
+    private final Integer voucherCount;
 }

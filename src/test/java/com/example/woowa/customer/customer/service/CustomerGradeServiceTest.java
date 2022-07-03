@@ -28,7 +28,7 @@ class CustomerGradeServiceTest {
         customerGradeCreateRequest);
 
     Assertions.assertThat(customerGradeFindResponse.getOrderCount()).isEqualTo(5);
-    Assertions.assertThat(customerGradeFindResponse.getGrade()).isEqualTo("일반");
+    Assertions.assertThat(customerGradeFindResponse.getTitle()).isEqualTo("일반");
     Assertions.assertThat(customerGradeFindResponse.getDiscountPrice()).isEqualTo(3000);
     Assertions.assertThat(customerGradeFindResponse.getVoucherCount()).isEqualTo(2);
   }
@@ -49,7 +49,7 @@ class CustomerGradeServiceTest {
         customerGradeFindResponse.getId());
 
     Assertions.assertThat(customerGradeFindResponse1.getOrderCount()).isEqualTo(5);
-    Assertions.assertThat(customerGradeFindResponse1.getGrade()).isEqualTo("일반");
+    Assertions.assertThat(customerGradeFindResponse1.getTitle()).isEqualTo("일반");
     Assertions.assertThat(customerGradeFindResponse1.getDiscountPrice()).isEqualTo(3000);
     Assertions.assertThat(customerGradeFindResponse1.getVoucherCount()).isEqualTo(2);
   }
@@ -66,7 +66,7 @@ class CustomerGradeServiceTest {
         customerGradeFindResponse.getId(), updateCustomerGradeDto);
 
     Assertions.assertThat(customerGradeFindResponse1.getOrderCount()).isEqualTo(10);
-    Assertions.assertThat(customerGradeFindResponse1.getGrade()).isEqualTo("실버");
+    Assertions.assertThat(customerGradeFindResponse1.getTitle()).isEqualTo("실버");
     Assertions.assertThat(customerGradeFindResponse1.getDiscountPrice()).isEqualTo(2000);
     Assertions.assertThat(customerGradeFindResponse1.getVoucherCount()).isEqualTo(2);
   }

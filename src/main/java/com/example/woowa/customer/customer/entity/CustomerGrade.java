@@ -26,7 +26,7 @@ public class CustomerGrade extends BaseTimeEntity {
     private Integer orderCount;
 
     @Column(nullable = false, unique = true, length = 45)
-    private String grade;
+    private String title;
 
     @Column(nullable = false)
     private Integer discountPrice;
@@ -34,10 +34,10 @@ public class CustomerGrade extends BaseTimeEntity {
     @Column(nullable = false)
     private Integer voucherCount;
 
-    public CustomerGrade(Integer orderCount, String grade, Integer discountPrice,
+    public CustomerGrade(Integer orderCount, String title, Integer discountPrice,
         Integer voucherCount) {
         this.orderCount = orderCount;
-        this.grade = grade;
+        this.title = title;
         this.discountPrice = discountPrice;
         this.voucherCount = voucherCount;
     }
@@ -47,9 +47,9 @@ public class CustomerGrade extends BaseTimeEntity {
         this.orderCount = orderCount;
     }
 
-    public void setGrade(String grade) {
-        assert !grade.isBlank();
-        this.grade = grade;
+    public void setGrade(String title) {
+        assert !title.isBlank() && (title.length() <= 10);
+        this.title = title;
     }
 
     public void setDiscountPrice(int discountPrice) {

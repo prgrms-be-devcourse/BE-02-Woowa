@@ -6,10 +6,10 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 public class CustomerFindResponse {
-    private String loginId;
-    private String birthdate;
-    private Integer orderPerMonth;
-    private Integer point;
-    private Boolean isIssued;
-    private CustomerGradeFindResponse customerGrade;
+    private final String loginId;
+    private final String birthdate;
+    private final Integer orderPerMonth;
+    private final Integer point;
+    private final Boolean isIssued;
+    private final CustomerGradeFindResponse customerGrade;
 }

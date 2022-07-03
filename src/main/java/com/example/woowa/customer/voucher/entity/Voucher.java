@@ -49,6 +49,7 @@ public class Voucher extends BaseTimeEntity {
     private String code;
 
     public Voucher(VoucherType voucherType, EventType eventType, Integer discountValue, LocalDateTime expirationDate) {
+        assert expirationDate.isAfter(LocalDateTime.now());
         this.voucherType = voucherType;
         this.eventType = eventType;
         this.discountValue = discountValue;

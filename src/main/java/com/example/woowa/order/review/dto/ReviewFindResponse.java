@@ -6,7 +6,7 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 public class ReviewFindResponse {
-    private Long id;
-    private String content;
-    private Integer scoreType;
+    private final Long id;
+    private final String content;
+    private final Integer scoreType;
 }

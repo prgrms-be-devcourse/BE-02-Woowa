@@ -37,11 +37,11 @@ public class Review extends BaseTimeEntity {
     private ScoreType scoreType;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(nullable = true)
+    @JoinColumn(nullable = false)
     private Customer customer;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(nullable = true)
+    @JoinColumn(nullable = false)
     private Order order;
 
     public Review(String content, ScoreType scoreType, Customer customer, Order order) {
