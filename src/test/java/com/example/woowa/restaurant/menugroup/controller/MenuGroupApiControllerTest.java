@@ -1,14 +1,24 @@
 package com.example.woowa.restaurant.menugroup.controller;
 
+import static org.springframework.restdocs.headers.HeaderDocumentation.headerWithName;
+import static org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders;
+import static org.springframework.restdocs.headers.HeaderDocumentation.responseHeaders;
+import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.delete;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.patch;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.post;
+import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
+import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
+import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
+import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
+import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import com.example.woowa.RestDocsConfiguration;
 import com.example.woowa.restaurant.menugroup.dto.MenuGroupResponse;
 import com.example.woowa.restaurant.menugroup.dto.MenuGroupSaveRequest;
 import com.example.woowa.restaurant.menugroup.dto.MenuGroupUpdateRequest;
@@ -24,16 +34,21 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.restdocs.payload.JsonFieldType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
 @SpringBootTest
 @AutoConfigureMockMvc
+@AutoConfigureRestDocs
 @Transactional
+@Import(RestDocsConfiguration.class)
 class MenuGroupApiControllerTest {
 
     @Autowired
@@ -80,7 +95,20 @@ class MenuGroupApiControllerTest {
                         .content(objectMapper.writeValueAsString(menuGroupSaveRequest)))
                 .andDo(print())
                 .andExpect(status().isCreated())
-                .andExpect(header().exists(HttpHeaders.LOCATION));
+                .andExpect(header().exists(HttpHeaders.LOCATION))
+                .andDo(document("add-menu-group",
+                        requestHeaders(
+                                headerWithName(HttpHeaders.CONTENT_TYPE).description(
+                                        MediaType.APPLICATION_JSON_VALUE)
+                        ),
+                        requestFields(
+                                fieldWithPath("title").type(JsonFieldType.STRING)
+                                        .description("메뉴그룹명(필수, 최대 100자"),
+                                fieldWithPath("description").type(JsonFieldType.STRING)
+                                        .type(JsonFieldType.STRING)
+                                        .description("메뉴그룹 설명(선택, 최대 500자)")
+                        )
+                ));
     }
 
     @Test
@@ -113,12 +141,34 @@ class MenuGroupApiControllerTest {
     void findMenuGroupOkTest() throws Exception {
         MenuGroup menuGroup = savedMenuGroups.get(0);
 
-        mockMvc.perform(get("/api/v1/menu-groups/" + menuGroup.getId()))
+        mockMvc.perform(get("/api/v1/menu-groups/{menuGroupId}", menuGroup.getId())
+                        .accept(MediaType.APPLICATION_JSON_VALUE))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("id").value(menuGroup.getId()))
                 .andExpect(jsonPath("title").value(menuGroup.getTitle()))
-                .andExpect(jsonPath("description").value(menuGroup.getDescription()));
+                .andExpect(jsonPath("description").value(menuGroup.getDescription()))
+                .andDo(document("find-menu-group",
+                        pathParameters(
+                                parameterWithName("menuGroupId").description("조회할 메뉴그룹 ID")
+                        ),
+                        requestHeaders(
+                                headerWithName(HttpHeaders.ACCEPT).description(
+                                        MediaType.APPLICATION_JSON_VALUE)
+                        ),
+                        responseHeaders(
+                                headerWithName(HttpHeaders.CONTENT_TYPE).description(
+                                        MediaType.APPLICATION_JSON_VALUE)
+                        ),
+                        responseFields(
+                                fieldWithPath("id").type(JsonFieldType.NUMBER)
+                                        .description("메뉴그룹 ID"),
+                                fieldWithPath("title").type(JsonFieldType.STRING)
+                                        .description("메뉴그룹명"),
+                                fieldWithPath("description").type(JsonFieldType.STRING)
+                                        .description("메뉴그룹 설명")
+                        )
+                ));
     }
 
     @Test
@@ -139,11 +189,32 @@ class MenuGroupApiControllerTest {
                         menuGroup.getDescription()))
                 .collect(Collectors.toList());
 
-        mockMvc.perform(get("/api/v1/restaurant/" + savedRestaurant.getId() + "/menu-groups")
-                        .accept(MediaType.APPLICATION_JSON_VALUE))
+        mockMvc.perform(
+                        get("/api/v1/restaurant/{restaurantId}/menu-groups", savedRestaurant.getId())
+                                .accept(MediaType.APPLICATION_JSON_VALUE))
                 .andDo(print())
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("menuGroups.length()").value(menuGroupResponses.size()));
+                .andExpect(jsonPath("menuGroups.length()").value(menuGroupResponses.size()))
+                .andDo(document("find-menu-group-list",
+                        requestHeaders(
+                                headerWithName(HttpHeaders.ACCEPT).description(
+                                        MediaType.APPLICATION_JSON_VALUE)
+                        ),
+                        responseHeaders(
+                                headerWithName(HttpHeaders.CONTENT_TYPE).description(
+                                        MediaType.APPLICATION_JSON_VALUE)
+                        ),
+                        responseFields(
+                                fieldWithPath("menuGroups[]").type(JsonFieldType.ARRAY)
+                                        .description("메뉴그룹 목록"),
+                                fieldWithPath("menuGroups[].id").type(JsonFieldType.NUMBER)
+                                        .description("메뉴그룹 ID"),
+                                fieldWithPath("menuGroups[].title").type(JsonFieldType.STRING)
+                                        .description("메뉴그룹명"),
+                                fieldWithPath("menuGroups[].description").type(JsonFieldType.STRING)
+                                        .description("메뉴그룹 설명")
+                        )
+                ));
     }
 
     @Test
@@ -163,11 +234,26 @@ class MenuGroupApiControllerTest {
         MenuGroupUpdateRequest menuGroupUpdateRequest = new MenuGroupUpdateRequest("사이드류",
                 "맛있는 사이드 메뉴");
 
-        mockMvc.perform(patch("/api/v1/menu-groups/" + menuGroup.getId())
+        mockMvc.perform(patch("/api/v1/menu-groups/{menuGroupId}", menuGroup.getId())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(menuGroupUpdateRequest)))
                 .andDo(print())
-                .andExpect(status().isOk());
+                .andExpect(status().isOk())
+                .andDo(document("update-menu-group",
+                        pathParameters(
+                                parameterWithName("menuGroupId").description("업데이트할 메뉴그룹 ID")
+                        ),
+                        requestHeaders(
+                                headerWithName(HttpHeaders.CONTENT_TYPE).description(
+                                        MediaType.APPLICATION_JSON_VALUE)
+                        ),
+                        requestFields(
+                                fieldWithPath("title").type(JsonFieldType.STRING)
+                                        .description("메뉴그룹명(필수, 최대 100자)"),
+                                fieldWithPath("description").type(JsonFieldType.STRING)
+                                        .description("메뉴그룹 설명(선택, 최대 500자)")
+                        )
+                ));
     }
 
     @Test
@@ -203,9 +289,14 @@ class MenuGroupApiControllerTest {
     void deleteMenuGroupOkTest() throws Exception {
         MenuGroup menuGroup = savedMenuGroups.get(0);
 
-        mockMvc.perform(delete("/api/v1/menu-groups/" + menuGroup.getId()))
+        mockMvc.perform(delete("/api/v1/menu-groups/{menuGroupId}", menuGroup.getId()))
                 .andDo(print())
-                .andExpect(status().isOk());
+                .andExpect(status().isOk())
+                .andDo(document("delete-menu-group",
+                        pathParameters(
+                                parameterWithName("menuGroupId").description("삭제할 메뉴그룹 ID")
+                        )
+                ));
     }
 
     @Test
