@@ -15,6 +15,7 @@ import com.example.woowa.order.order.dto.customer.OrderCustomerResponse;
 import com.example.woowa.order.order.dto.customer.OrderListCustomerRequest;
 import com.example.woowa.order.order.dto.customer.OrderListCustomerResponse;
 import com.example.woowa.order.order.dto.customer.OrderSaveRequest;
+import com.example.woowa.order.order.dto.restaurant.OrderAcceptRequest;
 import com.example.woowa.order.order.dto.restaurant.OrderListRestaurantRequest;
 import com.example.woowa.order.order.dto.restaurant.OrderListRestaurantResponse;
 import com.example.woowa.order.order.dto.restaurant.OrderRestaurantResponse;
@@ -123,10 +124,10 @@ public class OrderService {
     }
 
     @Transactional
-    public void acceptOrder(Long orderId, int cookingTime) {
+    public void acceptOrder(Long orderId, OrderAcceptRequest request) {
         Order order = findOrderById(orderId);
         Delivery delivery = deliveryEntityService.saveDelivery(order);
-        order.acceptOrder(cookingTime, delivery);
+        order.acceptOrder(request.getCookingTime(), delivery);
     }
 
     public Order findOrderById(Long orderId) {

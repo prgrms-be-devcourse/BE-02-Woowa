@@ -20,6 +20,7 @@ import com.example.woowa.order.order.dto.customer.OrderCustomerResponse;
 import com.example.woowa.order.order.dto.customer.OrderListCustomerRequest;
 import com.example.woowa.order.order.dto.customer.OrderListCustomerResponse;
 import com.example.woowa.order.order.dto.customer.OrderSaveRequest;
+import com.example.woowa.order.order.dto.restaurant.OrderAcceptRequest;
 import com.example.woowa.order.order.dto.restaurant.OrderListRestaurantRequest;
 import com.example.woowa.order.order.dto.restaurant.OrderListRestaurantResponse;
 import com.example.woowa.order.order.dto.restaurant.OrderRestaurantResponse;
@@ -460,7 +461,7 @@ class OrderServiceTest {
         given(deliveryEntityService.saveDelivery(order)).willReturn(delivery);
 
         // When
-        orderService.acceptOrder(orderId, cookingTime);
+        orderService.acceptOrder(orderId, new OrderAcceptRequest(cookingTime));
 
         // Then
         then(deliveryEntityService).should().saveDelivery(order);
@@ -478,7 +479,8 @@ class OrderServiceTest {
         given(orderRepository.findById(wrongOrderId)).willReturn(Optional.empty());
 
         // When // Then
-        assertThatThrownBy(() -> orderService.acceptOrder(wrongOrderId, cookingTime))
+        assertThatThrownBy(
+                () -> orderService.acceptOrder(wrongOrderId, new OrderAcceptRequest(cookingTime)))
                 .isExactlyInstanceOf(IllegalArgumentException.class);
     }
 
