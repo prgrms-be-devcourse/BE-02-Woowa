@@ -7,7 +7,7 @@
 ### Deploy
 <img src="https://img.shields.io/badge/Github Actions-2088FF?style=flat-square&logo=github&logoColor=black"/> <img src="https://img.shields.io/badge/Amazon EC2-FF9900?style=flat-square&logo=amazonec2&logoColor=black"/> <img src="https://img.shields.io/badge/Amazon CodeDeploy-EF2D5E?style=flat-square&logo=amazonaws&logoColor=black"/> <img src="https://img.shields.io/badge/Amazon CodePipeline-4A154B?style=flat-square&logo=amazon aws&logoColor=yellow"/> <img src="https://img.shields.io/badge/Amazon S3-E34F26?style=flat-square&logo=Amazon S3&logoColor=white"/> 
 
-###Tool
+### Tool
 <img src="https://img.shields.io/badge/IntelliJ IDEA-8A3391?style=flat-square&logo=IntelliJ IDEA&logoColor=black"/> <img src="https://img.shields.io/badge/Notion-FFFFFF?style=flat-square&logo=Notion&logoColor=black"/> <img src="https://img.shields.io/badge/Github-000000?style=flat-square&logo=Github&logoColor=white"/> <img src="https://img.shields.io/badge/Slack-4A154B?style=flat-square&logo=Slack&logoColor=white"/> 
 
 ### Team
