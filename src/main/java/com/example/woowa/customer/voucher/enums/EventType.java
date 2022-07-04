@@ -1,9 +1,10 @@
 package com.example.woowa.customer.voucher.enums;
 
+import com.example.woowa.common.EnumFindable;
 import java.util.Arrays;
 import java.util.Optional;
 
-public enum EventType {
+public enum EventType implements EnumFindable {
   MONTH("month"),
   SPECIAL("special");
 
@@ -14,15 +15,12 @@ public enum EventType {
   }
 
   @Override
-  public String toString() {
+  public String getType() {
     return type;
   }
 
-  public static EventType of(String value) throws Exception {
-    return Optional.ofNullable(find(value)).orElseThrow(() -> new RuntimeException("not valid event type"));
-  }
-
-  private static EventType find(String value) {
-    return Arrays.stream(values()).filter(type -> type.toString().equals(value)).findFirst().orElse(null);
+  @Override
+  public String toString() {
+    return getType();
   }
 }

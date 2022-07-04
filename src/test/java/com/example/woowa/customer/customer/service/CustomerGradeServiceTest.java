@@ -1,13 +1,10 @@
 package com.example.woowa.customer.customer.service;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.is;
-
 import com.example.woowa.customer.customer.dto.CustomerGradeCreateRequest;
 import com.example.woowa.customer.customer.dto.CustomerGradeFindResponse;
 import com.example.woowa.customer.customer.dto.CustomerGradeUpdateRequest;
 import com.example.woowa.customer.customer.repository.CustomerGradeRepository;
-import com.example.woowa.customer.customer.service.CustomerGradeService;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -30,10 +27,10 @@ class CustomerGradeServiceTest {
     CustomerGradeFindResponse customerGradeFindResponse = customerGradeService.createCustomerGrade(
         customerGradeCreateRequest);
 
-    assertThat(customerGradeFindResponse.getOrderCount(), is(5));
-    assertThat(customerGradeFindResponse.getGrade(), is("일반"));
-    assertThat(customerGradeFindResponse.getDiscountPrice(), is(3000));
-    assertThat(customerGradeFindResponse.getVoucherCount(), is(2));
+    Assertions.assertThat(customerGradeFindResponse.getOrderCount()).isEqualTo(5);
+    Assertions.assertThat(customerGradeFindResponse.getTitle()).isEqualTo("일반");
+    Assertions.assertThat(customerGradeFindResponse.getDiscountPrice()).isEqualTo(3000);
+    Assertions.assertThat(customerGradeFindResponse.getVoucherCount()).isEqualTo(2);
   }
 
   @AfterEach
@@ -51,10 +48,10 @@ class CustomerGradeServiceTest {
     CustomerGradeFindResponse customerGradeFindResponse1 = customerGradeService.findCustomerGrade(
         customerGradeFindResponse.getId());
 
-    assertThat(customerGradeFindResponse1.getOrderCount(), is(5));
-    assertThat(customerGradeFindResponse1.getGrade(), is("일반"));
-    assertThat(customerGradeFindResponse1.getDiscountPrice(), is(3000));
-    assertThat(customerGradeFindResponse1.getVoucherCount(), is(2));
+    Assertions.assertThat(customerGradeFindResponse1.getOrderCount()).isEqualTo(5);
+    Assertions.assertThat(customerGradeFindResponse1.getTitle()).isEqualTo("일반");
+    Assertions.assertThat(customerGradeFindResponse1.getDiscountPrice()).isEqualTo(3000);
+    Assertions.assertThat(customerGradeFindResponse1.getVoucherCount()).isEqualTo(2);
   }
 
   @Test
@@ -68,9 +65,9 @@ class CustomerGradeServiceTest {
     CustomerGradeFindResponse customerGradeFindResponse1 = customerGradeService.updateCustomerGrade(
         customerGradeFindResponse.getId(), updateCustomerGradeDto);
 
-    assertThat(customerGradeFindResponse1.getOrderCount(), is(10));
-    assertThat(customerGradeFindResponse1.getGrade(), is("실버"));
-    assertThat(customerGradeFindResponse1.getDiscountPrice(), is(2000));
-    assertThat(customerGradeFindResponse1.getVoucherCount(), is(2));
+    Assertions.assertThat(customerGradeFindResponse1.getOrderCount()).isEqualTo(10);
+    Assertions.assertThat(customerGradeFindResponse1.getTitle()).isEqualTo("실버");
+    Assertions.assertThat(customerGradeFindResponse1.getDiscountPrice()).isEqualTo(2000);
+    Assertions.assertThat(customerGradeFindResponse1.getVoucherCount()).isEqualTo(2);
   }
 }

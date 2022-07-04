@@ -3,7 +3,7 @@ package com.example.woowa.customer.voucher.service;
 import com.example.woowa.customer.customer.entity.Customer;
 import com.example.woowa.customer.customer.entity.CustomerGrade;
 import com.example.woowa.customer.customer.service.CustomerService;
-import com.example.woowa.customer.voucher.converter.VoucherConverter;
+import com.example.woowa.customer.voucher.converter.VoucherMapper;
 import com.example.woowa.customer.voucher.dto.VoucherCreateRequest;
 import com.example.woowa.customer.voucher.dto.VoucherFindResponse;
 import com.example.woowa.customer.voucher.entity.Voucher;
@@ -24,6 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class VoucherService {
     private final VoucherRepository voucherRepository;
     private final CustomerService customerService;
+    private final VoucherMapper voucherMapper;
 
     @Transactional
     public List<VoucherFindResponse> registerMonthlyVoucher(String customerLoginId) {
@@ -31,6 +32,9 @@ public class VoucherService {
         Customer customer = customerService.findCustomerEntity(customerLoginId);
         if (!customer.getIsIssued()) {
             CustomerGrade customerGrade = customer.getCustomerGrade();
+            if (customerGrade == null) {
+                throw new RuntimeException("고객 등급이 존재하지 않습니다.");
+            }
             int disountPrice = customerGrade.getDiscountPrice();
             int voucherCount = customerGrade.getVoucherCount();
             LocalDateTime time = LocalDateTime.now().plusDays(30);
@@ -38,9 +42,12 @@ public class VoucherService {
                 Voucher voucher = new Voucher(VoucherType.FiXED, EventType.MONTH, disountPrice, time);
                 voucherRepository.save(voucher);
                 customer.addVoucher(voucher);
-                result.add(VoucherConverter.toVoucherDto(voucher));
+                result.add(voucherMapper.toVoucherDto(voucher));
             }
             customer.setIsIssued(true);
+        }
+        else {
+            throw  new RuntimeException("이미 정기 쿠폰을 발급받았습니다.");
         }
         return result;
     }
@@ -48,28 +55,32 @@ public class VoucherService {
     @Transactional
     public VoucherFindResponse registerVoucher(String customerLoginId, String code) {
         Voucher voucher = voucherRepository.findByCode(code).orElseThrow(()-> new RuntimeException("voucher not existed"));
-        if (LocalDateTime.now().isBefore(voucher.getExpirationDate())) {
+        if (isOkayToRegister(voucher)) {
             Customer customer = customerService.findCustomerEntity(customerLoginId);
             customer.addVoucher(voucher);
         }
-        return VoucherConverter.toVoucherDto(voucher);
+        return voucherMapper.toVoucherDto(voucher);
+    }
+
+    private boolean isOkayToRegister(Voucher voucher) {
+        return LocalDateTime.now().isBefore(voucher.getExpirationDate()) && !voucher.getIsUse();
     }
 
     @Transactional
     public VoucherFindResponse createVoucher(VoucherCreateRequest voucherCreateRequest) throws Exception {
-        Voucher voucher = VoucherConverter.toVoucher(voucherCreateRequest);
+        Voucher voucher = voucherMapper.toVoucher(voucherCreateRequest);
         voucher = voucherRepository.save(voucher);
-        return VoucherConverter.toVoucherDto(voucher);
+        return voucherMapper.toVoucherDto(voucher);
     }
 
     public VoucherFindResponse findVoucher(Long id) {
         Voucher voucher = findVoucherEntity(id);
-        return VoucherConverter.toVoucherDto(voucher);
+        return voucherMapper.toVoucherDto(voucher);
     }
 
     public List<VoucherFindResponse> findUserVoucher(String customerLoginId) {
         Customer customer = customerService.findCustomerEntity(customerLoginId);
-        return customer.getVouchers().stream().map(VoucherConverter::toVoucherDto).collect(Collectors.toList());
+        return customer.getVouchers().stream().map(voucherMapper::toVoucherDto).collect(Collectors.toList());
     }
 
     @Transactional

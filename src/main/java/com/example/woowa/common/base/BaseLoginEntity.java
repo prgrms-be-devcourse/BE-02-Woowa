@@ -1,6 +1,5 @@
 package com.example.woowa.common.base;
 
-import java.time.LocalDateTime;
 import javax.persistence.Column;
 import javax.persistence.MappedSuperclass;
 import lombok.AccessLevel;
@@ -26,15 +25,11 @@ public abstract class BaseLoginEntity extends BaseTimeEntity {
     @Column(nullable = false)
     private String phoneNumber;
 
-    @Column(nullable = false)
-    private LocalDateTime lastLoginedAt;
-
     public BaseLoginEntity(String loginId, String password, String name, String phoneNumber) {
         this.loginId = loginId;
         this.password = password;
         this.name = name;
         this.phoneNumber = phoneNumber;
-        this.lastLoginedAt = LocalDateTime.now();
     }
 
     public BaseLoginEntity(String loginId, String password) {
@@ -52,7 +47,9 @@ public abstract class BaseLoginEntity extends BaseTimeEntity {
         this.password = password;
     }
 
-    public void changeLastLoginedAt(LocalDateTime lastLoginedAt) {
-        this.lastLoginedAt = lastLoginedAt;
+    public BaseLoginEntity(String loginId, String password) {
+        this.loginId = loginId;
+        this.password = password;
     }
+
 }

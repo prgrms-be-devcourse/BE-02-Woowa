@@ -1,8 +1,5 @@
 package com.example.woowa.customer.voucher.service;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.is;
-
 import com.example.woowa.customer.customer.dto.CustomerAddressCreateRequest;
 import com.example.woowa.customer.customer.dto.CustomerCreateRequest;
 import com.example.woowa.customer.customer.dto.CustomerFindResponse;
@@ -18,6 +15,7 @@ import com.example.woowa.customer.voucher.enums.VoucherType;
 import com.example.woowa.customer.voucher.repository.VoucherRepository;
 import java.time.LocalDateTime;
 import java.util.List;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -51,7 +49,7 @@ class VoucherServiceTest {
   }
 
   public String getCustomerLoginId() {
-    CustomerAddressCreateRequest customerAddressCreateRequest = new CustomerAddressCreateRequest("서울시","동작구","집");
+    CustomerAddressCreateRequest customerAddressCreateRequest = new CustomerAddressCreateRequest("서울특별시 동작구 상도동","아파트 101호","집");
     CustomerCreateRequest customerCreateRequest = new CustomerCreateRequest("dev12","Programmers123!", "2000-01-01", customerAddressCreateRequest);
     CustomerFindResponse customerFindResponse = customerService.createCustomer(
         customerCreateRequest);
@@ -79,11 +77,11 @@ class VoucherServiceTest {
     String customerLoginId = getCustomerLoginId();
 
     voucherService.registerMonthlyVoucher(customerLoginId);
-    CustomerFindResponse customerFindResponse = customerService.findCustomer(customerLoginId);
+    List<VoucherFindResponse> vouchers = voucherService.findUserVoucher(customerLoginId);
 
-    assertThat(customerFindResponse.getVouchers().get(0).getVoucherType(), is(VoucherType.FiXED.toString()));
-    assertThat(customerFindResponse.getVouchers().get(0).getEventType(), is(EventType.MONTH.toString()));
-    assertThat(customerFindResponse.getVouchers().get(0).getDiscountValue(), is(3000));
+    Assertions.assertThat(vouchers.get(0).getVoucherType()).isEqualTo(VoucherType.FiXED.toString());
+    Assertions.assertThat(vouchers.get(0).getEventType()).isEqualTo(EventType.MONTH.toString());
+    Assertions.assertThat(vouchers.get(0).getDiscountValue()).isEqualTo(3000);
   }
 
   @Test
@@ -97,9 +95,9 @@ class VoucherServiceTest {
 
     List<VoucherFindResponse> vouchers  = voucherService.findUserVoucher(customerId);
 
-    assertThat(vouchers.get(0).getVoucherType(), is(VoucherType.FiXED.toString()));
-    assertThat(vouchers.get(0).getEventType(), is(EventType.SPECIAL.toString()));
-    assertThat(vouchers.get(0).getDiscountValue(), is(3000));
+    Assertions.assertThat(vouchers.get(0).getVoucherType()).isEqualTo(VoucherType.FiXED.toString());
+    Assertions.assertThat(vouchers.get(0).getEventType()).isEqualTo(EventType.SPECIAL.toString());
+    Assertions.assertThat(vouchers.get(0).getDiscountValue()).isEqualTo(3000);
   }
 
   @Test
@@ -110,10 +108,10 @@ class VoucherServiceTest {
 
     VoucherFindResponse voucherFindResponse = voucherService.createVoucher(voucherCreateRequest);
 
-    assertThat(voucherFindResponse.getVoucherType(), is(VoucherType.FiXED.toString()));
-    assertThat(voucherFindResponse.getEventType(), is(EventType.SPECIAL.toString()));
-    assertThat(voucherFindResponse.getDiscountValue(), is(3000));
-    assertThat(voucherFindResponse.getExpirationDate(), is(LocalDateTime.of(2022, 12, 1, 12, 0)));
+    Assertions.assertThat(voucherFindResponse.getVoucherType()).isEqualTo(VoucherType.FiXED.toString());
+    Assertions.assertThat(voucherFindResponse.getEventType()).isEqualTo(EventType.SPECIAL.toString());
+    Assertions.assertThat(voucherFindResponse.getDiscountValue()).isEqualTo(3000);
+    Assertions.assertThat(voucherFindResponse.getExpirationDate()).isEqualTo(LocalDateTime.of(2022, 12, 1, 12, 0));
   }
 
   @Test
@@ -125,12 +123,11 @@ class VoucherServiceTest {
 
     VoucherFindResponse voucherFindResponse1 = voucherService.findVoucher(voucherFindResponse.getId());
 
-    assertThat(voucherFindResponse1.getVoucherType(), is(VoucherType.FiXED.toString()));
-    assertThat(voucherFindResponse1.getEventType(), is(EventType.SPECIAL.toString()));
-    assertThat(voucherFindResponse1.getDiscountValue(), is(3000));
-    assertThat(voucherFindResponse1.getExpirationDate(), is(LocalDateTime.of(2022, 12, 1, 12, 0)));
+    Assertions.assertThat(voucherFindResponse1.getVoucherType()).isEqualTo(VoucherType.FiXED.toString());
+    Assertions.assertThat(voucherFindResponse1.getEventType()).isEqualTo(EventType.SPECIAL.toString());
+    Assertions.assertThat(voucherFindResponse1.getDiscountValue()).isEqualTo(3000);
+    Assertions.assertThat(voucherFindResponse1.getExpirationDate()).isEqualTo(LocalDateTime.of(2022, 12, 1, 12, 0));
   }
-
 
   @Test
   @DisplayName("유저 보유 쿠폰 목록 조회")
@@ -143,9 +140,9 @@ class VoucherServiceTest {
 
     List<VoucherFindResponse> vouchers  = voucherService.findUserVoucher(customerId);
 
-    assertThat(vouchers.get(0).getVoucherType(), is(VoucherType.FiXED.toString()));
-    assertThat(vouchers.get(0).getEventType(), is(EventType.SPECIAL.toString()));
-    assertThat(vouchers.get(0).getDiscountValue(), is(3000));
+    Assertions.assertThat(vouchers.get(0).getVoucherType()).isEqualTo(VoucherType.FiXED.toString());
+    Assertions.assertThat(vouchers.get(0).getEventType()).isEqualTo(EventType.SPECIAL.toString());
+    Assertions.assertThat(vouchers.get(0).getDiscountValue()).isEqualTo(3000);
   }
 
   @Test
@@ -158,9 +155,8 @@ class VoucherServiceTest {
 
     voucherService.registerVoucher(customerId, voucherFindResponse.getCode());
     voucherService.deleteVoucher(customerId, voucherFindResponse.getId());
-    List<VoucherFindResponse> vouchers  = customerService.findCustomer(customerId).getVouchers();
+    List<VoucherFindResponse> vouchers  = voucherService.findUserVoucher(customerId);
 
-    assertThat(vouchers.size(), is(0));
+    Assertions.assertThat(vouchers.size()).isEqualTo(0);
   }
-
 }

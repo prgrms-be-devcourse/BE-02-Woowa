@@ -1,6 +1,6 @@
 package com.example.woowa.admin.service;
 
-import com.example.woowa.admin.converter.AdminConverter;
+import com.example.woowa.admin.converter.AdminMapper;
 import com.example.woowa.admin.dto.AdminCreateRequest;
 import com.example.woowa.admin.dto.AdminFindResponse;
 import com.example.woowa.admin.dto.AdminUpdateRequest;
@@ -16,24 +16,25 @@ import org.springframework.transaction.annotation.Transactional;
 public class AdminService {
 
     private final AdminRepository adminRepository;
+    private final AdminMapper adminMapper;
 
     @Transactional
     public AdminFindResponse createAdmin(AdminCreateRequest adminCreateRequest) {
-        Admin admin = AdminConverter.toAdmin(adminCreateRequest);
+        Admin admin = adminMapper.toAdmin(adminCreateRequest);
         admin = adminRepository.save(admin);
-        return AdminConverter.toAdminDto(admin);
+        return adminMapper.toAdminDto(admin);
     }
 
     public AdminFindResponse findAdmin(String loginId) {
         Admin admin = findAdminEntity(loginId);
-        return AdminConverter.toAdminDto(admin);
+        return adminMapper.toAdminDto(admin);
     }
 
     @Transactional
     public AdminFindResponse updateAdmin(String loginId, AdminUpdateRequest adminUpdateRequest) {
         Admin admin = findAdminEntity(loginId);
         admin.changePassword(adminUpdateRequest.getLoginPassword());
-        return AdminConverter.toAdminDto(admin);
+        return adminMapper.toAdminDto(admin);
     }
 
     @Transactional

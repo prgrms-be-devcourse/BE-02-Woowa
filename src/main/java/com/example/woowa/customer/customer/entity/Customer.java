@@ -2,15 +2,15 @@ package com.example.woowa.customer.customer.entity;
 
 import static lombok.AccessLevel.PROTECTED;
 
+import com.example.woowa.common.base.BaseLoginEntity;
+import com.example.woowa.customer.voucher.entity.Voucher;
 import com.example.woowa.order.order.entity.Order;
 import com.example.woowa.order.review.entity.Review;
-import com.example.woowa.customer.voucher.entity.Voucher;
-
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
-import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -21,7 +21,6 @@ import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
-
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -29,16 +28,10 @@ import lombok.NoArgsConstructor;
 @Table(name = "customer")
 @Getter
 @NoArgsConstructor(access = PROTECTED)
-public class Customer {
+public class Customer extends BaseLoginEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
-    @Column(nullable = false, unique = true, length = 45)
-    private String loginId;
-
-    @Column(nullable = false, length = 45)
-    private String loginPassword;
 
     @Column(columnDefinition = "INT DEFAULT 0")
     private Integer orderPerMonth;
@@ -55,8 +48,8 @@ public class Customer {
     @Column(columnDefinition = "INT DEFAULT 0")
     private Integer point;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "customer_grade_id", nullable = false)
+    @OneToOne(fetch = FetchType.LAZY, orphanRemoval = true)
+    @JoinColumn(name = "customer_grade_id", nullable = true)
     private CustomerGrade customerGrade;
 
     @OneToMany(mappedBy = "customer", orphanRemoval = true)
@@ -68,13 +61,12 @@ public class Customer {
     @OneToMany(orphanRemoval = true)
     private List<Voucher> vouchers = new ArrayList<>();
 
-    @OneToMany(mappedBy = "customer")
+    @OneToMany(mappedBy = "customer", orphanRemoval = true)
     private List<Order> orders = new ArrayList<>();
 
     public Customer(String loginId, String loginPassword, LocalDate birthdate,
-                    CustomerGrade customerGrade) {
-        this.loginId = loginId;
-        this.loginPassword = loginPassword;
+        CustomerGrade customerGrade) {
+        super(loginId, loginPassword, "", "");
         this.orderPerMonth = 0;
         this.orderPerLastMonth = 0;
         this.isIssued = false;
@@ -83,25 +75,20 @@ public class Customer {
         this.customerGrade = customerGrade;
     }
 
-    public void setLoginPassword(String loginPassword) {
-        assert Pattern.matches("^(?=.*\\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[!,@,#,$,%]).{8,}$", loginPassword);
-        this.loginPassword = loginPassword;
-    }
-
     public void updateCustomerStatusOnFirstDay() {
         this.orderPerLastMonth = this.orderPerMonth;
         this.orderPerMonth = 0;
         this.isIssued = false;
     }
 
-    public void updateCustomerStatusWhenOrder(int plusPoint) {
+    public void updateCustomerStatusWhenOrder(int usedPoint, int plusPoint) {
         addOrderPerMonth();
-        addPoint(plusPoint);
+        usePoint(usedPoint - plusPoint);
     }
 
-    public void updateCustomerStatusWhenOrderCancel(int minusPoint) {
+    public void updateCustomerStatusWhenOrderCancel(int usedPoint, int minusPoint) {
         minusOrderPerMonth();
-        usePoint(minusPoint);
+        addPoint(usedPoint - minusPoint);
     }
 
     public void addOrderPerMonth() {
@@ -142,8 +129,15 @@ public class Customer {
     }
 
     public List<CustomerAddress> getCustomerAddresses() {
-        //주문 엔티티 목록을 발생 시간 순서로 정렬하고 거기에서 차례대로 주소 목록을 가져온다.
-        return customerAddresses;
+        List<CustomerAddress> orderCustomerAddresses = this.customerAddresses.stream().filter((e)->e.getRecentOrderAt() != null).sorted(
+            Comparator.comparing(CustomerAddress::getRecentOrderAt).reversed()).collect(
+            Collectors.toList());
+        List<CustomerAddress> notOrderCustomerAddresses = this.customerAddresses.stream().filter((e)->e.getRecentOrderAt() == null).collect(
+            Collectors.toList());
+        List<CustomerAddress> recentCustomerAddresses = new ArrayList<>();
+        recentCustomerAddresses.addAll(orderCustomerAddresses);
+        recentCustomerAddresses.addAll(notOrderCustomerAddresses);
+        return recentCustomerAddresses;
     }
 
     public void addCustomerAddress(CustomerAddress customerAddress) {

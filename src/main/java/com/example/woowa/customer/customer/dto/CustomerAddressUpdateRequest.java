@@ -4,14 +4,17 @@ import javax.validation.constraints.NotBlank;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import org.hibernate.validator.constraints.Length;
 
 @Getter
 @AllArgsConstructor
 public class CustomerAddressUpdateRequest {
     @NotBlank
-    private String defaultAddress;
+    private final String defaultAddress;
     @NotBlank
-    private String detailAddress;
+    @Length(max = 100)
+    private final String detailAddress;
     @NotBlank
-    private String nickname;
+    @Length(max = 10)
+    private final String nickname;
 }

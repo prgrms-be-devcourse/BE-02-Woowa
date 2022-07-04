@@ -45,7 +45,7 @@ public class VoucherController {
         return voucherService.findVoucher(id);
     }
 
-    @GetMapping("/{loginId}")
+    @GetMapping("/user/{loginId}")
     public List<VoucherFindResponse> findUserVoucher(@PathVariable String loginId) {
         return voucherService.findUserVoucher(loginId);
     }

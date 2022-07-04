@@ -1,162 +1,211 @@
 package com.example.woowa.restaurant.category.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.anyLong;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
+import com.example.woowa.restaurant.category.dto.request.CategoryCreateRequest;
+import com.example.woowa.restaurant.category.dto.request.CategoryUpdateRequest;
+import com.example.woowa.restaurant.category.dto.response.CategoryCreateResponse;
+import com.example.woowa.restaurant.category.dto.response.CategoryFindResponse;
 import com.example.woowa.restaurant.category.entity.Category;
+import com.example.woowa.restaurant.category.mapper.CategoryMapper;
 import com.example.woowa.restaurant.category.repository.CategoryRepository;
-import com.example.woowa.restaurant.restaurant.entity.Restaurant;
+import com.example.woowa.restaurant.owner.dto.request.OwnerCreateRequest;
+import com.example.woowa.restaurant.owner.dto.response.OwnerCreateResponse;
+import com.example.woowa.restaurant.owner.mapper.OwnerMapper;
+import com.example.woowa.restaurant.owner.repository.OwnerRepository;
+import com.example.woowa.restaurant.owner.service.OwnerService;
+import com.example.woowa.restaurant.restaurant.dto.request.RestaurantCreateRequest;
+import com.example.woowa.restaurant.restaurant.dto.response.RestaurantFindResponse;
+import com.example.woowa.restaurant.restaurant.mapper.RestaurantMapper;
 import com.example.woowa.restaurant.restaurant.repository.RestaurantRepository;
-import com.example.woowa.restaurant.restaurntat_category.entity.RestaurantCategory;
+import com.example.woowa.restaurant.restaurant.service.RestaurantService;
 import com.example.woowa.restaurant.restaurntat_category.repository.RestaurantCategoryRepository;
+import com.example.woowa.security.repository.RoleRepository;
+import com.example.woowa.security.repository.UserRepository;
 import java.time.LocalTime;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.mapstruct.factory.Mappers;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase.Replace;
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
-@SpringBootTest
+@DataJpaTest
+@AutoConfigureTestDatabase(replace = Replace.NONE)
 class CategoryServiceTest {
 
     @Autowired
-    private CategoryService categoryService;
+    CategoryRepository categoryRepository;
 
     @Autowired
-    private CategoryRepository categoryRepository;
+    RestaurantCategoryRepository restaurantCategoryRepository;
 
     @Autowired
-    private RestaurantRepository restaurantRepository;
+    RestaurantRepository restaurantRepository;
 
     @Autowired
-    private RestaurantCategoryRepository restaurantCategoryRepository;
+    OwnerRepository ownerRepository;
+
+    @Autowired
+    RoleRepository roleRepository;
+
+    @Autowired
+    UserRepository userRepository;
+
+    private CategoryMapper categoryMapper = Mappers.getMapper(CategoryMapper.class);
+
+    private RestaurantMapper restaurantMapper = Mappers.getMapper(RestaurantMapper.class);
+
+    private OwnerMapper ownerMapper = Mappers.getMapper(OwnerMapper.class);
 
     @Test
-    @DisplayName("저장된 모든 카테고리를 조회할 수 있다.")
+    @DisplayName("새로운 카테고리를 생성한다.")
+    void testCreateCategory() {
+        // Mocked
+        CategoryRepository mockedCategoryRepository = mock(CategoryRepository.class);
+        CategoryService categoryService = new CategoryService(mockedCategoryRepository, categoryMapper, null);
+
+        // Given
+        CategoryCreateRequest categoryCreateRequest = new CategoryCreateRequest("한식");
+        Category korean = makeCategories("한식").get(0);
+        CategoryCreateResponse manualConversion = new CategoryCreateResponse(korean.getId(),
+            korean.getName(), korean.getCreatedAt());
+
+        // When
+        when(mockedCategoryRepository.save(any(Category.class))).thenReturn(korean);
+        CategoryCreateResponse category = categoryService.createCategory(categoryCreateRequest);
+
+        // Then
+        verify(mockedCategoryRepository, times(1)).save(any(Category.class));
+        assertThat(category).usingRecursiveComparison().isEqualTo(manualConversion);
+    }
+
+    @Test
+    @DisplayName("모든 카테고리를 반환한다.")
     void testFindCategories() {
-        categoryService.createCategory("한식");
-        categoryService.createCategory("중식");
+        // Mocked
+        CategoryRepository mockedCategoryRepository = mock(CategoryRepository.class);
+        CategoryService categoryService = new CategoryService(mockedCategoryRepository, categoryMapper, null);
 
-        List<Category> categories = categoryService.findCategories();
+        // Given
+        List<Category> testers = makeCategories("한식", "중식");
+        List<CategoryFindResponse> manualConversion = testers.stream()
+            .map(category ->
+                new CategoryFindResponse(category.getId(), category.getName(),
+                    category.getCreatedAt(), category.getUpdatedAt()))
+            .collect(Collectors.toList());
 
-        assertThat(categories.size()).isEqualTo(2);
+        // When
+        when(mockedCategoryRepository.findAll()).thenReturn(testers);
+        List<CategoryFindResponse> categories = categoryService.findCategories();
+
+        // Then
+        verify(mockedCategoryRepository, times(1)).findAll();
+        for (int i = 0; i < categories.size(); i++)
+            assertThat(categories.get(i)).usingRecursiveComparison().isEqualTo(manualConversion.get(i));
     }
 
     @Test
-    @DisplayName("아이디를 통해 저장된 카테고리를 조회할 수 있다.")
-    void findCategoryById() {
-        Long koreanId = categoryService.createCategory("한식");
-        Long chineseId = categoryService.createCategory("중식");
+    @DisplayName("요청한 아이디를 가진 카테고리를 반환한다.")
+    void testFindCategoryById() {
+        // Mocked
+        CategoryRepository mockedCategoryRepository = mock(CategoryRepository.class);
+        CategoryService categoryService = new CategoryService(mockedCategoryRepository, categoryMapper, null);
 
-        assertThat(categoryService.findCategoryById(koreanId).getName()).isEqualTo("한식");
-        assertThat(categoryService.findCategoryById(chineseId).getName()).isEqualTo("중식");
+        // Given
+        Category korean = makeCategories("한식").get(0);
+        CategoryFindResponse manualConversion =
+            new CategoryFindResponse(korean.getId(), korean.getName(), korean.getCreatedAt(), korean.getUpdatedAt());
+
+        // When
+        when(mockedCategoryRepository.findById(1L)).thenReturn(Optional.of(korean));
+        CategoryFindResponse category = categoryService.findCategoryById(1L);
+
+        // Then
+        verify(mockedCategoryRepository, times(1)).findById(anyLong());
+        assertThat(category).usingRecursiveComparison().isEqualTo(manualConversion);
     }
 
     @Test
-    @DisplayName("이름을 통해 저장된 카테고리를 조회할 수 있다.")
-    void findCategoryByName() {
-        Long koreanId = categoryService.createCategory("한식");
-        Long chineseId = categoryService.createCategory("중식");
+    @DisplayName("특정 카테고리명을 가진 모든 가게를 해당 카테고리 아이디로 조회할 수 있다.")
+    void testFindRestaurantsByCategoryId() {
+        // Given
+        CategoryService categoryService = new CategoryService(categoryRepository, categoryMapper,
+            restaurantMapper);
+        CategoryCreateResponse korean = categoryService.createCategory(
+            new CategoryCreateRequest("한식"));
+        CategoryCreateResponse chinese = categoryService.createCategory(
+            new CategoryCreateRequest("중식"));
 
-        assertThat(categoryService.findCategoryByName("한식").getId()).isEqualTo(koreanId);
-        assertThat(categoryService.findCategoryByName("중식").getId()).isEqualTo(chineseId);
+        RestaurantService restaurantService = new RestaurantService(restaurantRepository, restaurantCategoryRepository,
+            categoryService, restaurantMapper);
+        OwnerService ownerService = new OwnerService(roleRepository, userRepository, ownerRepository, restaurantService, ownerMapper, restaurantMapper, new BCryptPasswordEncoder());
+        OwnerCreateResponse owner = ownerService.createOwner(
+            new OwnerCreateRequest("abcdefg12345", "aA1234567890", "오너", "010-1111-2222"));
+
+            ownerService.registerRestaurant(owner.getId(), new RestaurantCreateRequest("a",
+                "1234567890",
+                LocalTime.now(),
+                LocalTime.now().plusHours(1),
+                true,
+                "010-3333-4444",
+                "test1",
+                "서울시 종로구",
+                List.of(korean.getId(), chinese.getId())));
+            ownerService.registerRestaurant(owner.getId(), new RestaurantCreateRequest("b",
+                "1234567890",
+                LocalTime.now(),
+                LocalTime.now().plusHours(1),
+                true,
+                "010-5555-6666",
+                "test2",
+                "서울시 종로구",
+                List.of(korean.getId())));
+
+        // When
+        List<RestaurantFindResponse> koreanRestaurants = categoryService.findRestaurantsByCategoryId(
+            korean.getId());
+        List<RestaurantFindResponse> chineseRestaurants = categoryService.findRestaurantsByCategoryId(
+            chinese.getId());
+
+        // Then
+        assertThat(koreanRestaurants.size()).isEqualTo(2);
+        assertThat(chineseRestaurants.size()).isEqualTo(1);
     }
 
     @Test
-    @DisplayName("카테고리 아이디를 통해 연관된 가게를 조회할 수 있다.")
-    void findRestaurantsByCategoryId() {
-        Category korean = categoryRepository.save(new Category("한식"));
+    @DisplayName("저장된 카테고리명을 요청된 이름으로 변경한다.")
+    void testChangeCategoryName() {
+        // Given
+        CategoryService categoryService = new CategoryService(categoryRepository, categoryMapper, null);
+        CategoryCreateResponse beforeUpdating = categoryService.createCategory(
+            new CategoryCreateRequest("한식"));
 
-        Restaurant restaurant1 = Restaurant.createRestaurant("테스트 레스토랑1", "1234567890",
-            LocalTime.now(), LocalTime.now(), true,
-            "010-123-4567", "테스트용 임시 레스토랑 생성입니다.", "서울시 종로구");
+        // When
+        CategoryUpdateRequest categoryUpdateRequest = new CategoryUpdateRequest("중식");
+        categoryService.updateCategoryById(beforeUpdating.getId(), categoryUpdateRequest);
+        CategoryFindResponse afterUpdating = categoryService.findCategoryById(
+            beforeUpdating.getId());
 
-        Restaurant restaurant2 = Restaurant.createRestaurant("테스트 레스토랑1", "1234567890",
-            LocalTime.now(), LocalTime.now(), true,
-            "010-123-4567", "테스트용 임시 레스토랑 생성입니다.", "서울시 종로구");
-
-        restaurantRepository.save(restaurant1);
-        restaurantRepository.save(restaurant2);
-
-        RestaurantCategory relation1 = new RestaurantCategory(restaurant1, korean);
-        relation1.setCategory(korean);
-        relation1.setRestaurant(restaurant1);
-
-        RestaurantCategory relation2 = new RestaurantCategory(restaurant2, korean);
-        relation2.setCategory(korean);
-        relation2.setRestaurant(restaurant2);
-
-        restaurantCategoryRepository.save(relation1);
-        restaurantCategoryRepository.save(relation2);
-
-        List<Restaurant> restaurants = categoryService.findRestaurantsByCategoryId(korean.getId());
-        assertThat(restaurants.size()).isEqualTo(2);
+        // Then
+        assertThat(afterUpdating.getId()).isEqualTo(beforeUpdating.getId());
+        assertThat(afterUpdating.getName()).isEqualTo(categoryUpdateRequest.getName());
     }
 
-    @Test
-    @DisplayName("카테고리 이름을 통해 연관된 가게를 조회할 수 있다.")
-    void findRestaurantsByCategoryName() {
-        Category korean = categoryRepository.save(new Category("한식"));
-
-        Restaurant restaurant1 = Restaurant.createRestaurant("테스트 레스토랑1", "1234567890",
-            LocalTime.now(), LocalTime.now(), true,
-            "010-123-4567", "테스트용 임시 레스토랑 생성입니다.", "서울시 종로구");
-
-        Restaurant restaurant2 = Restaurant.createRestaurant("테스트 레스토랑1", "1234567890",
-            LocalTime.now(), LocalTime.now(), true,
-            "010-123-4567", "테스트용 임시 레스토랑 생성입니다.", "서울시 종로구");
-
-        restaurantRepository.save(restaurant1);
-        restaurantRepository.save(restaurant2);
-
-        RestaurantCategory relation1 = new RestaurantCategory(restaurant1, korean);
-        relation1.setCategory(korean);
-        relation1.setRestaurant(restaurant1);
-
-        RestaurantCategory relation2 = new RestaurantCategory(restaurant2, korean);
-        relation2.setCategory(korean);
-        relation2.setRestaurant(restaurant2);
-
-        restaurantCategoryRepository.save(relation1);
-        restaurantCategoryRepository.save(relation2);
-
-        List<Restaurant> restaurants = categoryService.findRestaurantsByCategoryName(korean.getName());
-        assertThat(restaurants.size()).isEqualTo(2);
-    }
-
-    @Test
-    @DisplayName("새로운 카테고리를 생성할 수 있다.")
-    void createCategory() {
-        Long categoryId = categoryService.createCategory("양식");
-
-        Category category = categoryService.findCategoryById(categoryId);
-
-        assertThat(category.getName()).isEqualTo("양식");
-    }
-
-    @Test
-    @DisplayName("카테고리 이름을 변경할 수 있다.")
-    void changeCategoryName() {
-        Long categoryId = categoryService.createCategory("양식");
-
-        Category oldCategory = categoryService.findCategoryById(categoryId);
-        categoryService.changeCategoryName(oldCategory.getName(), "한식");
-
-        Category newCategory = categoryService.findCategoryById(categoryId);
-        assertThat(newCategory.getName()).isEqualTo(newCategory.getName());
-    }
-
-    @Test
-    @DisplayName("카테고리를 삭제할 수 있다.")
-    void deleteCategory() {
-        Long categoryId = categoryService.createCategory("양식");
-
-        List<Category> beforeDeletion = categoryService.findCategories();
-        assertThat(beforeDeletion.size()).isEqualTo(1);
-
-        categoryService.deleteCategory(categoryId);
-
-        List<Category> afterDeletion = categoryService.findCategories();
-        assertThat(afterDeletion.size()).isEqualTo(0);
+    static List<Category> makeCategories(String... name) {
+        return Arrays.stream(name).map(Category::new).collect(Collectors.toList());
     }
 
 }

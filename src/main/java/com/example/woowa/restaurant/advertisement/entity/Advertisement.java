@@ -1,7 +1,8 @@
 package com.example.woowa.restaurant.advertisement.entity;
 
-import com.example.woowa.restaurant.advertisement.converter.UnitTypeConverter;
+import com.example.woowa.common.base.BaseTimeEntity;
 import com.example.woowa.restaurant.advertisement.converter.RateTypeConverter;
+import com.example.woowa.restaurant.advertisement.converter.UnitTypeConverter;
 import com.example.woowa.restaurant.advertisement.enums.RateType;
 import com.example.woowa.restaurant.advertisement.enums.UnitType;
 import com.example.woowa.restaurant.restaurant_advertisement.entity.RestaurantAdvertisement;
@@ -17,6 +18,7 @@ import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -24,7 +26,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "advertisement")
 @Entity
-public class Advertisement {
+public class Advertisement extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -47,21 +49,34 @@ public class Advertisement {
     @Column(nullable = false)
     private Integer rate;
 
-    @Column(columnDefinition = "TEXT")
+    @Column(nullable = false, columnDefinition = "TEXT")
     private String description;
 
-    public Advertisement(String title, UnitType unitType, RateType rateType, Integer rate, String description) {
+    @Column(nullable = false)
+    private Integer limitSize;
+
+    @Column(nullable = false)
+    private Integer currentSize;
+
+    @Builder
+    public Advertisement(String title, UnitType unitType, RateType rateType, Integer rate,
+        String description, Integer limitSize) {
         this.title = title;
         this.unitType = unitType;
         this.rateType = rateType;
         this.rate = rate;
         this.description = description;
+        this.limitSize = limitSize;
+        this.currentSize = 0;
     }
 
     public void addRestaurantAdvertisement(RestaurantAdvertisement restaurantAdvertisement) {
-        if (restaurantAdvertisement.getAdvertisement() != this) {
-            restaurantAdvertisement.setAdvertisement(this);
-        }
+        restaurantAdvertisement.setAdvertisement(this);
+    }
+
+    public void removeRestaurantAdvertisement(RestaurantAdvertisement restaurantAdvertisement) {
+        this.getRestaurantAdvertisements().remove(restaurantAdvertisement);
+        this.decrementCurrentSize();
     }
 
     public void changeTitle(String title) {
@@ -82,6 +97,18 @@ public class Advertisement {
 
     public void changeDescription(String description) {
         this.description = description;
+    }
+
+    public void incrementCurrentSize() {
+        this.currentSize++;
+    }
+
+    public void decrementCurrentSize() {
+        this.currentSize--;
+    }
+
+    public static boolean isAvailable(Advertisement advertisement) {
+        return advertisement.currentSize < advertisement.limitSize;
     }
 
 }

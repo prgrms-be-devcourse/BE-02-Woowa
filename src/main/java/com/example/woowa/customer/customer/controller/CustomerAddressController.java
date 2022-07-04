@@ -4,7 +4,6 @@ import com.example.woowa.customer.customer.dto.CustomerAddressUpdateRequest;
 import com.example.woowa.customer.customer.dto.CustomerAddressCreateRequest;
 import com.example.woowa.customer.customer.dto.CustomerAddressFindResponse;
 import com.example.woowa.customer.customer.service.CustomerAddressService;
-import com.example.woowa.customer.customer.service.CustomerService;
 
 import java.util.List;
 import javax.validation.Valid;
@@ -26,7 +25,6 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/v1/customers/addresses")
 public class CustomerAddressController {
     private final CustomerAddressService customerAddressService;
-    private final CustomerService customerService;
 
     @PostMapping("/{loginId}")
     public CustomerAddressFindResponse createCustomerAddress(@PathVariable String loginId, @RequestBody @Valid CustomerAddressCreateRequest customerAddressCreateRequest) {

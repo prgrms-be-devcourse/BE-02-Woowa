@@ -2,6 +2,7 @@ package com.example.woowa.customer.customer.entity;
 
 import static lombok.AccessLevel.PROTECTED;
 
+import com.example.woowa.common.base.BaseTimeEntity;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -16,7 +17,7 @@ import lombok.NoArgsConstructor;
 @Table(name = "customer_grade")
 @Getter
 @NoArgsConstructor(access = PROTECTED)
-public class CustomerGrade {
+public class CustomerGrade extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -25,7 +26,7 @@ public class CustomerGrade {
     private Integer orderCount;
 
     @Column(nullable = false, unique = true, length = 45)
-    private String grade;
+    private String title;
 
     @Column(nullable = false)
     private Integer discountPrice;
@@ -33,10 +34,10 @@ public class CustomerGrade {
     @Column(nullable = false)
     private Integer voucherCount;
 
-    public CustomerGrade(Integer orderCount, String grade, Integer discountPrice,
-                         Integer voucherCount) {
+    public CustomerGrade(Integer orderCount, String title, Integer discountPrice,
+        Integer voucherCount) {
         this.orderCount = orderCount;
-        this.grade = grade;
+        this.title = title;
         this.discountPrice = discountPrice;
         this.voucherCount = voucherCount;
     }
@@ -46,9 +47,9 @@ public class CustomerGrade {
         this.orderCount = orderCount;
     }
 
-    public void setGrade(String grade) {
-        assert !grade.isBlank();
-        this.grade = grade;
+    public void setGrade(String title) {
+        assert !title.isBlank() && (title.length() <= 10);
+        this.title = title;
     }
 
     public void setDiscountPrice(int discountPrice) {

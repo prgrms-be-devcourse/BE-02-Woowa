@@ -1,8 +1,7 @@
 package com.example.woowa.order.review.service;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.is;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.given;
 
 import com.example.woowa.customer.customer.dto.CustomerAddressCreateRequest;
 import com.example.woowa.customer.customer.dto.CustomerCreateRequest;
@@ -13,20 +12,33 @@ import com.example.woowa.customer.customer.repository.CustomerGradeRepository;
 import com.example.woowa.customer.customer.repository.CustomerRepository;
 import com.example.woowa.customer.customer.service.CustomerGradeService;
 import com.example.woowa.customer.customer.service.CustomerService;
+import com.example.woowa.customer.voucher.service.VoucherEntityService;
+import com.example.woowa.order.order.repository.OrderRepository;
+import com.example.woowa.order.order.service.OrderService;
+import com.example.woowa.order.review.converter.ReviewMapper;
 import com.example.woowa.order.review.dto.ReviewCreateRequest;
 import com.example.woowa.order.review.dto.ReviewFindResponse;
 import com.example.woowa.order.review.dto.ReviewUpdateRequest;
 import com.example.woowa.order.review.enums.ScoreType;
 import com.example.woowa.order.review.repository.ReviewRepository;
+import com.example.woowa.restaurant.menu.service.MenuService;
+import com.example.woowa.restaurant.restaurant.service.RestaurantService;
 import java.util.List;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.transaction.annotation.Transactional;
 
 @SpringBootTest
+@Transactional
+@ExtendWith(MockitoExtension.class)
 class ReviewServiceTest {
   @Autowired
   private CustomerService customerService;
@@ -49,13 +61,19 @@ class ReviewServiceTest {
   @Autowired
   private ReviewRepository reviewRepository;
 
+  @Autowired
+  private ReviewMapper reviewMapper;
+
+  @Mock
+  private OrderService orderService;
+
   public void makeDefaultCustomerGrade() {
     CustomerGradeCreateRequest customerGradeCreateRequest = new CustomerGradeCreateRequest(5, "일반", 3000, 2);
     customerGradeService.createCustomerGrade(customerGradeCreateRequest);
   }
 
   public String getCustomerLoginId() {
-    CustomerAddressCreateRequest customerAddressCreateRequest = new CustomerAddressCreateRequest("서울시","동작구","집");
+    CustomerAddressCreateRequest customerAddressCreateRequest = new CustomerAddressCreateRequest("서울특별시 동작구 상도동","빌라 101호","집");
     CustomerCreateRequest customerCreateRequest = new CustomerCreateRequest("dev12","Programmers123!", "2000-01-01", customerAddressCreateRequest);
     CustomerFindResponse customerFindResponse = customerService.createCustomer(
         customerCreateRequest);
@@ -64,13 +82,14 @@ class ReviewServiceTest {
 
   @BeforeEach
   void settingBeforeTest() {
+    reviewService = new ReviewService(reviewRepository, customerService, orderService, reviewMapper);
     makeDefaultCustomerGrade();
   }
 
   @AfterEach
   void settingAfterTest() {
-    customerAddressRepository.deleteAll();
     reviewRepository.deleteAll();
+    customerAddressRepository.deleteAll();
     customerRepository.deleteAll();
     customerGradeRepository.deleteAll();
   }
@@ -80,11 +99,12 @@ class ReviewServiceTest {
   void createReview() {
     String customerId = getCustomerLoginId();
     ReviewCreateRequest reviewCreateRequest = new ReviewCreateRequest("정말정말 맛있습니다.", 5);
+    given(orderService.findOrderById(any())).willReturn(null);
 
     ReviewFindResponse reviewFindResponse = reviewService.createReview(customerId, null, reviewCreateRequest);
 
-    assertThat(reviewFindResponse.getContent(), is("정말정말 맛있습니다."));
-    assertThat(reviewFindResponse.getScoreType(), is(ScoreType.FIVE.getValue()));
+    Assertions.assertThat(reviewFindResponse.getContent()).isEqualTo("정말정말 맛있습니다.");
+    Assertions.assertThat(reviewFindResponse.getScoreType()).isEqualTo(ScoreType.FIVE.getValue());
   }
 
   @Test
@@ -92,12 +112,13 @@ class ReviewServiceTest {
   void findReview() {
     String customerId = getCustomerLoginId();
     ReviewCreateRequest reviewCreateRequest = new ReviewCreateRequest("정말정말 맛있습니다.", 5);
+    given(orderService.findOrderById(any())).willReturn(null);
     ReviewFindResponse reviewFindResponse = reviewService.createReview(customerId, null, reviewCreateRequest);
 
     reviewFindResponse = reviewService.findReview(reviewFindResponse.getId());
 
-    assertThat(reviewFindResponse.getContent(), is("정말정말 맛있습니다."));
-    assertThat(reviewFindResponse.getScoreType(), is(ScoreType.FIVE.getValue()));
+    Assertions.assertThat(reviewFindResponse.getContent()).isEqualTo("정말정말 맛있습니다.");
+    Assertions.assertThat(reviewFindResponse.getScoreType()).isEqualTo(ScoreType.FIVE.getValue());
   }
 
   @Test
@@ -105,12 +126,13 @@ class ReviewServiceTest {
   void findUserReview() {
     String customerId = getCustomerLoginId();
     ReviewCreateRequest reviewCreateRequest = new ReviewCreateRequest("정말정말 맛있습니다.", 5);
+    given(orderService.findOrderById(any())).willReturn(null);
     reviewService.createReview(customerId, null, reviewCreateRequest);
 
     List<ReviewFindResponse> reviews = reviewService.findUserReview(customerId);
 
-    assertThat(reviews.get(0).getContent(), is("정말정말 맛있습니다."));
-    assertThat(reviews.get(0).getScoreType(), is(ScoreType.FIVE.getValue()));
+    Assertions.assertThat(reviews.get(0).getContent()).isEqualTo("정말정말 맛있습니다.");
+    Assertions.assertThat(reviews.get(0).getScoreType()).isEqualTo(ScoreType.FIVE.getValue());
   }
 
   @Test
@@ -118,14 +140,15 @@ class ReviewServiceTest {
   void updateReview() {
     String customerId = getCustomerLoginId();
     ReviewCreateRequest reviewCreateRequest = new ReviewCreateRequest("정말정말 맛있습니다.", 5);
+    given(orderService.findOrderById(any())).willReturn(null);
     ReviewFindResponse reviewFindResponse = reviewService.createReview(customerId, null, reviewCreateRequest);
     ReviewUpdateRequest reviewUpdateRequest = new ReviewUpdateRequest("정말정말 맛없습니다.", 1);
 
     reviewFindResponse = reviewService.updateReview(reviewFindResponse.getId(), reviewUpdateRequest);
     reviewFindResponse = reviewService.findReview(reviewFindResponse.getId());
 
-    assertThat(reviewFindResponse.getContent(), is("정말정말 맛없습니다."));
-    assertThat(reviewFindResponse.getScoreType(), is(ScoreType.ONE.getValue()));
+    Assertions.assertThat(reviewFindResponse.getContent()).isEqualTo("정말정말 맛없습니다.");
+    Assertions.assertThat(reviewFindResponse.getScoreType()).isEqualTo(ScoreType.ONE.getValue());
   }
 
   @Test
@@ -133,10 +156,11 @@ class ReviewServiceTest {
   void deleteReview() {
     String customerId = getCustomerLoginId();
     ReviewCreateRequest reviewCreateRequest = new ReviewCreateRequest("정말정말 맛있습니다.", 5);
+    given(orderService.findOrderById(any())).willReturn(null);
     ReviewFindResponse reviewFindResponse = reviewService.createReview(customerId, null, reviewCreateRequest);
 
     reviewService.deleteReview(reviewFindResponse.getId());
 
-    assertThat(reviewRepository.count(), is(0l));
+    Assertions.assertThat(reviewRepository.count()).isEqualTo(0l);
   }
 }
