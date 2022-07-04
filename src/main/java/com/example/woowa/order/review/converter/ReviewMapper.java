@@ -9,13 +9,15 @@ import com.example.woowa.order.review.enums.ScoreType;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Mappings;
+import org.mapstruct.NullValuePropertyMappingStrategy;
 
-@Mapper(componentModel = "spring", imports = {ScoreType.class})
+@Mapper(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.SET_TO_NULL, componentModel = "spring", imports = {ScoreType.class})
 public interface ReviewMapper {
 
   @Mapping(target = "scoreType", expression = "java(review.getScoreType().getValue())")
   ReviewFindResponse toReviewDto(Review review);
   @Mappings({
+      @Mapping(target = "customer", source = "customer"),
       @Mapping(target = "scoreType", expression = "java(ScoreType.find(reviewCreateRequest.getScoreType()))"),
       @Mapping(target = "order", ignore = true)
   })

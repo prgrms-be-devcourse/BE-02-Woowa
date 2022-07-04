@@ -41,14 +41,14 @@ public class Review extends BaseTimeEntity {
     private Customer customer;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(nullable = false)
+    @JoinColumn(nullable = true)
     private Order order;
 
     public Review(String content, ScoreType scoreType, Customer customer, Order order) {
         this.content = content;
         this.scoreType = scoreType;
         this.customer = customer;
-        this.order = null;
+        this.order = order;
     }
 
     public void setContent(String content) {
