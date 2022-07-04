@@ -11,11 +11,11 @@ import lombok.Getter;
 @Getter
 public class OrderSummeryResponse {
 
-    private final Long orderId;
+    private final Long id;
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private final LocalDateTime createdAt;
     private final String orderStatus;
     private final String restaurantName;
-    private final Integer afterDiscountPrice;
+    private final Integer afterDiscountTotalPrice;
     private final List<CartSummeryResponse> carts;
 }
