@@ -1,6 +1,8 @@
 package com.example.woowa.order.order.entity;
 
+import com.example.woowa.common.base.BaseTimeEntity;
 import com.example.woowa.customer.customer.entity.Customer;
+import com.example.woowa.delivery.entity.Delivery;
 import com.example.woowa.order.order.enums.OrderStatus;
 import com.example.woowa.order.order.enums.PaymentType;
 import com.example.woowa.restaurant.restaurant.entity.Restaurant;
@@ -32,7 +34,7 @@ import lombok.NoArgsConstructor;
 @Table(name = "orders")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
-public class Order {
+public class Order extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -54,64 +56,78 @@ public class Order {
     private List<Cart> carts = new ArrayList<>();
 
     @Column(nullable = false)
-    private Integer beforeDiscountTotalPrice;
+    private Integer orderPrice;
+    @Column(nullable = false)
+    private Integer deliveryFee;
 
     @Column(nullable = false)
     private Integer afterDiscountTotalPrice;
 
-    @Column(columnDefinition = "DEFAULT 0")
-    private Integer discountPrice;
+    @Column(columnDefinition = "INTEGER DEFAULT 0")
+    private Integer voucherDiscountPrice;
+
+    @OneToOne(mappedBy = "order")
+    private Delivery delivery;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private PaymentType paymentType;
 
-    @Column(columnDefinition = "DEFAULT 0")
+    @Column(columnDefinition = "INTEGER DEFAULT 0")
     private Integer usedPoint;
+
     private Integer cookingTime;
+
+    private String deliveryAddress;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private OrderStatus orderStatus;
 
     private Order(Voucher voucher, Customer customer, Restaurant restaurant,
-            Integer beforeDiscountTotalPrice, Integer afterDiscountTotalPrice,
-            Integer discountPrice,
-            PaymentType paymentType, Integer usedPoint, OrderStatus orderStatus) {
+            Integer orderPrice, Integer afterDiscountTotalPrice,
+            Integer voucherDiscountPrice,
+            PaymentType paymentType, Integer usedPoint, OrderStatus orderStatus,
+            String deliveryAddress, int deliveryFee) {
         this.voucher = voucher;
         this.customer = customer;
         this.restaurant = restaurant;
-        this.beforeDiscountTotalPrice = beforeDiscountTotalPrice;
+        this.orderPrice = orderPrice;
         this.afterDiscountTotalPrice = afterDiscountTotalPrice;
-        this.discountPrice = discountPrice;
+        this.voucherDiscountPrice = voucherDiscountPrice;
         this.paymentType = paymentType;
         this.usedPoint = usedPoint;
         this.orderStatus = orderStatus;
+        this.deliveryAddress = deliveryAddress;
+        this.deliveryFee = deliveryFee;
     }
 
     public static Order createOrder(Customer customer, Restaurant restaurant, Voucher voucher,
-            Integer usedPoint, PaymentType paymentType, List<Cart> carts) {
+            String deliveryAddress,
+            Integer usedPoint, PaymentType paymentType, List<Cart> carts, int deliveryFee) {
 
-        customer.usePoint(usedPoint);
-
-        int beforeDiscountTotalPrice = carts.stream()
+        int orderPrice = carts.stream()
                 .mapToInt(cart -> cart.getMenu().getPrice() * cart.getQuantity())
                 .sum();
-        int discountPrice =
-                usedPoint + getVoucherDiscountPrice(voucher, beforeDiscountTotalPrice);
-        int afterDiscountTotalPrice = beforeDiscountTotalPrice - discountPrice;
+        int voucherDiscountPrice = getVoucherDiscountPrice(voucher, orderPrice + deliveryFee);
+        int afterDiscountTotalPrice = orderPrice + deliveryFee - voucherDiscountPrice;
 
-        Order order = new Order(voucher, customer, restaurant, beforeDiscountTotalPrice,
+        customer.updateCustomerStatusWhenOrder(usedPoint,
+                calculatePlusPoint(afterDiscountTotalPrice));
+
+        Order order = new Order(voucher, customer, restaurant, orderPrice,
                 afterDiscountTotalPrice,
-                discountPrice, paymentType, usedPoint, OrderStatus.PAYMENT_COMPLETED);
+                voucherDiscountPrice, paymentType, usedPoint, OrderStatus.PAYMENT_COMPLETED,
+                deliveryAddress, deliveryFee);
 
         carts.forEach(order::addCart);
 
         return order;
     }
 
-    public void acceptOrder(int cookingTime) {
+    public void acceptOrder(int cookingTime, Delivery delivery) {
         orderStatus = OrderStatus.ACCEPTED;
+        this.delivery = delivery;
         this.cookingTime = cookingTime;
     }
 
@@ -121,6 +137,9 @@ public class Order {
             voucher = null;
         }
 
+        customer.updateCustomerStatusWhenOrderCancel(usedPoint,
+                calculatePlusPoint(afterDiscountTotalPrice));
+
         orderStatus = OrderStatus.CANCEL;
     }
 
@@ -129,7 +148,15 @@ public class Order {
         cart.setOrder(this);
     }
 
+    public void setDelivery(Delivery delivery) {
+        this.delivery = delivery;
+    }
+
     private static int getVoucherDiscountPrice(Voucher voucher, int beforeDiscountTotalPrice) {
         return Objects.isNull(voucher) ? 0 : voucher.getDiscountPrice(beforeDiscountTotalPrice);
+    }
+
+    private static int calculatePlusPoint(Integer afterDiscountTotalPrice) {
+        return (int) Math.round(afterDiscountTotalPrice * 0.5D);
     }
 }

@@ -1,8 +1,6 @@
 package com.example.woowa.customer.voucher.enums;
 
-import com.example.woowa.common.EnumFindable;
-import java.util.Arrays;
-import java.util.Optional;
+import com.example.woowa.common.interfaces.EnumFindable;
 
 public enum VoucherType implements EnumFindable {
     FiXED("fixed") {

@@ -1,5 +1,6 @@
 package com.example.woowa.restaurant.menugroup.entity;
 
+import com.example.woowa.common.base.BaseTimeEntity;
 import com.example.woowa.restaurant.menu.entity.Menu;
 import com.example.woowa.restaurant.restaurant.entity.Restaurant;
 
@@ -26,7 +27,7 @@ import org.springframework.util.StringUtils;
 @Table(name = "menu_groups")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
-public class MenuGroup {
+public class MenuGroup extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

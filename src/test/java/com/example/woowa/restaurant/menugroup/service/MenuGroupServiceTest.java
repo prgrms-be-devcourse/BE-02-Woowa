@@ -7,11 +7,17 @@ import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.when;
 
+import com.example.woowa.restaurant.menugroup.MenuGroupMapperImpl;
+import com.example.woowa.restaurant.menugroup.dto.MenuGroupListResponse;
+import com.example.woowa.restaurant.menugroup.dto.MenuGroupResponse;
+import com.example.woowa.restaurant.menugroup.dto.MenuGroupSaveRequest;
+import com.example.woowa.restaurant.menugroup.dto.MenuGroupUpdateRequest;
 import com.example.woowa.restaurant.menugroup.entity.MenuGroup;
 import com.example.woowa.restaurant.menugroup.repository.MenuGroupRepository;
 import com.example.woowa.restaurant.restaurant.entity.Restaurant;
 import com.example.woowa.restaurant.restaurant.service.RestaurantService;
 import java.time.LocalTime;
+import java.util.Collections;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -35,9 +41,13 @@ class MenuGroupServiceTest {
 
     MenuGroup menuGroup;
 
+    MenuGroupMapperImpl mapper;
+
     @BeforeEach
     void init() {
-        menuGroupService = new MenuGroupService(menuGroupRepository, restaurantService);
+        mapper = new MenuGroupMapperImpl();
+        menuGroupService = new MenuGroupService(menuGroupRepository, restaurantService,
+                mapper);
 
         String name = "김밥나라";
         String businessNumber = "000-00-00000";
@@ -55,6 +65,24 @@ class MenuGroupServiceTest {
     }
 
     @Test
+    @DisplayName("특정 레스토랑의 메뉴그룹을 조회한다.")
+    void findMenuGroupByRestaurantTest() {
+        // Given
+        Long restaurantId = 1L;
+        given(restaurantService.findRestaurantById(restaurantId)).willReturn(restaurant);
+        given(menuGroupRepository.findByRestaurant(restaurant)).willReturn(
+                Collections.singletonList(menuGroup));
+
+        // When
+        MenuGroupListResponse response = menuGroupService.findMenuGroupByRestaurant(restaurantId);
+
+        // Then
+        assertThat(response.getMenuGroups().size()).isEqualTo(1);
+        assertThat(response.getMenuGroups()).usingRecursiveFieldByFieldElementComparator()
+                .isEqualTo(Collections.singletonList(mapper.toMenuGroupResponse(menuGroup)));
+    }
+
+    @Test
     @DisplayName("메뉴그룹을 저장한다.")
     void addMenuGroupTest() {
         // Given
@@ -64,8 +92,8 @@ class MenuGroupServiceTest {
         given(restaurantService.findRestaurantById(restaurantId)).willReturn(restaurant);
 
         // When
-        menuGroupService.addMenuGroup(restaurantId, menuGroup.getTitle(),
-                menuGroup.getDescription());
+        menuGroupService.addMenuGroup(restaurantId, new MenuGroupSaveRequest(menuGroup.getTitle(),
+                menuGroup.getDescription()));
 
         // Then
         then(menuGroupRepository).should().save(any());
@@ -81,8 +109,9 @@ class MenuGroupServiceTest {
 
         // When // Then
         assertThatThrownBy(
-                () -> menuGroupService.addMenuGroup(wrongRestaurantId, menuGroup.getTitle(),
-                        menuGroup.getDescription()))
+                () -> menuGroupService.addMenuGroup(wrongRestaurantId,
+                        new MenuGroupSaveRequest(menuGroup.getTitle(),
+                                menuGroup.getDescription())))
                 .isExactlyInstanceOf(IllegalArgumentException.class);
     }
 
@@ -94,10 +123,11 @@ class MenuGroupServiceTest {
         when(menuGroupRepository.findById(menuGroupId)).thenReturn(Optional.of(menuGroup));
 
         // When
-        MenuGroup findMenuGroup = menuGroupService.findMenuGroupById(menuGroupId);
+        MenuGroupResponse response = menuGroupService.findMenuById(menuGroupId);
 
         // Then
-        assertThat(findMenuGroup).usingRecursiveComparison().isEqualTo(menuGroup);
+        assertThat(response).usingRecursiveComparison()
+                .isEqualTo(mapper.toMenuGroupResponse(menuGroup));
     }
 
     @Test
@@ -108,7 +138,7 @@ class MenuGroupServiceTest {
         when(menuGroupRepository.findById(wrongMenuGroupId)).thenReturn(Optional.empty());
 
         // When // Then
-        assertThatThrownBy(() -> menuGroupService.findMenuGroupById(wrongMenuGroupId))
+        assertThatThrownBy(() -> menuGroupService.findMenuById(wrongMenuGroupId))
                 .isExactlyInstanceOf(IllegalArgumentException.class);
     }
 
@@ -122,10 +152,11 @@ class MenuGroupServiceTest {
         given(menuGroupRepository.findById(menuGroupId)).willReturn(Optional.of(menuGroup));
 
         // When
-        menuGroupService.updateMenuGroup(menuGroupId, newTitle, newDescription);
+        menuGroupService.updateMenuGroup(menuGroupId,
+                new MenuGroupUpdateRequest(newTitle, newDescription));
 
         // Then
-        MenuGroup findMenuGroup = menuGroupService.findMenuGroupById(menuGroupId);
+        MenuGroup findMenuGroup = menuGroupService.findMenuGroupEntityById(menuGroupId);
         assertThat(findMenuGroup.getTitle()).isEqualTo(newTitle);
         assertThat(findMenuGroup.getDescription()).isEqualTo(null);
     }
@@ -141,7 +172,8 @@ class MenuGroupServiceTest {
 
         // When // Then
         assertThatThrownBy(
-                () -> menuGroupService.updateMenuGroup(wrongMenuGroupId, newTitle, newDescription))
+                () -> menuGroupService.updateMenuGroup(wrongMenuGroupId,
+                        new MenuGroupUpdateRequest(newTitle, newDescription)))
                 .isExactlyInstanceOf(IllegalArgumentException.class);
     }
 
