@@ -9,17 +9,22 @@ import static org.mockito.BDDMockito.then;
 import com.example.woowa.customer.customer.entity.Customer;
 import com.example.woowa.customer.customer.entity.CustomerGrade;
 import com.example.woowa.customer.customer.service.CustomerService;
+import com.example.woowa.customer.voucher.entity.Voucher;
+import com.example.woowa.customer.voucher.enums.EventType;
+import com.example.woowa.customer.voucher.enums.VoucherType;
 import com.example.woowa.customer.voucher.service.VoucherEntityService;
 import com.example.woowa.delivery.entity.Delivery;
 import com.example.woowa.delivery.enums.DeliveryStatus;
 import com.example.woowa.delivery.service.DeliveryAreaService;
 import com.example.woowa.delivery.service.DeliveryEntityService;
-import com.example.woowa.order.order.converter.OrderConverter;
+import com.example.woowa.order.order.dto.cart.CartResponse;
 import com.example.woowa.order.order.dto.cart.CartSaveRequest;
+import com.example.woowa.order.order.dto.cart.CartSummeryResponse;
 import com.example.woowa.order.order.dto.customer.OrderCustomerResponse;
 import com.example.woowa.order.order.dto.customer.OrderListCustomerRequest;
 import com.example.woowa.order.order.dto.customer.OrderListCustomerResponse;
 import com.example.woowa.order.order.dto.customer.OrderSaveRequest;
+import com.example.woowa.order.order.dto.customer.OrderSummeryResponse;
 import com.example.woowa.order.order.dto.restaurant.OrderAcceptRequest;
 import com.example.woowa.order.order.dto.restaurant.OrderListRestaurantRequest;
 import com.example.woowa.order.order.dto.restaurant.OrderListRestaurantResponse;
@@ -31,6 +36,8 @@ import com.example.woowa.order.order.entity.Cart;
 import com.example.woowa.order.order.entity.Order;
 import com.example.woowa.order.order.enums.OrderStatus;
 import com.example.woowa.order.order.enums.PaymentType;
+import com.example.woowa.order.order.mapper.CartMapper;
+import com.example.woowa.order.order.mapper.OrderMapper;
 import com.example.woowa.order.order.repository.OrderRepository;
 import com.example.woowa.restaurant.menu.entity.Menu;
 import com.example.woowa.restaurant.menu.enums.MenuStatus;
@@ -44,6 +51,7 @@ import java.time.LocalTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -51,6 +59,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.SliceImpl;
 
 @ExtendWith(MockitoExtension.class)
@@ -76,6 +85,11 @@ class OrderServiceTest {
 
     @Mock
     DeliveryEntityService deliveryEntityService;
+    @Mock
+    CartMapper cartMapper;
+    @Mock
+    OrderMapper orderMapper;
+    ;
 
     OrderService orderService;
 
@@ -86,19 +100,22 @@ class OrderServiceTest {
     List<Cart> carts;
 
     Delivery delivery;
-
+    Voucher voucher;
+    List<CartResponse> cartResponses;
 
     @BeforeEach
     void init() {
         orderService = new OrderService(orderRepository, customerService, restaurantService,
-                voucherEntityService, deliveryAreaService, menuService, deliveryEntityService);
+                voucherEntityService, deliveryAreaService, deliveryEntityService,
+                orderMapper, cartMapper);
         customer = initCustomer();
         restaurant = initRestaurant();
         menus = initMenus();
         carts = initCarts();
         order = initOrder();
-        delivery = Delivery.createDelivery(order, order.getRestaurant().getAddress(),
-                order.getDeliveryAddress(), order.getDeliveryFee());
+        delivery = initDelivery(order);
+        voucher = initVoucher();
+        cartResponses = initCartResponses();
     }
 
     @Test
@@ -113,6 +130,7 @@ class OrderServiceTest {
 
         Long menuId1 = 1L;
         Long menuId2 = 2L;
+        Long voucherId = 1L;
 
         Menu menu1 = menus.get(0);
         Menu menu2 = menus.get(1);
@@ -120,20 +138,22 @@ class OrderServiceTest {
         int orderPrice =
                 menu1.getPrice() * 1 + menu2.getPrice() * 2;
 
+        List<CartSaveRequest> cartSaveRequests = List.of(
+                new CartSaveRequest(menuId1, 1),
+                new CartSaveRequest(menuId2, 2)
+        );
+
         given(customerService.findCustomerEntity(any())).willReturn(customer);
         given(restaurantService.findRestaurantById(any())).willReturn(restaurant);
         given(orderRepository.save(any())).willReturn(order);
-        given(menuService.findMenuEntityById(menuId2)).willReturn(menu2);
-        given(menuService.findMenuEntityById(menuId1)).willReturn(menu1);
         given(orderRepository.findById(orderId)).willReturn(Optional.of(order));
         given(deliveryAreaService.getDeliveryFee(restaurant, "서울특별시 강남구")).willReturn(deliveryFee);
-
-        List<CartSaveRequest> cartSaveRequests = List.of(
-                new CartSaveRequest(menuId1, 1),
-                new CartSaveRequest(menuId2, 2));
+        given(voucherEntityService.findVoucherById(voucherId)).willReturn(voucher);
+        given(cartMapper.toCart(cartSaveRequests.get(0))).willReturn(carts.get(0));
+        given(cartMapper.toCart(cartSaveRequests.get(1))).willReturn(carts.get(1));
 
         OrderSaveRequest orderSaveRequest = new OrderSaveRequest(customer.getLoginId(),
-                restaurantId, null, usePoint, paymentType, "서울특별시 강남구",
+                restaurantId, voucherId, usePoint, paymentType, "서울특별시 강남구",
                 cartSaveRequests
         );
 
@@ -158,6 +178,7 @@ class OrderServiceTest {
         // Given
         Long orderId = 1L;
         Order copyOrder = initOrder();
+        initDelivery(copyOrder);
 
         given(orderRepository.findById(orderId)).willReturn(Optional.of(order));
 
@@ -191,13 +212,28 @@ class OrderServiceTest {
         PageRequest pageable = PageRequest.of(0, 3);
 
         given(restaurantService.findRestaurantById(restaurantId)).willReturn(restaurant);
+        Slice<Order> slice = new SliceImpl(Collections.singletonList(order), pageable,
+                false);
+
+        List<OrderRestaurantResponse> orderRestaurantResponses = List.of(
+                new OrderRestaurantResponse(order.getCreatedAt(), cartResponses,
+                        order.getOrderPrice(), order.getDeliveryFee(),
+                        order.getAfterDiscountTotalPrice(),
+                        order.getVoucherDiscountPrice() + order.getUsedPoint(),
+                        orderMapper.getOrderStatusStringForRestaurant(order))
+        );
+
         given(orderRepository.findByRestaurant(restaurant,
                 LocalDateTime.of(from, LocalTime.of(0, 0)),
                 LocalDateTime.of(end, LocalTime.of(23, 59)), pageable)).willReturn(
-                new SliceImpl(Collections.singletonList(order), pageable,
-                        false));
-        // When
+                slice);
 
+        given(orderMapper.toOrderListRestaurantResponse(slice.hasNext(),
+                slice.getNumberOfElements(), slice.getContent())).willReturn(
+                new OrderListRestaurantResponse(slice.hasNext(), slice.getNumberOfElements(),
+                        orderRestaurantResponses));
+
+        // When
         OrderListRestaurantResponse response = orderService.findOrderByRestaurant(
                 new OrderListRestaurantRequest(restaurantId, 0, 3,
                         from, end));
@@ -206,7 +242,7 @@ class OrderServiceTest {
         assertThat(response.getHasNextPage()).isFalse();
         assertThat(response.getSize()).isEqualTo(1);
         assertThat(response.getOrders()).usingRecursiveFieldByFieldElementComparator()
-                .contains(OrderConverter.toOrderRestaurantResponse(order));
+                .isEqualTo(orderRestaurantResponses);
     }
 
     @Test
@@ -256,6 +292,23 @@ class OrderServiceTest {
                 pageable)).willReturn(orderSlice
         );
 
+        List<CartSummeryResponse> summeryResponses = carts.stream()
+                .map(cart -> new CartSummeryResponse(cart.getMenu().getTitle(), cart.getQuantity()))
+                .collect(
+                        Collectors.toList());
+
+        List<OrderSummeryResponse> orderSummeryResponses = orderSlice.getContent().stream()
+                .map(o -> new OrderSummeryResponse(o.getId(), o.getCreatedAt(),
+                        orderMapper.getOrderStatusStringForCustomer(order),
+                        order.getRestaurant().getName(), order.getAfterDiscountTotalPrice(),
+                        summeryResponses)).collect(
+                        Collectors.toList());
+
+        given(orderMapper.toOrderListCustomerResponse(orderSlice.hasNext(),
+                orderSlice.getNumberOfElements(), orderSlice.getContent()))
+                .willReturn(new OrderListCustomerResponse(orderSlice.hasNext(),
+                        orderSlice.getNumberOfElements(), orderSummeryResponses));
+
         // When
         OrderListCustomerResponse response = orderService.findOrderByCustomer(
                 new OrderListCustomerRequest(loginId, 0, 3,
@@ -264,8 +317,8 @@ class OrderServiceTest {
         // Then
         assertThat(response.getHasNextPage()).isFalse();
         assertThat(response.getSize()).isEqualTo(1);
-        assertThat(response.getMenus()).usingRecursiveFieldByFieldElementComparator()
-                .contains(OrderConverter.toOrderSummeryResponse(order));
+        assertThat(response.getOrders()).usingRecursiveFieldByFieldElementComparator()
+                .isEqualTo(orderSummeryResponses);
     }
 
     @Test
@@ -304,6 +357,12 @@ class OrderServiceTest {
         // Given
         Long orderId = 1L;
         given(orderRepository.findById(orderId)).willReturn(Optional.of(order));
+        given(orderMapper.toOrderCustomerResponse(order)).willReturn(
+                new OrderCustomerResponse(order.getCreatedAt(), cartResponses,
+                        order.getOrderPrice(), order.getDeliveryFee(),
+                        order.getVoucherDiscountPrice(), order.getUsedPoint(),
+                        order.getOrderStatus().getDescription(),
+                        order.getDeliveryAddress()));
 
         // When
         OrderCustomerResponse response = orderService.findDetailOrderForCustomer(orderId);
@@ -334,7 +393,19 @@ class OrderServiceTest {
     void findDetailOrderForRestaurantTest() {
         // Given
         Long orderId = 1L;
+
+        OrderRestaurantResponse orderRestaurantResponse = new OrderRestaurantResponse(
+                order.getCreatedAt(),
+                cartResponses,
+                order.getOrderPrice(), order.getDeliveryFee(),
+                order.getAfterDiscountTotalPrice(),
+                order.getVoucherDiscountPrice() + order.getUsedPoint(),
+                orderMapper.getOrderStatusStringForRestaurant(order)
+        );
+
         given(orderRepository.findById(orderId)).willReturn(Optional.of(order));
+        given(orderMapper.toOrderRestaurantResponse(order)).willReturn(
+                orderRestaurantResponse);
 
         // When
         OrderRestaurantResponse response = orderService.findDetailOrderByIdForRestaurant(
@@ -375,13 +446,21 @@ class OrderServiceTest {
         long voucherDiscountPrice = 100_000L;
         long usedPoint = 10_000L;
 
+        OrderStatistics orderStatistics = new OrderStatistics(orderCount, orderPrice,
+                voucherDiscountPrice,
+                usedPoint);
+
         given(restaurantService.findRestaurantById(restaurantId)).willReturn(restaurant);
         given(orderRepository.findOrderStatistics(restaurant,
                 LocalDateTime.of(from, LocalTime.of(0, 0)),
                 LocalDateTime.of(end, LocalTime.of(23, 59)),
                 DeliveryStatus.DELIVERY_FINISH))
-                .willReturn(new OrderStatistics(orderCount, orderPrice, voucherDiscountPrice,
-                        usedPoint));
+                .willReturn(orderStatistics);
+        given(orderMapper.toOrderStatisticsResponse(orderStatistics)).willReturn(
+                new OrderStatisticsResponse(orderStatistics.getOrderCount(),
+                        orderStatistics.getOrderPrice(),
+                        orderStatistics.getVoucherDiscountPrice()
+                                + orderStatistics.getUsedPoint()));
 
         // When
         OrderStatisticsResponse statistics = orderService.findOrderStatistics(
@@ -511,5 +590,22 @@ class OrderServiceTest {
     private Order initOrder() {
         return Order.createOrder(customer, restaurant, null, "서울특별시 강남구", 0,
                 PaymentType.CREDIT_CARD, carts, 3000);
+    }
+
+    private Delivery initDelivery(Order order) {
+        return Delivery.createDelivery(order, order.getRestaurant().getAddress(),
+                order.getDeliveryAddress(), order.getDeliveryFee());
+    }
+
+    private List<CartResponse> initCartResponses() {
+        return carts.stream()
+                .map(cart -> new CartResponse(cart.getMenu().getTitle(), cart.getQuantity(),
+                        cart.getMenu().getPrice() * cart.getQuantity()))
+                .collect(Collectors.toList());
+    }
+
+    private Voucher initVoucher() {
+        return new Voucher(VoucherType.FiXED, EventType.SPECIAL, 1000,
+                LocalDateTime.now().plusMonths(1));
     }
 }
