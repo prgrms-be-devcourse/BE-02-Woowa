@@ -14,6 +14,7 @@ import com.example.woowa.customer.customer.entity.CustomerGrade;
 import com.example.woowa.customer.customer.repository.CustomerGradeRepository;
 import com.example.woowa.customer.customer.repository.CustomerRepository;
 import java.time.LocalDate;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -42,7 +43,7 @@ class CustomerServiceTest {
   }
 
   public String getCustomerLoginId() {
-    CustomerAddressCreateRequest customerAddressCreateRequest = new CustomerAddressCreateRequest("서울시","동작구","집");
+    CustomerAddressCreateRequest customerAddressCreateRequest = new CustomerAddressCreateRequest("서울특별시 동작구 상도동","빌라 101호","집");
     CustomerCreateRequest customerCreateRequest = new CustomerCreateRequest("dev12","Programmers123!", "2000-01-01", customerAddressCreateRequest);
     CustomerFindResponse customerFindResponse = customerService.createCustomer(
         customerCreateRequest);
@@ -63,52 +64,19 @@ class CustomerServiceTest {
   @Test
   @DisplayName("유저 생성")
   void createUser() {
-    CustomerAddressCreateRequest customerAddressCreateRequest = new CustomerAddressCreateRequest("서울시","동작구","집");
+    CustomerAddressCreateRequest customerAddressCreateRequest = new CustomerAddressCreateRequest("서울특별시 동작구 상도동","빌라 101호","집");
     CustomerCreateRequest customerCreateRequest = new CustomerCreateRequest("dev12","Programmers123!", "2000-01-01", customerAddressCreateRequest);
     CustomerFindResponse customerFindResponse = customerService.createCustomer(
         customerCreateRequest);
 
-    assertThat(customerFindResponse.getLoginId(), is("dev12"));
-    assertThat(customerFindResponse.getPoint(), is(0));
-    assertThat(customerFindResponse.getBirthdate(), is(LocalDate.of(2000,1,1).toString()));
-    assertThat(customerFindResponse.getCustomerGrade().getOrderCount(), is(1));
-    assertThat(customerFindResponse.getCustomerGrade().getGrade(), is("일반"));
-    assertThat(customerFindResponse.getCustomerGrade().getDiscountPrice(), is(3000));
-    assertThat(customerFindResponse.getCustomerGrade().getVoucherCount(), is(2));
+    Assertions.assertThat(customerFindResponse.getLoginId()).isEqualTo("dev12");
+    Assertions.assertThat(customerFindResponse.getPoint()).isEqualTo(0);
+    Assertions.assertThat(customerFindResponse.getBirthdate()).isEqualTo(LocalDate.of(2000,1,1).toString());
+    Assertions.assertThat(customerFindResponse.getCustomerGrade().getOrderCount()).isEqualTo(1);
+    Assertions.assertThat(customerFindResponse.getCustomerGrade().getTitle()).isEqualTo("일반");
+    Assertions.assertThat(customerFindResponse.getCustomerGrade().getDiscountPrice()).isEqualTo(3000);
+    Assertions.assertThat(customerFindResponse.getCustomerGrade().getVoucherCount()).isEqualTo(2);
   }
-
-//  @Test
-//  @DisplayName("아이디 입력 오류")
-//  void createCustomerFail1() {
-//    CustomerAddressCreateRequest customerAddressCreateRequest = new CustomerAddressCreateRequest("서울시","동작구","집");
-//    CustomerCreateRequest customerCreateRequest = new CustomerCreateRequest("devcourse","Programmers123!", "2000-01-01", customerAddressCreateRequest);
-//
-//    assertThrows(AssertionError.class, ()-> {
-//      customerService.createCustomer(customerCreateRequest);
-//    });
-//  }
-//
-//  @Test
-//  @DisplayName("비밀번호 입력 오류")
-//  void createCustomerFail2() {
-//    CustomerAddressCreateRequest customerAddressCreateRequest = new CustomerAddressCreateRequest("서울시","동작구","집");
-//    CustomerCreateRequest customerCreateRequest = new CustomerCreateRequest("dev12","Programmers123", "2000-01-01", customerAddressCreateRequest);
-//
-//    assertThrows(AssertionError.class, ()-> {
-//      customerService.createCustomer(customerCreateRequest);
-//    });
-//  }
-//
-//  @Test
-//  @DisplayName("생년월일 입력 오류")
-//  void createCustomerFail3() {
-//    CustomerAddressCreateRequest customerAddressCreateRequest = new CustomerAddressCreateRequest("서울시","동작구","집");
-//    CustomerCreateRequest customerCreateRequest = new CustomerCreateRequest("dev12","Programmers123!", "hello", customerAddressCreateRequest);
-//
-//    assertThrows(AssertionError.class, ()-> {
-//      customerService.createCustomer(customerCreateRequest);
-//    });
-//  }
 
   @Test
   @DisplayName("유저 정보 조회")
@@ -117,13 +85,13 @@ class CustomerServiceTest {
 
     CustomerFindResponse customerFindResponse = customerService.findCustomer(id);
 
-    assertThat(customerFindResponse.getLoginId(), is("dev12"));
-    assertThat(customerFindResponse.getPoint(), is(0));
-    assertThat(customerFindResponse.getBirthdate(), is(LocalDate.of(2000,1,1).toString()));
-    assertThat(customerFindResponse.getCustomerGrade().getOrderCount(), is(1));
-    assertThat(customerFindResponse.getCustomerGrade().getGrade(), is("일반"));
-    assertThat(customerFindResponse.getCustomerGrade().getDiscountPrice(), is(3000));
-    assertThat(customerFindResponse.getCustomerGrade().getVoucherCount(), is(2));
+    Assertions.assertThat(customerFindResponse.getLoginId()).isEqualTo("dev12");
+    Assertions.assertThat(customerFindResponse.getPoint()).isEqualTo(0);
+    Assertions.assertThat(customerFindResponse.getBirthdate()).isEqualTo(LocalDate.of(2000,1,1).toString());
+    Assertions.assertThat(customerFindResponse.getCustomerGrade().getOrderCount()).isEqualTo(1);
+    Assertions.assertThat(customerFindResponse.getCustomerGrade().getTitle()).isEqualTo("일반");
+    Assertions.assertThat(customerFindResponse.getCustomerGrade().getDiscountPrice()).isEqualTo(3000);
+    Assertions.assertThat(customerFindResponse.getCustomerGrade().getVoucherCount()).isEqualTo(2);
   }
 
   @Test
@@ -136,25 +104,13 @@ class CustomerServiceTest {
     customerService.updateCustomer(customerFindResponse.getLoginId(), customerUpdateRequest);
     CustomerFindResponse customerFindResponse1 = customerService.findCustomer(customerFindResponse.getLoginId());
 
-    assertThat(customerFindResponse1.getLoginId(), is("dev12"));
-    assertThat(customerFindResponse.getPoint(), is(0));
-    assertThat(customerFindResponse.getBirthdate(), is(LocalDate.of(2000,1,1).toString()));
-    assertThat(customerFindResponse.getCustomerGrade().getOrderCount(), is(1));
-    assertThat(customerFindResponse.getCustomerGrade().getGrade(), is("일반"));
-    assertThat(customerFindResponse.getCustomerGrade().getDiscountPrice(), is(3000));
-    assertThat(customerFindResponse.getCustomerGrade().getVoucherCount(), is(2));
-  }
-
-  @Test
-  @DisplayName("잘못된 유저 정보 업데이트")
-  void updateCustomerFail() {
-    String id = getCustomerLoginId();
-    CustomerFindResponse customerFindResponse = customerService.findCustomer(id);
-
-    assertThrows(AssertionError.class, ()-> {
-      CustomerUpdateRequest customerUpdateRequest = new CustomerUpdateRequest("programmers");
-      customerService.updateCustomer(customerFindResponse.getLoginId(), customerUpdateRequest);
-    });
+    Assertions.assertThat(customerFindResponse1.getLoginId()).isEqualTo("dev12");
+    Assertions.assertThat(customerFindResponse.getPoint()).isEqualTo(0);
+    Assertions.assertThat(customerFindResponse.getBirthdate()).isEqualTo(LocalDate.of(2000,1,1).toString());
+    Assertions.assertThat(customerFindResponse.getCustomerGrade().getOrderCount()).isEqualTo(1);
+    Assertions.assertThat(customerFindResponse.getCustomerGrade().getTitle()).isEqualTo("일반");
+    Assertions.assertThat(customerFindResponse.getCustomerGrade().getDiscountPrice()).isEqualTo(3000);
+    Assertions.assertThat(customerFindResponse.getCustomerGrade().getVoucherCount()).isEqualTo(2);
   }
 
   @Test
@@ -178,10 +134,10 @@ class CustomerServiceTest {
 
     CustomerGrade customerGrade = customerGradeService.findDefaultCustomerGrade();
 
-    assertThat(customerGrade.getOrderCount(), is(1));
-    assertThat(customerGrade.getGrade(), is("일반"));
-    assertThat(customerGrade.getDiscountPrice(), is(3000));
-    assertThat(customerGrade.getVoucherCount(), is(2));
+    Assertions.assertThat(customerGrade.getOrderCount()).isEqualTo(1);
+    Assertions.assertThat(customerGrade.getTitle()).isEqualTo("일반");
+    Assertions.assertThat(customerGrade.getDiscountPrice()).isEqualTo(3000);
+    Assertions.assertThat(customerGrade.getVoucherCount()).isEqualTo(2);
   }
 
   @Test
@@ -193,15 +149,15 @@ class CustomerServiceTest {
     customerGradeService.createCustomerGrade(customerGradeCreateRequest2);
     String customerId = getCustomerLoginId();
     Customer customer = customerService.findCustomerEntity(customerId);
-    customer.updateCustomerStatusWhenOrder(3000);
-    customer.updateCustomerStatusWhenOrder(2000);
+    customer.updateCustomerStatusWhenOrder(0,3000);
+    customer.updateCustomerStatusWhenOrder(0,2000);
 
     CustomerGrade customerGrade = customerGradeService.findCustomerGradeByOrderPerMonthCount(customer.getOrderPerMonth());
 
-    assertThat(customerGrade.getOrderCount(), is(2));
-    assertThat(customerGrade.getGrade(), is("실버"));
-    assertThat(customerGrade.getDiscountPrice(), is(3000));
-    assertThat(customerGrade.getVoucherCount(), is(2));
+    Assertions.assertThat(customerGrade.getOrderCount()).isEqualTo(2);
+    Assertions.assertThat(customerGrade.getTitle()).isEqualTo("실버");
+    Assertions.assertThat(customerGrade.getDiscountPrice()).isEqualTo(3000);
+    Assertions.assertThat(customerGrade.getVoucherCount()).isEqualTo(2);
   }
 
   @Test
@@ -210,13 +166,13 @@ class CustomerServiceTest {
   void updateCustomerStatusOn() {
     String customerId = getCustomerLoginId();
     Customer customer = customerService.findCustomerEntity(customerId);
-    customer.updateCustomerStatusWhenOrder(3000);
-    customer.updateCustomerStatusWhenOrder(2000);
+    customer.updateCustomerStatusWhenOrder(0, 3000);
+    customer.updateCustomerStatusWhenOrder(0,2000);
 
     CustomerFindResponse customerFindResponse = customerService.updateCustomerStatusOnFirstDay(customerId);
 
-    assertThat(customerFindResponse.getOrderPerMonth(), is(0));
-    assertThat(customerFindResponse.getIsIssued(), is(false));
-    assertThat(customerFindResponse.getPoint(), is(5000));
+    Assertions.assertThat(customerFindResponse.getOrderPerMonth()).isEqualTo(0);
+    Assertions.assertThat(customerFindResponse.getIsIssued()).isEqualTo(false);
+    Assertions.assertThat(customerFindResponse.getPoint()).isEqualTo(5000);
   }
 }

@@ -19,7 +19,7 @@ public enum ScoreType {
         return value;
     }
 
-    public static ScoreType of(int value) {
+    public static ScoreType find(int value) {
         return Arrays.stream(values()).filter((e) -> e.value == value).findFirst().orElseThrow(() -> new RuntimeException("1~5 사이 값을 입력하세요"));
     }
 }

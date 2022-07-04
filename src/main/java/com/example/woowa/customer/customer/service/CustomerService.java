@@ -1,7 +1,6 @@
 package com.example.woowa.customer.customer.service;
 
-import com.example.woowa.customer.customer.converter.CustomerAddressConverter;
-import com.example.woowa.customer.customer.converter.CustomerConverter;
+import com.example.woowa.customer.customer.converter.CustomerMapper;
 import com.example.woowa.customer.customer.dto.CustomerCreateRequest;
 import com.example.woowa.customer.customer.dto.CustomerFindResponse;
 import com.example.woowa.customer.customer.dto.CustomerUpdateRequest;
@@ -9,6 +8,8 @@ import com.example.woowa.customer.customer.entity.Customer;
 import com.example.woowa.customer.customer.entity.CustomerAddress;
 import com.example.woowa.customer.customer.repository.CustomerAddressRepository;
 import com.example.woowa.customer.customer.repository.CustomerRepository;
+import com.example.woowa.delivery.entity.AreaCode;
+import com.example.woowa.delivery.service.AreaCodeService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,29 +21,32 @@ public class CustomerService {
     private final CustomerAddressRepository customerAddressRepository;
     private final CustomerRepository customerRepository;
     private final CustomerGradeService customerGradeService;
+    private final AreaCodeService areaCodeService;
+    private final CustomerMapper customerMapper;
 
     @Transactional
     public CustomerFindResponse createCustomer(CustomerCreateRequest customerCreateRequest) {
-        Customer customer = CustomerConverter.toCustomer(customerCreateRequest, customerGradeService.findDefaultCustomerGrade());
+        Customer customer = customerMapper.toCustomer(customerCreateRequest, customerGradeService.findDefaultCustomerGrade());
         customerRepository.save(customer);
-        CustomerAddress customerAddress = CustomerAddressConverter.toCustomerAddress(customerCreateRequest.getAddress(), customer);
+        AreaCode areaCode = areaCodeService.findByAddress(customerCreateRequest.getAddress().getDefaultAddress());
+        CustomerAddress customerAddress = customerMapper.toCustomerAddress(areaCode, customerCreateRequest.getAddress(), customer);
         customerAddressRepository.save(customerAddress);
         customer.addCustomerAddress(customerAddress);
-        return CustomerConverter.toCustomerDto(customer);
+        return customerMapper.toCustomerDto(customer);
     }
 
     public CustomerFindResponse findCustomer(String loginId) {
         Customer customer = findCustomerEntity(loginId);
-        return CustomerConverter.toCustomerDto(customer);
+        return customerMapper.toCustomerDto(customer);
     }
 
     @Transactional
     public CustomerFindResponse updateCustomer(String loginId, CustomerUpdateRequest customerUpdateRequest) {
         Customer customer = findCustomerEntity(loginId);
         if (customerUpdateRequest.getLoginPassword() != null) {
-            customer.setLoginPassword(customerUpdateRequest.getLoginPassword());
+            customer.changePassword(customerUpdateRequest.getLoginPassword());
         }
-        return CustomerConverter.toCustomerDto(customer);
+        return customerMapper.toCustomerDto(customer);
     }
 
     @Transactional
@@ -66,6 +70,6 @@ public class CustomerService {
     public CustomerFindResponse updateCustomerStatusOnFirstDay(String loginId) {
         Customer customer = findCustomerEntity(loginId);
         customer.updateCustomerStatusOnFirstDay();
-        return CustomerConverter.toCustomerDto(customer);
+        return customerMapper.toCustomerDto(customer);
     }
 }

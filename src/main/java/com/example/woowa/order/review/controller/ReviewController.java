@@ -34,7 +34,7 @@ public class ReviewController {
         return reviewService.findReview(id);
     }
 
-    @GetMapping("/{loginId}")
+    @GetMapping("/user/{loginId}")
     public List<ReviewFindResponse> findUserReview(@PathVariable String loginId) {
         return reviewService.findUserReview(loginId);
     }

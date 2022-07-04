@@ -1,12 +1,10 @@
 package com.example.woowa.admin.service;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.is;
-
 import com.example.woowa.admin.dto.AdminCreateRequest;
 import com.example.woowa.admin.dto.AdminFindResponse;
 import com.example.woowa.admin.dto.AdminUpdateRequest;
 import com.example.woowa.admin.repository.AdminRepository;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -37,7 +35,7 @@ class AdminServiceTest {
     AdminCreateRequest  adminCreateRequest = new AdminCreateRequest("dev12", "Programmers12!");
     adminService.createAdmin(adminCreateRequest).getLoginId();
 
-    assertThat(adminRepository.count(), is(1l));
+    Assertions.assertThat(adminRepository.count()).isEqualTo(1l);
   }
 
   @Test
@@ -47,7 +45,7 @@ class AdminServiceTest {
 
     AdminFindResponse adminFindResponse = adminService.findAdmin(loginId);
 
-    assertThat(adminFindResponse.getLoginId(), is("dev12"));
+    Assertions.assertThat(adminFindResponse.getLoginId()).isEqualTo("dev12");
   }
 
   @Test
@@ -58,7 +56,7 @@ class AdminServiceTest {
 
     adminService.updateAdmin(loginId, adminUpdateRequest);
 
-    assertThat(adminRepository.count(), is(1l));
+    Assertions.assertThat(adminRepository.count()).isEqualTo(1l);
   }
 
   @Test
@@ -68,7 +66,7 @@ class AdminServiceTest {
 
     adminService.deleteAdmin(loginId);
 
-    assertThat(adminRepository.count(), is(0l));
+    Assertions.assertThat(adminRepository.count()).isEqualTo(0l);
   }
 
 }

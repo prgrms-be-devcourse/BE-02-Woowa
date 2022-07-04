@@ -19,7 +19,6 @@ public class AreaCodeService {
     @Transactional
     public void deleteAll() {
         areaCodeRepository.deleteAll();
-        return;
     }
     public List<AreaCode> findAll() {
         return areaCodeRepository.findAll();

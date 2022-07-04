@@ -3,7 +3,6 @@ package com.example.woowa.customer.customer.controller;
 import com.example.woowa.customer.customer.dto.CustomerUpdateRequest;
 import com.example.woowa.customer.customer.dto.CustomerCreateRequest;
 import com.example.woowa.customer.customer.dto.CustomerFindResponse;
-import com.example.woowa.customer.customer.service.CustomerGradeService;
 import com.example.woowa.customer.customer.service.CustomerService;
 
 import javax.validation.Valid;

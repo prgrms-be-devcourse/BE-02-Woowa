@@ -13,8 +13,8 @@ import org.hibernate.validator.constraints.Length;
 public class ReviewUpdateRequest {
   @NotBlank
   @Length(min = 10, max = 500)
-  private String content;
+  private final String content;
   @Min(value = 1)
   @Max(value = 5)
-  private Integer scoreType;
+  private final Integer scoreType;
 }
