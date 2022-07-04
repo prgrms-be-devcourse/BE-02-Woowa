@@ -1,9 +1,15 @@
 package com.example.woowa.order.order.repository;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
+import com.example.woowa.TestInitUtil;
 import com.example.woowa.customer.customer.entity.Customer;
 import com.example.woowa.customer.customer.entity.CustomerGrade;
 import com.example.woowa.customer.customer.repository.CustomerGradeRepository;
 import com.example.woowa.customer.customer.repository.CustomerRepository;
+import com.example.woowa.customer.voucher.entity.Voucher;
+import com.example.woowa.customer.voucher.repository.VoucherRepository;
+import com.example.woowa.delivery.entity.Delivery;
 import com.example.woowa.delivery.enums.DeliveryStatus;
 import com.example.woowa.delivery.repository.DeliveryRepository;
 import com.example.woowa.order.order.dto.statistics.OrderStatistics;
@@ -17,6 +23,7 @@ import com.example.woowa.restaurant.menugroup.entity.MenuGroup;
 import com.example.woowa.restaurant.menugroup.repository.MenuGroupRepository;
 import com.example.woowa.restaurant.restaurant.entity.Restaurant;
 import com.example.woowa.restaurant.restaurant.repository.RestaurantRepository;
+import com.mysql.cj.util.TestUtils;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -31,38 +38,33 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Slice;
 import org.springframework.transaction.annotation.Transactional;
 
-//TODO 딜리버리 상태 변경 가능할 때 테스트 검증(현재는 쿼리 수행만 확인)
 @SpringBootTest
 @Transactional
 class OrderRepositoryTest {
 
     @Autowired
     OrderRepository orderRepository;
-
     @Autowired
     CustomerRepository customerRepository;
-
     @Autowired
     MenuRepository menuRepository;
-
     @Autowired
     MenuGroupRepository menuGroupRepository;
-
     @Autowired
     RestaurantRepository restaurantRepository;
-
     @Autowired
     CustomerGradeRepository gradeRepository;
-
     @Autowired
     DeliveryRepository deliveryRepository;
+    @Autowired
+    VoucherRepository voucherRepository;
 
     Long restaurantId;
     Long customerId;
 
     List<Cart> carts;
     Order order;
-
+    Voucher voucher;
 
     @Test
     @DisplayName("기간별 레스토랑 주문 정보를 조회한다.")
@@ -77,12 +79,12 @@ class OrderRepositoryTest {
                 PageRequest.of(0, 3));
 
         // Then
-//        List<Order> content = orderSlice.getContent();
-//        assertThat(content.size()).isEqualTo(1);
-//        assertThat(content).contains(order);
-//
-//        Order findOrder = content.get(0);
-//        assertThat(findOrder.getCarts()).containsAll(carts);
+        List<Order> content = orderSlice.getContent();
+        assertThat(content.size()).isEqualTo(1);
+        assertThat(content).contains(order);
+
+        Order findOrder = content.get(0);
+        assertThat(findOrder.getCarts()).containsAll(carts);
     }
 
     @Test
@@ -97,8 +99,8 @@ class OrderRepositoryTest {
                 LocalDateTime.now(), PageRequest.of(0, 1));
 
         // Then
-//        assertThat(orderSlice.getContent().size()).isEqualTo(1);
-//        assertThat(orderSlice.getContent()).containsExactly(order);
+        assertThat(orderSlice.getContent().size()).isEqualTo(1);
+        assertThat(orderSlice.getContent()).containsExactly(order);
     }
 
     @Test
@@ -114,6 +116,9 @@ class OrderRepositoryTest {
                 DeliveryStatus.DELIVERY_FINISH);
 
         // Then
+        assertThat(orderStatistics.getOrderCount()).isEqualTo(1);
+        assertThat(orderStatistics.getOrderPrice()).isEqualTo(Long.valueOf(order.getOrderPrice()));
+        assertThat(orderStatistics.getUsedPoint()).isEqualTo(Long.valueOf(order.getUsedPoint()));
     }
 
     @BeforeEach
@@ -162,9 +167,14 @@ class OrderRepositoryTest {
                 new Cart(menu4, 1),
                 new Cart(menu4, 1));
 
+        voucher = voucherRepository.save(TestInitUtil.initVoucher());
         order = orderRepository.save(
-                Order.createOrder(customer, restaurant, null, "서을 특별시 강남구", 0,
+                Order.createOrder(customer, restaurant, voucher, "서을 특별시 강남구", 0,
                         PaymentType.CREDIT_CARD,
                         carts, 3000));
+        Delivery delivery = deliveryRepository.save(
+                Delivery.createDelivery(order, "서울 특별시 강남구", "서울 특별시 강남구", 3000));
+        order.acceptOrder(30, delivery);
+        delivery.finish();
     }
 }
