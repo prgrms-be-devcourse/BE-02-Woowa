@@ -1,6 +1,6 @@
 package com.example.woowa.restaurant.advertisement.enums;
 
-import com.example.woowa.common.EnumFindable;
+import com.example.woowa.common.interfaces.EnumFindable;
 import java.util.function.BiFunction;
 import lombok.RequiredArgsConstructor;
 

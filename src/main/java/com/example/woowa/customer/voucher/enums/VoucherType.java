@@ -1,8 +1,6 @@
 package com.example.woowa.customer.voucher.enums;
 
-import com.example.woowa.common.EnumFindable;
-import java.util.Arrays;
-import java.util.Optional;
+import com.example.woowa.common.interfaces.EnumFindable;
 
 public enum VoucherType implements EnumFindable {
     FiXED("fixed") {
@@ -36,6 +34,10 @@ public enum VoucherType implements EnumFindable {
 
     private final String type;
 
+    VoucherType(String type) {
+        this.type = type;
+    }
+
     @Override
     public String getType() {
         return type;
@@ -44,10 +46,6 @@ public enum VoucherType implements EnumFindable {
     @Override
     public String toString() {
         return getType();
-    }
-
-    VoucherType(String type) {
-        this.type = type;
     }
 
     public int discount(int currentPrice, int amount) {

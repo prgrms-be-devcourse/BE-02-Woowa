@@ -32,7 +32,9 @@ public class TestInitUtil {
 
         Customer customer = new Customer("dev12", "Programmers123!", LocalDate.of(1997, 05, 17),
             customerGrade);
-        CustomerAddress customerAddress = new CustomerAddress("서울시 동작구 상도동 101-2", "아파트 101호", "회사",
+
+        AreaCode areaCode = new AreaCode("12344", "서울시 관악구 신림동", true);
+        CustomerAddress customerAddress = new CustomerAddress(areaCode, "아파트 101호", "회사",
             customer);
         customer.addCustomerAddress(customerAddress);
         return customer;
@@ -42,7 +44,9 @@ public class TestInitUtil {
         CustomerGrade customerGrade = initCustomerGrade();
         Customer customer = new Customer("dev12", "Programmers123!", LocalDate.of(1997, 05, 17),
             customerGrade);
-        CustomerAddress customerAddress = new CustomerAddress("서울시 동작구 상도동 101-2", "아파트 101호", "회사",
+
+        AreaCode areaCode = new AreaCode("12344", "서울시 관악구 신림동", true);
+        CustomerAddress customerAddress = new CustomerAddress(areaCode, "아파트 101호", "회사",
             customer);
         customer.addCustomerAddress(customerAddress);
         return customer;
@@ -99,7 +103,10 @@ public class TestInitUtil {
 
     public static Order initOrder(Customer customer, Restaurant restaurant, Voucher voucher,
         List<Cart> carts) {
-        return Order.createOrder(customer, restaurant, null, 0, PaymentType.CREDIT_CARD, carts);
+        String deliveryAddress = " ";
+        int deliveryFee = 1000;
+        return Order.createOrder(customer, restaurant, null, deliveryAddress, 0,
+            PaymentType.CREDIT_CARD, carts, deliveryFee);
     }
 
     public static Order initOrder() {
@@ -107,7 +114,10 @@ public class TestInitUtil {
         Restaurant restaurant = initRestaurant();
         Voucher voucher = initVoucher();
         List<Cart> carts = initCarts();
-        return Order.createOrder(customer, restaurant, null, 0, PaymentType.CREDIT_CARD, carts);
+        String deliveryAddress = " ";
+        int deliveryFee = 1000;
+        return Order.createOrder(customer, restaurant, null, deliveryAddress, 0,
+            PaymentType.CREDIT_CARD, carts, deliveryFee);
     }
 
     public static Delivery initDelivery(Customer customer, CustomerAddress customerAddress,

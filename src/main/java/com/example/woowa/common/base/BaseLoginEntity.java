@@ -35,7 +35,6 @@ public abstract class BaseLoginEntity extends BaseTimeEntity {
     public BaseLoginEntity(String loginId, String password) {
         this.loginId = loginId;
         this.password = password;
-        this.lastLoginedAt = LocalDateTime.now();
     }
 
     public void update(String name, String phoneNumber) {
@@ -44,11 +43,6 @@ public abstract class BaseLoginEntity extends BaseTimeEntity {
     }
 
     public void changePassword(String password) {
-        this.password = password;
-    }
-
-    public BaseLoginEntity(String loginId, String password) {
-        this.loginId = loginId;
         this.password = password;
     }
 
