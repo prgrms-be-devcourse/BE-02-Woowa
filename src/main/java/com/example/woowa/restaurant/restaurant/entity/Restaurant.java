@@ -1,10 +1,8 @@
 package com.example.woowa.restaurant.restaurant.entity;
 
 
-import com.example.woowa.delivery.entity.AreaCode;
+import com.example.woowa.common.base.BaseTimeEntity;
 import com.example.woowa.delivery.entity.DeliveryArea;
-
-
 import com.example.woowa.restaurant.menugroup.entity.MenuGroup;
 import com.example.woowa.restaurant.owner.entity.Owner;
 import com.example.woowa.restaurant.restaurant_advertisement.entity.RestaurantAdvertisement;
@@ -32,7 +30,7 @@ import lombok.NoArgsConstructor;
 @Table(name = "restaurant")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
-public class Restaurant {
+public class Restaurant extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -142,9 +140,7 @@ public class Restaurant {
     }
   
     public void addRestaurantCategory(RestaurantCategory restaurantCategory) {
-        if (!Objects.equals(restaurantCategory.getRestaurant().getId(), this.getId())) {
-            restaurantCategory.setRestaurant(this);
-        }
+        restaurantCategory.setRestaurant(this);
     }
 
     public void setOwner(Owner owner) {
