@@ -1,4 +1,4 @@
-package com.example.woowa.common;
+package com.example.woowa.common.interfaces;
 
 import java.util.Arrays;
 

@@ -11,9 +11,13 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+
+import javax.persistence.ManyToOne;
+
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -44,8 +48,13 @@ public class Delivery {
     @OneToOne(fetch = FetchType.LAZY)
     private Order order;
 
-    private Delivery(String restaurantAddress, String customerAddress, int deliveryFee,
-            DeliveryStatus deliveryStatus) {
+    @ManyToOne(fetch = FetchType.LAZY)
+    private Rider rider;
+
+    @Builder
+    private Delivery(Order order, String restaurantAddress, String customerAddress, int deliveryFee,
+        DeliveryStatus deliveryStatus) {
+        this.order = order;
         this.restaurantAddress = restaurantAddress;
         this.customerAddress = customerAddress;
         this.deliveryFee = deliveryFee;
@@ -53,14 +62,28 @@ public class Delivery {
     }
 
     public static Delivery createDelivery(Order order, String restaurantAddress,
-            String customerAddress, int deliveryFee) {
-        Delivery delivery = new Delivery(restaurantAddress, customerAddress, deliveryFee,
-                DeliveryStatus.DELIVERY_WAITING);
-        order.setDelivery(delivery);
-        return delivery;
+        String customerAddress, int deliveryFee) {
+        return new Delivery(order, restaurantAddress, customerAddress, deliveryFee,
+            DeliveryStatus.DELIVERY_WAITING);
     }
 
-    private void changeDeliveryStatus(DeliveryStatus deliveryStatus) {
-        this.deliveryStatus = deliveryStatus;
+    public void accept(Rider rider, int cookMinute, int deliveryMinute) {
+        this.rider = rider;
+        this.deliveryStatus = DeliveryStatus.DELIVERY_REGISTRATION;
+        this.arrivalTime = LocalDateTime.now().plusMinutes(deliveryMinute + cookMinute);
+    }
+
+    public void delay(int delayMinute) {
+        this.arrivalTime = arrivalTime.plusMinutes(delayMinute);
+    }
+
+    public void pickUp(int deliveryMinute) {
+        this.deliveryStatus = DeliveryStatus.DELIVERY_PICKUP;
+        this.arrivalTime = LocalDateTime.now().plusMinutes(deliveryMinute);
+    }
+
+    public void finish() {
+        this.deliveryStatus = DeliveryStatus.DELIVERY_FINISH;
+        this.arrivalTime = LocalDateTime.now();
     }
 }

@@ -1,33 +1,36 @@
 package com.example.woowa.delivery.entity;
 
+import java.util.ArrayList;
+import java.util.List;
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.OneToMany;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-
-import javax.persistence.*;
-import java.util.ArrayList;
-import java.util.List;
 
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 public class AreaCode {
 
+    @OneToMany(mappedBy = "areaCode", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private final List<DeliveryArea> deliveryAreaList = new ArrayList<>();
+    @OneToMany(mappedBy = "areaCode", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private final List<RiderAreaCode> riderAreaCodeList = new ArrayList<>();
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
     @Column(unique = true, nullable = false)
     private String code;
-
     @Column(nullable = false)
     private String defaultAddress;
-
     @Column(nullable = false)
     private boolean isAbolish;
-
-    @OneToMany(mappedBy = "areaCode", cascade = CascadeType.REMOVE, orphanRemoval = true)
-    private List<DeliveryArea> deliveryAreaList = new ArrayList<>();
 
     public AreaCode(String code, String defaultAddress, boolean isAbolish) {
         this.code = code;
@@ -39,8 +42,7 @@ public class AreaCode {
         this.deliveryAreaList.add(deliveryArea);
     }
 
-    public String getAddress(String detailAddress) {
-        return detailAddress + " " + detailAddress;
+    public void addRiderArea(RiderAreaCode riderAreaCode) {
+        this.riderAreaCodeList.add(riderAreaCode);
     }
-
 }

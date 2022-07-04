@@ -34,3 +34,4 @@ build/
 
 ### env
 src/main/resources/application-db.yaml
+/src/main/resources/google-format.xml
