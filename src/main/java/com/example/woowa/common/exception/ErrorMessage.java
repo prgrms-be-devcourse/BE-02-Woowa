@@ -14,7 +14,6 @@ public enum ErrorMessage {
     //Delivery
     NOT_FOUND_DELIVERY_ID("없는 배달 정보 입니다."),
     ALREADY_RECEIVE_DELIVERY("이미 처리된 배달 요청 입니다."),
-    ALREADY_RECEIVE_DELIVERY("이미 처리된 배달 요청 입니다."),
 
     INVALID_PERIOD_VALUE("조회 기간의 시작일은 마감일 이전이어야 합니다."),
 
