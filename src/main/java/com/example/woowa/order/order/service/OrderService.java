@@ -25,7 +25,6 @@ import com.example.woowa.order.order.entity.Order;
 import com.example.woowa.order.order.mapper.CartMapper;
 import com.example.woowa.order.order.mapper.OrderMapper;
 import com.example.woowa.order.order.repository.OrderRepository;
-import com.example.woowa.restaurant.menu.service.MenuService;
 import com.example.woowa.restaurant.restaurant.entity.Restaurant;
 import com.example.woowa.restaurant.restaurant.service.RestaurantService;
 import java.time.LocalDate;
@@ -50,7 +49,6 @@ public class OrderService {
     private final RestaurantService restaurantService;
     private final VoucherEntityService voucherEntityService;
     private final DeliveryAreaService deliveryAreaService;
-    private final MenuService menuService;
     private final DeliveryEntityService deliveryEntityService;
     private final OrderMapper orderMapper;
     private final CartMapper cartMapper;
