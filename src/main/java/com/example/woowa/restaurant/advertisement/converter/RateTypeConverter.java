@@ -1,6 +1,6 @@
 package com.example.woowa.restaurant.advertisement.converter;
 
-import com.example.woowa.common.EnumFindable;
+import com.example.woowa.common.interfaces.EnumFindable;
 import com.example.woowa.restaurant.advertisement.enums.RateType;
 import javax.persistence.AttributeConverter;
 import javax.persistence.Converter;

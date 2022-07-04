@@ -27,7 +27,7 @@ public class Owner extends BaseLoginEntity {
     private Long id;
 
     @OneToMany(mappedBy = "owner", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Restaurant> restaurants = new ArrayList<>();
+    private final List<Restaurant> restaurants = new ArrayList<>();
 
     @Builder
     public Owner(String loginId, String password, String name, String phoneNumber) {
@@ -40,14 +40,6 @@ public class Owner extends BaseLoginEntity {
 
     public void changePassword(String loginPassword) {
         super.changePassword(loginPassword);
-    }
-
-    public void changeName(String name) {
-        super.changeName(name);
-    }
-
-    public void changePhoneNumber(String phoneNumber) {
-        super.changePhoneNumber(phoneNumber);
     }
 
 }

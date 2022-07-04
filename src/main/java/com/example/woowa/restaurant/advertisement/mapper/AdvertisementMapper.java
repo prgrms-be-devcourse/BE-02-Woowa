@@ -1,6 +1,6 @@
 package com.example.woowa.restaurant.advertisement.mapper;
 
-import com.example.woowa.common.EnumFindable;
+import com.example.woowa.common.interfaces.EnumFindable;
 import com.example.woowa.restaurant.advertisement.dto.request.AdvertisementCreateRequest;
 import com.example.woowa.restaurant.advertisement.dto.request.AdvertisementUpdateRequest;
 import com.example.woowa.restaurant.advertisement.dto.response.AdvertisementCreateResponse;
@@ -20,8 +20,8 @@ import org.mapstruct.ReportingPolicy;
 public interface AdvertisementMapper {
 
     @Mappings({
-        @Mapping(target = "rateType", expression = "java(com.example.woowa.common.EnumFindable.find(advertisementCreateRequest.getRateType(), RateType.values()))"),
-        @Mapping(target = "unitType", expression = "java(com.example.woowa.common.EnumFindable.find(advertisementCreateRequest.getUnitType(), UnitType.values()))")
+        @Mapping(target = "rateType", expression = "java(com.example.woowa.common.interfaces.EnumFindable.find(advertisementCreateRequest.getRateType(), RateType.values()))"),
+        @Mapping(target = "unitType", expression = "java(com.example.woowa.common.interfaces.EnumFindable.find(advertisementCreateRequest.getUnitType(), UnitType.values()))")
     })
     Advertisement toEntity(AdvertisementCreateRequest advertisementCreateRequest);
 
@@ -37,10 +37,13 @@ public interface AdvertisementMapper {
     })
     AdvertisementFindResponse toFindResponse(Advertisement advertisement);
 
-    default void updateEntity(AdvertisementUpdateRequest advertisementUpdateRequest, @MappingTarget Advertisement advertisement) {
+    default void updateEntity(AdvertisementUpdateRequest advertisementUpdateRequest,
+        @MappingTarget Advertisement advertisement) {
         advertisement.changeTitle(advertisementUpdateRequest.getTitle());
-        advertisement.changeUnitType(EnumFindable.find(advertisementUpdateRequest.getUnitType(), UnitType.values()));
-        advertisement.changeRateType(EnumFindable.find(advertisementUpdateRequest.getRateType(), RateType.values()));
+        advertisement.changeUnitType(
+            EnumFindable.find(advertisementUpdateRequest.getUnitType(), UnitType.values()));
+        advertisement.changeRateType(
+            EnumFindable.find(advertisementUpdateRequest.getRateType(), RateType.values()));
         advertisement.changeRate(advertisementUpdateRequest.getRate());
         advertisement.changeDescription(advertisementUpdateRequest.getDescription());
     }

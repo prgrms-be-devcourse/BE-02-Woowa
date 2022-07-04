@@ -111,7 +111,17 @@
       <scope>provided</scope>
       <version>${org.projectlombok.version}</version>
     </dependency>
+    <dependency>
+      <artifactId>spring-boot-starter-security</artifactId>
+      <groupId>org.springframework.boot</groupId>
+    </dependency>
+    <dependency>
+      <artifactId>java-jwt</artifactId>
+      <groupId>com.auth0</groupId>
+      <version>3.19.1</version>
+    </dependency>
   </dependencies>
+
   <description>woowa</description>
   <groupId>com.example</groupId>
   <modelVersion>4.0.0</modelVersion>
