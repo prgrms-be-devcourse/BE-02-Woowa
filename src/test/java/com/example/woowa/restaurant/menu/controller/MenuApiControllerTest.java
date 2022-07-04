@@ -128,7 +128,7 @@ class MenuApiControllerTest {
     }
 
     @Test
-    @DisplayName("존재하지 않는 메뉴그룹에 메뉴를 추가하려 하면 상태코드 400 응답이 발생한다.")
+    @DisplayName("존재하지 않는 메뉴그룹에 메뉴를 추가하려 하면 상태코드 404 응답이 발생한다.")
     void addMenuBadRequestTest() throws Exception {
         Long wrongMenuGroupId = -1L;
         MenuSaveRequest menuSaveRequest = new MenuSaveRequest(wrongMenuGroupId,
@@ -139,7 +139,7 @@ class MenuApiControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(menuSaveRequest)))
                 .andDo(print())
-                .andExpect(status().isBadRequest());
+                .andExpect(status().isNotFound());
     }
 
     @Test
@@ -175,13 +175,13 @@ class MenuApiControllerTest {
     }
 
     @Test
-    @DisplayName("존재하지 않는 메뉴를 단건 조회하면 상태코드 400 응답이 발생한다.")
+    @DisplayName("존재하지 않는 메뉴를 단건 조회하면 상태코드 404 응답이 발생한다.")
     void findDetailMenuNotFoundTest() throws Exception {
         long wrongMenuId = -1L;
         mockMvc.perform(get("/api/v1/menus/" + wrongMenuId)
                         .accept(MediaType.APPLICATION_JSON_VALUE))
                 .andDo(print())
-                .andExpect(status().isBadRequest());
+                .andExpect(status().isNotFound());
     }
 
     @Test
@@ -211,7 +211,7 @@ class MenuApiControllerTest {
     }
 
     @Test
-    @DisplayName("존재하지 않는 메뉴 정보를 업데이트하려 하면 상태코드 400 응답이 발생한다.")
+    @DisplayName("존재하지 않는 메뉴 정보를 업데이트하려 하면 상태코드 404 응답이 발생한다.")
     void updateMenuNotFoundTest() throws Exception {
         MenuUpdateRequest menuUpdateRequest = new MenuUpdateRequest("참치 김밥2", "더 맛있는 참치 김밥", 5000);
         long wrongMenuId = -1L;
@@ -220,7 +220,7 @@ class MenuApiControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(menuUpdateRequest)))
                 .andDo(print())
-                .andExpect(status().isBadRequest());
+                .andExpect(status().isNotFound());
     }
 
     @Test
@@ -247,16 +247,17 @@ class MenuApiControllerTest {
     }
 
     @Test
-    @DisplayName("존재하지 않는 메뉴의 대표 메뉴 설정 여부를 변경하려 하면 상태코드 400 응답이 발생한다.")
+    @DisplayName("존재하지 않는 메뉴의 대표 메뉴 설정 여부를 변경하려 하면 상태코드 404 응답이 발생한다.")
     void changeMainMenuStatusNotFoundTest() throws Exception {
         MainMenuStatusUpdateRequest mainMenuStatusUpdateRequest = new MainMenuStatusUpdateRequest(
                 true);
+        long wrongMenuId = -1L;
 
-        mockMvc.perform(patch("/api/v1/menus/" + savedMenu.getId() + "/main-menu")
+        mockMvc.perform(patch("/api/v1/menus/" + wrongMenuId + "/main-menu")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(mainMenuStatusUpdateRequest)))
                 .andDo(print())
-                .andExpect(status().isOk());
+                .andExpect(status().isNotFound());
     }
 
     @Test
@@ -282,7 +283,7 @@ class MenuApiControllerTest {
     }
 
     @Test
-    @DisplayName("존재하지 않는 메뉴의 판매 상태를 변경하려 하면 상태코드 400 응답이 발생한다.")
+    @DisplayName("존재하지 않는 메뉴의 판매 상태를 변경하려 하면 상태코드 404 응답이 발생한다.")
     void changeMenuStatusNotFoundTest() throws Exception {
         MenuStatusUpdateRequest menuStatusUpdateRequest = new MenuStatusUpdateRequest("sale");
         long wrongMenuId = -1L;
@@ -291,7 +292,7 @@ class MenuApiControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(menuStatusUpdateRequest)))
                 .andDo(print())
-                .andExpect(status().isBadRequest());
+                .andExpect(status().isNotFound());
     }
 
     @Test
@@ -308,12 +309,12 @@ class MenuApiControllerTest {
     }
 
     @Test
-    @DisplayName("존재하지 않는 메뉴를 삭제하려 하면 상태코드 400 응답이 발생한다.")
+    @DisplayName("존재하지 않는 메뉴를 삭제하려 하면 상태코드 404 응답이 발생한다.")
     void deleteMenuNotFoundTest() throws Exception {
         long wrongMenuId = -1L;
         mockMvc.perform(delete("/api/v1/menus/" + wrongMenuId))
                 .andDo(print())
-                .andExpect(status().isBadRequest());
+                .andExpect(status().isNotFound());
     }
 
     @AllArgsConstructor

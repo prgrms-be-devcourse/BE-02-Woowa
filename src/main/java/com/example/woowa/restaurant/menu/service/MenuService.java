@@ -1,5 +1,6 @@
 package com.example.woowa.restaurant.menu.service;
 
+import com.example.woowa.common.exception.NotFoundException;
 import com.example.woowa.restaurant.menu.dto.MainMenuStatusUpdateRequest;
 import com.example.woowa.restaurant.menu.dto.MenuResponse;
 import com.example.woowa.restaurant.menu.dto.MenuSaveRequest;
@@ -57,6 +58,6 @@ public class MenuService {
 
     public Menu findMenuEntityById(Long menuId) {
         return menuRepository.findById(menuId)
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 menuId 입니다."));
+                .orElseThrow(() -> new NotFoundException("존재하지 않는 Menu 입니다."));
     }
 }

@@ -6,6 +6,7 @@ import static org.mockito.BDDMockito.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 
+import com.example.woowa.common.exception.NotFoundException;
 import com.example.woowa.restaurant.menu.dto.MainMenuStatusUpdateRequest;
 import com.example.woowa.restaurant.menu.dto.MenuResponse;
 import com.example.woowa.restaurant.menu.dto.MenuSaveRequest;
@@ -82,7 +83,7 @@ class MenuServiceTest {
     }
 
     @Test
-    @DisplayName("존재하지 않는 메뉴를 단건 조회하려 하면 예외가 발생한다.")
+    @DisplayName("존재하지 않는 메뉴를 단건 조회하려 하면 NotFoundException 이 발생한다.")
     void findMenuByNotExistsIdTest() {
         // Given
         Long menuId = 1L;
@@ -90,7 +91,7 @@ class MenuServiceTest {
 
         // When // Then
         assertThatThrownBy(() -> menuService.findMenuEntityById(menuId))
-                .isExactlyInstanceOf(IllegalArgumentException.class);
+                .isExactlyInstanceOf(NotFoundException.class);
     }
 
     @Test
@@ -114,7 +115,7 @@ class MenuServiceTest {
     }
 
     @Test
-    @DisplayName("존재하지 않는 메뉴의 정보를 업데이트하려 하면 예외가 발생한다.")
+    @DisplayName("존재하지 않는 메뉴의 정보를 업데이트하려 하면 NotFoundException 이 발생한다.")
     void updateMenuNotExistsIdTest() {
         // Given
         Long wrongMenuId = -1L;
@@ -127,7 +128,7 @@ class MenuServiceTest {
         assertThatThrownBy(
                 () -> menuService.updateMenu(
                         wrongMenuId, new MenuUpdateRequest(newTitle, newDescription, newPrice)))
-                .isExactlyInstanceOf(IllegalArgumentException.class);
+                .isExactlyInstanceOf(NotFoundException.class);
     }
 
     @Test
@@ -145,7 +146,7 @@ class MenuServiceTest {
     }
 
     @Test
-    @DisplayName("존재하지 않는 메뉴를 삭제하려 하면 예외가 발생한다.")
+    @DisplayName("존재하지 않는 메뉴를 삭제하려 하면 NotFoundException 이 발생한다.")
     void deleteMenuNotExistsIdTest() {
         // Given
         Long wrongMenuId = -1L;
@@ -153,7 +154,7 @@ class MenuServiceTest {
 
         // When // Then
         assertThatThrownBy(() -> menuService.deleteMenu(wrongMenuId))
-                .isExactlyInstanceOf(IllegalArgumentException.class);
+                .isExactlyInstanceOf(NotFoundException.class);
     }
 
     @Test
@@ -172,7 +173,7 @@ class MenuServiceTest {
     }
 
     @Test
-    @DisplayName("존재하지 않는 메뉴를 대표메뉴로 등록하려 하면 예외가 발생한다.")
+    @DisplayName("존재하지 않는 메뉴를 대표메뉴로 등록하려 하면 NotFoundException 이 발생한다.")
     void setMainMenuNotExistsIdTest() {
         // Given
         Long wrongMenuId = 1L;
@@ -181,7 +182,7 @@ class MenuServiceTest {
         // When // Then
         assertThatThrownBy(() -> menuService.changeMainMenuStatus(wrongMenuId,
                 new MainMenuStatusUpdateRequest(true)))
-                .isExactlyInstanceOf(IllegalArgumentException.class);
+                .isExactlyInstanceOf(NotFoundException.class);
     }
 
     @Test
@@ -200,7 +201,7 @@ class MenuServiceTest {
     }
 
     @Test
-    @DisplayName("존재하지 않는 메뉴를 대표메뉴에서 등록 해제하려 하면 예외가 발생한다.")
+    @DisplayName("존재하지 않는 메뉴를 대표메뉴에서 등록 해제하려 하면 NotFoundException 이 발생한다.")
     void cancelMainMenuNotExistsIdTest() {
         // Given
         Long wrongMenuId = 1L;
@@ -209,7 +210,7 @@ class MenuServiceTest {
         // When // Then
         assertThatThrownBy(() -> menuService.changeMainMenuStatus(wrongMenuId,
                 new MainMenuStatusUpdateRequest(false)))
-                .isExactlyInstanceOf(IllegalArgumentException.class);
+                .isExactlyInstanceOf(NotFoundException.class);
     }
 
     @Test
@@ -261,7 +262,7 @@ class MenuServiceTest {
     }
 
     @Test
-    @DisplayName("존재하지 않는 메뉴의 상태를 변경하려 하면 예외가 발생한다.")
+    @DisplayName("존재하지 않는 메뉴의 상태를 변경하려 하면 NotFoundException 이 발생한다.")
     void changeMenuStatusNotExistsIdTest() {
         // Given
         Long wrongMenuId = -1L;
@@ -270,6 +271,6 @@ class MenuServiceTest {
         // When // Then
         assertThatThrownBy(() -> menuService.changeMenuStatus(
                 wrongMenuId, new MenuStatusUpdateRequest(MenuStatus.SALE.getCode())))
-                .isExactlyInstanceOf(IllegalArgumentException.class);
+                .isExactlyInstanceOf(NotFoundException.class);
     }
 }

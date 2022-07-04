@@ -124,7 +124,7 @@ class MenuGroupApiControllerTest {
     }
 
     @Test
-    @DisplayName("존재하지 않는 레스토랑에 메뉴 그룹을 추가하려 하면 상태코드 400 응답이 발생한다.")
+    @DisplayName("존재하지 않는 레스토랑에 메뉴 그룹을 추가하려 하면 상태코드 404 응답이 발생한다.")
     void addMenuGroupNotFoundRestaurantTest() throws Exception {
         MenuGroupSaveRequest menuGroupSaveRequest = new MenuGroupSaveRequest("볶음밥류", "맛있는 볶음밥");
         long wrongRestaurantId = -1L;
@@ -133,7 +133,7 @@ class MenuGroupApiControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(menuGroupSaveRequest)))
                 .andDo(print())
-                .andExpect(status().isBadRequest());
+                .andExpect(status().isNotFound());
     }
 
     @Test
@@ -172,13 +172,13 @@ class MenuGroupApiControllerTest {
     }
 
     @Test
-    @DisplayName("존재하지 않는 메뉴 그룹을 단건 조회하면 상태코드 400 응답이 발생한다.")
+    @DisplayName("존재하지 않는 메뉴 그룹을 단건 조회하면 상태코드 404 응답이 발생한다.")
     void findMenuGroupNotFoundTest() throws Exception {
         long wrongMenuGroupId = -1L;
 
         mockMvc.perform(get("/api/v1/menu-groups/" + wrongMenuGroupId))
                 .andDo(print())
-                .andExpect(status().isBadRequest());
+                .andExpect(status().isNotFound());
     }
 
     @Test
@@ -218,13 +218,13 @@ class MenuGroupApiControllerTest {
     }
 
     @Test
-    @DisplayName("존재하지 않는 레스토랑의 메뉴 그룹을 조회하면 상태코드 400 응답이 발생한다.")
+    @DisplayName("존재하지 않는 레스토랑의 메뉴 그룹을 조회하면 상태코드 404 응답이 발생한다.")
     void findMenuGroupListNotFoundRestaurantTest() throws Exception {
         long wrongRestaurantId = -1L;
         mockMvc.perform(get("/api/v1/restaurant/" + wrongRestaurantId + "/menu-groups")
                         .accept(MediaType.APPLICATION_JSON_VALUE))
                 .andDo(print())
-                .andExpect(status().isBadRequest());
+                .andExpect(status().isNotFound());
     }
 
     @Test
@@ -271,7 +271,7 @@ class MenuGroupApiControllerTest {
     }
 
     @Test
-    @DisplayName("존재하지 않는 메뉴 그룹 정보를 업데이트하려 하면 상태코드 400 응답이 발생한다.")
+    @DisplayName("존재하지 않는 메뉴 그룹 정보를 업데이트하려 하면 상태코드 404 응답이 발생한다.")
     void updateMenuGroupNotFoundTest() throws Exception {
         long wrongMenuGroupId = -1L;
         MenuGroupUpdateRequest menuGroupUpdateRequest = new MenuGroupUpdateRequest("사이드류",
@@ -281,7 +281,7 @@ class MenuGroupApiControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(menuGroupUpdateRequest)))
                 .andDo(print())
-                .andExpect(status().isBadRequest());
+                .andExpect(status().isNotFound());
     }
 
     @Test
@@ -300,12 +300,12 @@ class MenuGroupApiControllerTest {
     }
 
     @Test
-    @DisplayName("존재하지 않는 메뉴 그룹을 삭제하려 하면 상태코드 400 응답이 발생한다.")
+    @DisplayName("존재하지 않는 메뉴 그룹을 삭제하려 하면 상태코드 404 응답이 발생한다.")
     void deleteMenuGroupNotFoundTest() throws Exception {
         long wrongMenuGroupId = -1L;
 
         mockMvc.perform(delete("/api/v1/menu-groups/" + wrongMenuGroupId))
                 .andDo(print())
-                .andExpect(status().isBadRequest());
+                .andExpect(status().isNotFound());
     }
 }
