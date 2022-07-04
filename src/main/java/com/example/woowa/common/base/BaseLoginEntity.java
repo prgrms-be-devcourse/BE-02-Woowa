@@ -3,9 +3,7 @@ package com.example.woowa.common.base;
 import java.time.LocalDateTime;
 import javax.persistence.Column;
 import javax.persistence.MappedSuperclass;
-
 import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -14,7 +12,9 @@ import lombok.NoArgsConstructor;
 @MappedSuperclass
 public abstract class BaseLoginEntity extends BaseTimeEntity {
 
-    @Column(unique = true, nullable = false, updatable = false)
+    @Column(unique = true,
+        nullable = false,
+        updatable = false)
     private String loginId;
 
     @Column(nullable = false)
@@ -37,25 +37,22 @@ public abstract class BaseLoginEntity extends BaseTimeEntity {
         this.lastLoginedAt = LocalDateTime.now();
     }
 
-    public void changePassword(String password) {
-        this.password = password;
-    }
-
-    public void changeName(String name) {
-        this.name = name;
-    }
-
-    public void changePhoneNumber(String phoneNumber) {
-        this.phoneNumber = phoneNumber;
-    }
-
-    public void changeLastLoginedAt(LocalDateTime lastLoginedAt) {
-        this.lastLoginedAt = lastLoginedAt;
-    }
-
     public BaseLoginEntity(String loginId, String password) {
         this.loginId = loginId;
         this.password = password;
         this.lastLoginedAt = LocalDateTime.now();
+    }
+
+    public void update(String name, String phoneNumber) {
+        this.name = name;
+        this.phoneNumber = phoneNumber;
+    }
+
+    public void changePassword(String password) {
+        this.password = password;
+    }
+
+    public void changeLastLoginedAt(LocalDateTime lastLoginedAt) {
+        this.lastLoginedAt = lastLoginedAt;
     }
 }
