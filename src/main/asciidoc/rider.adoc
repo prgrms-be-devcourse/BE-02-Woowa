@@ -1,0 +1,12 @@
+:hardbreaks:
+ifndef::snippets[]
+:snippets: ../../../target/generated-snippets
+endif::[]
+
+== 배달기사
+
+=== /post
+
+.Request
+include::{snippets}/sign-rider/http-request.adoc[]
+include::{snippets}/sign-rider/request-fields.adoc[]
