@@ -1,10 +1,13 @@
 package com.example.woowa.restaurant.menu.service;
 
+import com.example.woowa.restaurant.menu.dto.MainMenuStatusUpdateRequest;
+import com.example.woowa.restaurant.menu.dto.MenuResponse;
+import com.example.woowa.restaurant.menu.dto.MenuSaveRequest;
+import com.example.woowa.restaurant.menu.dto.MenuStatusUpdateRequest;
+import com.example.woowa.restaurant.menu.dto.MenuUpdateRequest;
 import com.example.woowa.restaurant.menu.entity.Menu;
-import com.example.woowa.restaurant.menu.enums.MenuStatus;
+import com.example.woowa.restaurant.menu.mapper.MenuMapper;
 import com.example.woowa.restaurant.menu.repository.MenuRepository;
-import com.example.woowa.restaurant.menugroup.entity.MenuGroup;
-import com.example.woowa.restaurant.menugroup.service.MenuGroupService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -15,44 +18,45 @@ import org.springframework.transaction.annotation.Transactional;
 public class MenuService {
 
     private final MenuRepository menuRepository;
-    private final MenuGroupService menuGroupService;
+    private final MenuMapper menuMapper;
 
     @Transactional
-    public Long addMenu(Long menuGroupId, String title, String description, Integer price) {
-        MenuGroup findMenuGroup = menuGroupService.findMenuGroupById(menuGroupId);
-        Menu menu = Menu.createMenu(findMenuGroup, title, price, description, false,
-                MenuStatus.SALE);
-        return menuRepository.save(menu).getId();
+    public Long addMenu(MenuSaveRequest request) {
+        return menuRepository.save(menuMapper.toMenu(request)).getId();
     }
 
-    public Menu findMenuById(Long menuId) {
-        return menuRepository.findById(menuId)
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 menuId 입니다."));
+    public MenuResponse findMenuById(Long menuId) {
+        return menuMapper.toMenuResponse(findMenuEntityById(menuId));
     }
 
     @Transactional
-    public void updateMenu(Long menuId, String title, String description, Integer price) {
-        findMenuById(menuId).update(title, price, description);
+    public void updateMenu(Long menuId, MenuUpdateRequest request) {
+        findMenuEntityById(menuId).update(request.getTitle(), request.getPrice(),
+                request.getDescription());
     }
 
     @Transactional
     public void deleteMenu(Long menuId) {
-        Menu findMenu = findMenuById(menuId);
+        Menu findMenu = findMenuEntityById(menuId);
         menuRepository.delete(findMenu);
     }
 
     @Transactional
-    public void setMainMenu(Long menuId) {
-        findMenuById(menuId).setMainMenu();
+    public void changeMainMenuStatus(Long menuId, MainMenuStatusUpdateRequest request) {
+        if (request.getIsMainMenu()) {
+            findMenuEntityById(menuId).setMainMenu();
+        } else {
+            findMenuEntityById(menuId).cancelMainMenu();
+        }
     }
 
     @Transactional
-    public void cancelMainMenu(Long menuId) {
-        findMenuById(menuId).cancelMainMenu();
+    public void changeMenuStatus(Long menuId, MenuStatusUpdateRequest request) {
+        findMenuEntityById(menuId).changeMenuStatus(request.getMenuStatus());
     }
 
-    @Transactional
-    public void changeMenuStatus(Long menuId, MenuStatus menuStatus) {
-        findMenuById(menuId).changeMenuStatus(menuStatus);
+    public Menu findMenuEntityById(Long menuId) {
+        return menuRepository.findById(menuId)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 menuId 입니다."));
     }
 }
