@@ -2,7 +2,9 @@ package com.example.woowa.restaurant.restaurant.service;
 
 import com.example.woowa.restaurant.category.entity.Category;
 import com.example.woowa.restaurant.category.service.CategoryService;
+import com.example.woowa.restaurant.restaurant.dto.request.RestaurantCreateRequest;
 import com.example.woowa.restaurant.restaurant.entity.Restaurant;
+import com.example.woowa.restaurant.restaurant.mapper.RestaurantMapper;
 import com.example.woowa.restaurant.restaurant.repository.RestaurantRepository;
 import com.example.woowa.restaurant.restaurntat_category.entity.RestaurantCategory;
 import com.example.woowa.restaurant.restaurntat_category.entity.RestaurantCategoryId;
@@ -22,17 +24,15 @@ public class RestaurantService {
     private final RestaurantRepository restaurantRepository;
     private final RestaurantCategoryRepository restaurantCategoryRepository;
     private final CategoryService categoryService;
+    private final RestaurantMapper restaurantMapper;
 
     @Transactional
-    public Long createRestaurant(String name, String businessNumber, LocalTime openingTime,
-        LocalTime closingTime, Boolean isOpen, String phoneNumber, String description,
-        String address, List<Long> categories) {
+    public Long createRestaurant(RestaurantCreateRequest restaurantCreateRequest) {
         Restaurant restaurant = restaurantRepository.save(
-            Restaurant.createRestaurant(name, businessNumber, openingTime, closingTime,
-                isOpen, phoneNumber, description, address));
+            restaurantMapper.toEntity(restaurantCreateRequest));
 
-        categories.forEach(categoryId -> {
-            Category category = categoryService.findCategoryById(categoryId);
+        restaurantCreateRequest.getCategoryIds().forEach(categoryId -> {
+            Category category = categoryService.findCategoryEntityById(categoryId);
             RestaurantCategory restaurantCategory = new RestaurantCategory(restaurant, category);
         });
 
@@ -79,7 +79,7 @@ public class RestaurantService {
     @Transactional
     public void addCategory(Long restaurantId, Long categoryId) {
         Restaurant restaurant = findRestaurantById(restaurantId);
-        Category category = categoryService.findCategoryById(categoryId);
+        Category category = categoryService.findCategoryEntityById(categoryId);
 
         RestaurantCategory restaurantCategory = new RestaurantCategory(restaurant, category);
     }
@@ -87,13 +87,18 @@ public class RestaurantService {
     @Transactional
     public void removeCategory(Long restaurantId, Long categoryId) {
         Restaurant restaurant = findRestaurantById(restaurantId);
-        Category category = categoryService.findCategoryById(categoryId);
+        Category category = categoryService.findCategoryEntityById(categoryId);
 
         RestaurantCategory restaurantCategory = restaurantCategoryRepository.findById(
             new RestaurantCategoryId(restaurantId, categoryId)).get();
 
         restaurant.getRestaurantCategories().remove(restaurantCategory);
         category.getRestaurantCategories().remove(restaurantCategory);
+    }
+
+    public Restaurant findRestaurantEntityById(Long restaurantId) {
+        return restaurantRepository.findById(restaurantId)
+            .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 가게 아이디입니다."));
     }
 
     public List<Category> findCategories(Long restaurantId) {
