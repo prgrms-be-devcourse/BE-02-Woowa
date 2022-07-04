@@ -1,19 +1,18 @@
 package com.example.woowa.restaurant.owner.entity;
 
+import com.example.woowa.common.base.BaseLoginEntity;
 import com.example.woowa.restaurant.restaurant.entity.Restaurant;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import javax.persistence.CascadeType;
-import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
-
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -21,7 +20,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "owner")
 @Entity
-public class Owner {
+public class Owner extends BaseLoginEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -30,41 +29,25 @@ public class Owner {
     @OneToMany(mappedBy = "owner", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Restaurant> restaurants = new ArrayList<>();
 
-    @Column(unique = true, nullable = false, updatable = false, length = 45)
-    private String loginId;
-
-    @Column(nullable = false, length = 45)
-    private String loginPassword;
-
-    @Column(nullable = false, length = 45)
-    private String name;
-
-    @Column(nullable = false, length = 45)
-    private String phoneNumber;
-
-    public Owner(String loginId, String loginPassword, String name, String phoneNumber) {
-        this.loginId = loginId;
-        this.loginPassword = loginPassword;
-        this.name = name;
-        this.phoneNumber = phoneNumber;
+    @Builder
+    public Owner(String loginId, String password, String name, String phoneNumber) {
+        super(loginId, password, name, phoneNumber);
     }
 
     public void addRestaurant(Restaurant restaurant) {
-        if (!Objects.equals(restaurant.getOwner().getId(), this.getId())) {
-            restaurant.setOwner(this);
-        }
+        restaurant.setOwner(this);
     }
 
-    public void changeLoginPassword(String loginPassword) {
-        this.loginPassword = loginPassword;
+    public void changePassword(String loginPassword) {
+        super.changePassword(loginPassword);
     }
 
     public void changeName(String name) {
-        this.name = name;
+        super.changeName(name);
     }
 
     public void changePhoneNumber(String phoneNumber) {
-        this.phoneNumber = phoneNumber;
+        super.changePhoneNumber(phoneNumber);
     }
 
 }
