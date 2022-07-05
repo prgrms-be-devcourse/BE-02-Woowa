@@ -23,6 +23,7 @@ jobs:
       with:
         files: "./src/main/resources/application-db.yaml"
       env:
+        spring.datasource.url: ${{ secrets.RDS_URL }}
         spring.datasource.username: ${{ secrets.RDS_USER_NAME }}
         spring.datasource.password: ${{ secrets.RDS_USER_PWD }}
           
