@@ -6,6 +6,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 
+import com.example.woowa.common.exception.NotFoundException;
 import com.example.woowa.customer.customer.entity.Customer;
 import com.example.woowa.customer.customer.entity.CustomerGrade;
 import com.example.woowa.customer.customer.service.CustomerService;
@@ -52,6 +53,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import org.hibernate.annotations.NotFound;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -81,15 +83,11 @@ class OrderServiceTest {
     DeliveryAreaService deliveryAreaService;
 
     @Mock
-    MenuService menuService;
-
-    @Mock
     DeliveryEntityService deliveryEntityService;
     @Mock
     CartMapper cartMapper;
     @Mock
     OrderMapper orderMapper;
-    ;
 
     OrderService orderService;
 
@@ -190,7 +188,7 @@ class OrderServiceTest {
     }
 
     @Test
-    @DisplayName("존재하지 않는 주문을 조회하려 하면 예외가 발생한다.")
+    @DisplayName("존재하지 않는 주문을 조회하려 하면 NotFoundException 예외가 발생한다.")
     void findOrderByNotExistsIdTest() {
         // Given
         Long orderId = 1L;
@@ -199,7 +197,7 @@ class OrderServiceTest {
 
         // When // Then
         assertThatThrownBy(() -> orderService.findOrderById(orderId))
-                .isExactlyInstanceOf(IllegalArgumentException.class);
+                .isExactlyInstanceOf(NotFoundException.class);
     }
 
     @Test
@@ -377,7 +375,7 @@ class OrderServiceTest {
     }
 
     @Test
-    @DisplayName("회원의 존재하지 않는 특정 주문을 조회하려 하면 예외가 발생한다.")
+    @DisplayName("회원의 존재하지 않는 특정 주문을 조회하려 하면 NotFoundException 예외가 발생한다.")
     void findDetailOrderForCustomerNotExistsTest() {
         // Given
         Long wrongOrderId = -1L;
@@ -385,7 +383,7 @@ class OrderServiceTest {
 
         // When // Then
         assertThatThrownBy(() -> orderService.findDetailOrderForCustomer(wrongOrderId))
-                .isExactlyInstanceOf(IllegalArgumentException.class);
+                .isExactlyInstanceOf(NotFoundException.class);
     }
 
     @Test
@@ -422,7 +420,7 @@ class OrderServiceTest {
     }
 
     @Test
-    @DisplayName("가게의 존재하지 않는 특정 주문을 조회하려 하면 예외가 발생한다.")
+    @DisplayName("가게의 존재하지 않는 특정 주문을 조회하려 NotFoundException 예외가 발생한다.")
     void findDetailOrderForRestaurantNotExistsTest() {
         // Given
         Long wrongOrderId = -1L;
@@ -431,7 +429,7 @@ class OrderServiceTest {
         // When // Then
         assertThatThrownBy(() -> orderService.findDetailOrderByIdForRestaurant(
                 wrongOrderId))
-                .isExactlyInstanceOf(IllegalArgumentException.class);
+                .isExactlyInstanceOf(NotFoundException.class);
     }
 
     @Test
@@ -519,7 +517,7 @@ class OrderServiceTest {
     }
 
     @Test
-    @DisplayName("존재하지 않는 주문을 취소하려 하면 예외가 발생한다.")
+    @DisplayName("존재하지 않는 주문을 취소하려 하면 NotFoundException 예외가 발생한다.")
     void cancelOrderNotExistsIdTest() {
         // Given
         Long wrongOrderId = -1L;
@@ -527,7 +525,7 @@ class OrderServiceTest {
 
         // When // Then
         assertThatThrownBy(() -> orderService.cancelOrder(wrongOrderId))
-                .isExactlyInstanceOf(IllegalArgumentException.class);
+                .isExactlyInstanceOf(NotFoundException.class);
     }
 
     @Test
@@ -550,7 +548,7 @@ class OrderServiceTest {
     }
 
     @Test
-    @DisplayName("존재하지 않는 주문을 수락하려 하면 예외가 발생한다.")
+    @DisplayName("존재하지 않는 주문을 수락하려 하면 NotFoundException 예외가 발생한다.")
     void acceptOrderNotExistsIdTest() {
         // Given
         Long wrongOrderId = -1L;
@@ -560,7 +558,7 @@ class OrderServiceTest {
         // When // Then
         assertThatThrownBy(
                 () -> orderService.acceptOrder(wrongOrderId, new OrderAcceptRequest(cookingTime)))
-                .isExactlyInstanceOf(IllegalArgumentException.class);
+                .isExactlyInstanceOf(NotFoundException.class);
     }
 
     private Customer initCustomer() {
