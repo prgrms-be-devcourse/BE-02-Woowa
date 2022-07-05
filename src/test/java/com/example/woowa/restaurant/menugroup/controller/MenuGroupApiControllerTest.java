@@ -45,7 +45,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
 @SpringBootTest
-@AutoConfigureMockMvc
+@AutoConfigureMockMvc(addFilters = false)
 @AutoConfigureRestDocs
 @Transactional
 @Import(RestDocsConfiguration.class)
@@ -90,13 +90,16 @@ class MenuGroupApiControllerTest {
     void addMenuGroupOkTest() throws Exception {
         MenuGroupSaveRequest menuGroupSaveRequest = new MenuGroupSaveRequest("볶음밥류", "맛있는 볶음밥");
 
-        mockMvc.perform(post("/api/v1/restaurant/" + savedRestaurant.getId() + "/menu-groups")
+        mockMvc.perform(post("/api/v1/restaurant/{restaurantId}/menu-groups", savedRestaurant.getId())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(menuGroupSaveRequest)))
                 .andDo(print())
                 .andExpect(status().isCreated())
                 .andExpect(header().exists(HttpHeaders.LOCATION))
                 .andDo(document("add-menu-group",
+                        pathParameters(
+                                parameterWithName("restaurantId").description("메뉴그룹을 추가할 가게의 ID")
+                        ),
                         requestHeaders(
                                 headerWithName(HttpHeaders.CONTENT_TYPE).description(
                                         MediaType.APPLICATION_JSON_VALUE)
@@ -107,6 +110,9 @@ class MenuGroupApiControllerTest {
                                 fieldWithPath("description").type(JsonFieldType.STRING)
                                         .type(JsonFieldType.STRING)
                                         .description("메뉴그룹 설명(선택, 최대 500자)")
+                        ),
+                        responseHeaders(
+                                headerWithName(HttpHeaders.LOCATION).description("생성된 메뉴 그룹의 위치")
                         )
                 ));
     }
@@ -116,7 +122,7 @@ class MenuGroupApiControllerTest {
     void addMenuGroupEmptyTitleTest() throws Exception {
         MenuGroupSaveRequest menuGroupSaveRequest = new MenuGroupSaveRequest("", "맛있는 볶음밥");
 
-        mockMvc.perform(post("/api/v1/restaurant/" + savedRestaurant.getId() + "/menu-groups")
+        mockMvc.perform(post("/api/v1/restaurant/{restaurantId}/menu-groups", savedRestaurant.getId())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(menuGroupSaveRequest)))
                 .andDo(print())
@@ -129,7 +135,7 @@ class MenuGroupApiControllerTest {
         MenuGroupSaveRequest menuGroupSaveRequest = new MenuGroupSaveRequest("볶음밥류", "맛있는 볶음밥");
         long wrongRestaurantId = -1L;
 
-        mockMvc.perform(post("/api/v1/restaurant/" + wrongRestaurantId + "/menu-groups")
+        mockMvc.perform(post("/api/v1/restaurant/{restaurantId}/menu-groups", wrongRestaurantId)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(menuGroupSaveRequest)))
                 .andDo(print())
@@ -176,7 +182,7 @@ class MenuGroupApiControllerTest {
     void findMenuGroupNotFoundTest() throws Exception {
         long wrongMenuGroupId = -1L;
 
-        mockMvc.perform(get("/api/v1/menu-groups/" + wrongMenuGroupId))
+        mockMvc.perform(get("/api/v1/menu-groups/{menuGroupId}", wrongMenuGroupId))
                 .andDo(print())
                 .andExpect(status().isNotFound());
     }
@@ -196,6 +202,9 @@ class MenuGroupApiControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("menuGroups.length()").value(menuGroupResponses.size()))
                 .andDo(document("find-menu-group-list",
+                        pathParameters(
+                                parameterWithName("restaurantId").description("메뉴그룹을 조회할 가게 ID")
+                        ),
                         requestHeaders(
                                 headerWithName(HttpHeaders.ACCEPT).description(
                                         MediaType.APPLICATION_JSON_VALUE)
@@ -221,7 +230,7 @@ class MenuGroupApiControllerTest {
     @DisplayName("존재하지 않는 레스토랑의 메뉴 그룹을 조회하면 상태코드 404 응답이 발생한다.")
     void findMenuGroupListNotFoundRestaurantTest() throws Exception {
         long wrongRestaurantId = -1L;
-        mockMvc.perform(get("/api/v1/restaurant/" + wrongRestaurantId + "/menu-groups")
+        mockMvc.perform(get("/api/v1/restaurant/{restaurantId}/menu-groups", wrongRestaurantId)
                         .accept(MediaType.APPLICATION_JSON_VALUE))
                 .andDo(print())
                 .andExpect(status().isNotFound());
@@ -263,7 +272,7 @@ class MenuGroupApiControllerTest {
         MenuGroupUpdateRequest menuGroupUpdateRequest = new MenuGroupUpdateRequest("",
                 "맛있는 사이드 메뉴");
 
-        mockMvc.perform(patch("/api/v1/menu-groups/" + menuGroup.getId())
+        mockMvc.perform(patch("/api/v1/menu-groups/{menuGroupId}",menuGroup.getId())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(menuGroupUpdateRequest)))
                 .andDo(print())
@@ -277,7 +286,7 @@ class MenuGroupApiControllerTest {
         MenuGroupUpdateRequest menuGroupUpdateRequest = new MenuGroupUpdateRequest("사이드류",
                 "맛있는 사이드 메뉴");
 
-        mockMvc.perform(patch("/api/v1/menu-groups/" + wrongMenuGroupId)
+        mockMvc.perform(patch("/api/v1/menu-groups/{menuGroupId}", wrongMenuGroupId)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(menuGroupUpdateRequest)))
                 .andDo(print())
@@ -304,7 +313,7 @@ class MenuGroupApiControllerTest {
     void deleteMenuGroupNotFoundTest() throws Exception {
         long wrongMenuGroupId = -1L;
 
-        mockMvc.perform(delete("/api/v1/menu-groups/" + wrongMenuGroupId))
+        mockMvc.perform(delete("/api/v1/menu-groups/{menuGroupId}", wrongMenuGroupId))
                 .andDo(print())
                 .andExpect(status().isNotFound());
     }
