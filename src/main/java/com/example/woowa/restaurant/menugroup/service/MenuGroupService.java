@@ -1,7 +1,7 @@
 package com.example.woowa.restaurant.menugroup.service;
 
 import com.example.woowa.common.exception.NotFoundException;
-import com.example.woowa.restaurant.menugroup.MenuGroupMapper;
+import com.example.woowa.restaurant.menugroup.mapper.MenuGroupMapper;
 import com.example.woowa.restaurant.menugroup.dto.MenuGroupListResponse;
 import com.example.woowa.restaurant.menugroup.dto.MenuGroupResponse;
 import com.example.woowa.restaurant.menugroup.dto.MenuGroupSaveRequest;
