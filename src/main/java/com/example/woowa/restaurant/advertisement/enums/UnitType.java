@@ -1,5 +1,6 @@
 package com.example.woowa.restaurant.advertisement.enums;
 
+
 import com.example.woowa.common.interfaces.EnumFindable;
 import lombok.RequiredArgsConstructor;
 
