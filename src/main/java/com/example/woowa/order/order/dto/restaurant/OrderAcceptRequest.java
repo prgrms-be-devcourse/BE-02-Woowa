@@ -8,8 +8,8 @@ import lombok.Getter;
 @Getter
 public class OrderAcceptRequest {
 
-    @NotNull
-    @Positive
+    @NotNull(message = "조리 예상 시간은 필수입니다.")
+    @Positive(message = "조리 예상 시간은 0보다 커야 합니다.")
     private final Integer cookingTime;
 
     public OrderAcceptRequest(@JsonProperty("cookingTime") Integer cookingTime) {

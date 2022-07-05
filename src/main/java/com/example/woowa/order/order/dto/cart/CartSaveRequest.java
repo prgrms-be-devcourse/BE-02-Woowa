@@ -9,10 +9,10 @@ import lombok.Getter;
 @Getter
 public class CartSaveRequest {
 
-    @NotNull
+    @NotNull(message = "주문할 메뉴 ID는 필수입니다.")
     private final Long menuId;
 
-    @NotNull
-    @Positive
+    @NotNull(message = "주문 수량은 필수입니다.")
+    @Positive(message = "주문 수량은 0보다 커야합니다.")
     private final Integer quantity;
 }
