@@ -29,7 +29,6 @@ import com.example.woowa.restaurant.menugroup.entity.MenuGroup;
 import com.example.woowa.restaurant.menugroup.repository.MenuGroupRepository;
 import com.example.woowa.restaurant.restaurant.entity.Restaurant;
 import com.example.woowa.restaurant.restaurant.repository.RestaurantRepository;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.time.LocalTime;
 import lombok.AllArgsConstructor;
@@ -169,6 +168,9 @@ class MenuApiControllerTest {
                 .andExpect(jsonPath("description").value(savedMenu.getDescription()))
                 .andExpect(jsonPath("price").value(savedMenu.getPrice()))
                 .andDo(document("find-detail-menu",
+                        pathParameters(
+                                parameterWithName("menuId").description("조회할 메뉴 ID")
+                        ),
                         requestHeaders(
                                 headerWithName(HttpHeaders.ACCEPT).description(
                                         MediaType.APPLICATION_JSON_VALUE)
@@ -256,19 +258,18 @@ class MenuApiControllerTest {
         MainMenuStatusUpdateRequest mainMenuStatusUpdateRequest = new MainMenuStatusUpdateRequest(
                 true);
 
-        mockMvc.perform(patch("/api/v1/menus/" + savedMenu.getId() + "/main-menu")
+        mockMvc.perform(patch("/api/v1/menus/{menuId}/main-menu", savedMenu.getId())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(mainMenuStatusUpdateRequest)))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andDo(document("change-main-menu-status",
-                        requestHeaders(
-                                headerWithName(HttpHeaders.CONTENT_TYPE).description(
-                                        MediaType.APPLICATION_JSON_VALUE)
+                        pathParameters(
+                                parameterWithName("menuId").description("설정을 변경할 메뉴 ID")
                         ),
                         requestFields(
                                 fieldWithPath("isMainMenu").type(JsonFieldType.BOOLEAN)
-                                        .description("대표 메뉴 설정 여부(boolean)")
+                                        .description("대표 메뉴 설정 여부")
                         )
                 ));
     }
