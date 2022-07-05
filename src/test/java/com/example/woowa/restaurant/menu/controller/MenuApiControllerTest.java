@@ -29,6 +29,7 @@ import com.example.woowa.restaurant.menugroup.entity.MenuGroup;
 import com.example.woowa.restaurant.menugroup.repository.MenuGroupRepository;
 import com.example.woowa.restaurant.restaurant.entity.Restaurant;
 import com.example.woowa.restaurant.restaurant.repository.RestaurantRepository;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.time.LocalTime;
 import lombok.AllArgsConstructor;
@@ -48,7 +49,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
 @SpringBootTest
-@AutoConfigureMockMvc
+@AutoConfigureMockMvc(addFilters = false)
 @AutoConfigureRestDocs
 @Transactional
 @Import(RestDocsConfiguration.class)
@@ -124,7 +125,21 @@ class MenuApiControllerTest {
                                 headerWithName(HttpHeaders.LOCATION).description("생성된 메뉴의 위치")
                         )
                 ));
+    }
 
+    @Test
+    @DisplayName("메뉴를 추가하는데 필수 필드(title, price)를 누락하면 400 상태 코드와 함께 에러 메시지를 응답한다.")
+    void addMenuMissingRequiredFieldTest() throws Exception {
+        MenuSaveRequest menuSaveRequest = new MenuSaveRequest(savedMenuGroup.getId(),
+                null, null,
+                null);
+
+        mockMvc.perform(post("/api/v1/menus")
+                        .contentType(MediaType.APPLICATION_JSON_VALUE)
+                        .accept(MediaType.APPLICATION_JSON_VALUE)
+                        .content(objectMapper.writeValueAsString(menuSaveRequest)))
+                .andDo(print())
+                .andExpect(status().isBadRequest());
     }
 
     @Test
@@ -208,6 +223,18 @@ class MenuApiControllerTest {
                                         .description("메뉴 가격(필수)")
                         )
                 ));
+    }
+
+    @Test
+    @DisplayName("메뉴 정보를 업데이트하는데 필수 필드(title, price)를 누락하면 400 상태코드와 함께 에러 메시지를 응답한다.")
+    void updateMenuMissingRequiredFieldTest() throws Exception {
+        MenuUpdateRequest menuUpdateRequest = new MenuUpdateRequest(null, null, null);
+
+        mockMvc.perform(patch("/api/v1/menus/" + savedMenu.getId())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(menuUpdateRequest)))
+                .andDo(print())
+                .andExpect(status().isBadRequest());
     }
 
     @Test
