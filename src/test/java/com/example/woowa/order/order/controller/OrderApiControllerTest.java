@@ -62,7 +62,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
 @SpringBootTest
-@AutoConfigureMockMvc
+@AutoConfigureMockMvc(addFilters = false)
 @AutoConfigureRestDocs
 @Import(RestDocsConfiguration.class)
 @Transactional
@@ -459,22 +459,21 @@ class OrderApiControllerTest {
         OrderAcceptRequest request = new OrderAcceptRequest(30);
 
         mockMvc.perform(patch("/api/v1/orders/{orderId}/accept", order.getId())
-                        .accept(MediaType.APPLICATION_JSON_VALUE)
                         .contentType(MediaType.APPLICATION_JSON_VALUE)
                         .content(objectMapper.writeValueAsString(request)))
                 .andDo(print())
                 .andExpect(status().isOk())
-                .andDo(document("cancel-order",
+                .andDo(document("accept-order",
                         pathParameters(
                                 parameterWithName("orderId").description("수락할 주문 ID")
                         ),
                         requestHeaders(
-                                headerWithName(HttpHeaders.ACCEPT).description(
+                                headerWithName(HttpHeaders.CONTENT_TYPE).description(
                                         MediaType.APPLICATION_JSON_VALUE)
                         ),
                         requestFields(
                                 fieldWithPath("cookingTime").type(JsonFieldType.NUMBER)
-                                        .description("조리 예상 시간")
+                                        .description("조리 예상 시간(분)")
                         )
                 ));
     }
