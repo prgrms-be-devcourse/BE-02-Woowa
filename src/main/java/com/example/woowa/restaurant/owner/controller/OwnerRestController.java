@@ -5,8 +5,6 @@ import com.example.woowa.restaurant.owner.dto.request.OwnerUpdateRequest;
 import com.example.woowa.restaurant.owner.dto.response.OwnerCreateResponse;
 import com.example.woowa.restaurant.owner.dto.response.OwnerFindResponse;
 import com.example.woowa.restaurant.owner.service.OwnerService;
-import com.example.woowa.restaurant.restaurant.dto.request.RestaurantCreateRequest;
-import com.example.woowa.restaurant.restaurant.dto.response.RestaurantFindResponse;
 import java.util.List;
 import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -47,12 +45,6 @@ public class OwnerRestController {
         return new ResponseEntity<>(owner, HttpStatus.OK);
     }
 
-    @GetMapping(value = "/{ownerId}/restaurants", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<RestaurantFindResponse>> findRestaurantsByOwnerId(final @PathVariable Long ownerId) {
-        List<RestaurantFindResponse> restaurants = ownerService.findRestaurantsByOwnerId(ownerId);
-        return new ResponseEntity<>(restaurants, HttpStatus.OK);
-    }
-
     @DeleteMapping(value = "/{ownerId}")
     public ResponseEntity<Void> deleteOwnerById(final @PathVariable Long ownerId) {
         ownerService.deleteOwnerById(ownerId);
@@ -63,19 +55,6 @@ public class OwnerRestController {
     public ResponseEntity<Void> updateOwnerById(final @PathVariable Long ownerId,
         final @Valid @RequestBody OwnerUpdateRequest ownerUpdateRequest) {
         ownerService.updateOwnerById(ownerId, ownerUpdateRequest);
-        return new ResponseEntity<>(HttpStatus.OK);
-    }
-
-    @PostMapping(value = "/{ownerId}/restaurants")
-    public ResponseEntity<Void> registerRestaurant(final @PathVariable Long ownerId,
-        final @Valid @RequestBody RestaurantCreateRequest restaurantCreateRequest) {
-        ownerService.registerRestaurant(ownerId, restaurantCreateRequest);
-        return new ResponseEntity<>(HttpStatus.CREATED);
-    }
-
-    @DeleteMapping(value = "/{ownerId}/restaurants/{restaurantId}")
-    public ResponseEntity<Void> removeRestaurant(final @PathVariable Long ownerId, final @PathVariable long restaurantId) {
-        ownerService.removeRestaurant(ownerId, restaurantId);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
