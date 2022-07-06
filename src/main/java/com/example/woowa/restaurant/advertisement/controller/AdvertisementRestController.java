@@ -50,7 +50,7 @@ public class AdvertisementRestController {
 
     @PutMapping(value = "/{advertisementId}", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Void> updateAdvertisementById(final @PathVariable Long advertisementId,
-        @RequestBody @Valid final AdvertisementUpdateRequest advertisementUpdateRequest) {
+        final @Valid @RequestBody AdvertisementUpdateRequest advertisementUpdateRequest) {
         advertisementService.updateAdvertisementById(advertisementId, advertisementUpdateRequest);
         return new ResponseEntity<>(HttpStatus.OK);
     }
