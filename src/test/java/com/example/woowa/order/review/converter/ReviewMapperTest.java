@@ -1,14 +1,5 @@
 package com.example.woowa.order.review.converter;
 
-import static org.junit.jupiter.api.Assertions.*;
-
-import com.example.woowa.customer.voucher.converter.VoucherMapper;
-import com.example.woowa.customer.voucher.dto.VoucherCreateRequest;
-import com.example.woowa.customer.voucher.dto.VoucherFindResponse;
-import com.example.woowa.customer.voucher.entity.Voucher;
-import com.example.woowa.customer.voucher.enums.EventType;
-import com.example.woowa.customer.voucher.enums.VoucherType;
-import com.example.woowa.order.order.entity.Order;
 import com.example.woowa.order.review.dto.ReviewCreateRequest;
 import com.example.woowa.order.review.dto.ReviewFindResponse;
 import com.example.woowa.order.review.entity.Review;
@@ -21,14 +12,13 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import java.time.LocalDateTime;
-
 @SpringBootTest
 @ExtendWith(MockitoExtension.class)
 class ReviewMapperTest {
 
   @Autowired
   private ReviewMapper reviewMapper;
+
 
   @Test
   @DisplayName("리뷰 dto 변환")
