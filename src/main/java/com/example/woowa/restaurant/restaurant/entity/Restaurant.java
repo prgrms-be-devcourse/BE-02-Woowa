@@ -98,6 +98,8 @@ public class Restaurant extends BaseTimeEntity {
             LocalTime openingTime, LocalTime closingTime, Boolean isOpen, String phoneNumber,
             String description, String address) throws IllegalArgumentException {
         validateBusinessHours(openingTime, closingTime);
+        if (!CRNValidator.isValid(businessNumber))
+            throw new IllegalArgumentException("잘못된 사업자등록번호입니다.");
 
         return new Restaurant(name, businessNumber, openingTime, closingTime, isOpen, phoneNumber,
                 description, address);
@@ -157,4 +159,5 @@ public class Restaurant extends BaseTimeEntity {
             throw new IllegalArgumentException("openingTime 과 closingTime 은 같을 수 없습니다.");
         }
     }
+
 }
