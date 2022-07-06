@@ -5,7 +5,6 @@ import com.example.woowa.restaurant.advertisement.dto.request.AdvertisementUpdat
 import com.example.woowa.restaurant.advertisement.dto.response.AdvertisementCreateResponse;
 import com.example.woowa.restaurant.advertisement.dto.response.AdvertisementFindResponse;
 import com.example.woowa.restaurant.advertisement.service.AdvertisementService;
-import com.example.woowa.restaurant.restaurant.dto.response.RestaurantFindResponse;
 import java.util.List;
 import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -30,8 +29,8 @@ public class AdvertisementRestController {
     private final AdvertisementService advertisementService;
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<AdvertisementCreateResponse> createAdvertisement(@Valid @RequestBody
-        final AdvertisementCreateRequest advertisementCreateRequest) {
+    public ResponseEntity<AdvertisementCreateResponse> createAdvertisement(final @Valid @RequestBody
+        AdvertisementCreateRequest advertisementCreateRequest) {
         AdvertisementCreateResponse advertisement = advertisementService.createAdvertisement(
             advertisementCreateRequest);
         return new ResponseEntity<>(advertisement, HttpStatus.OK);
@@ -44,40 +43,34 @@ public class AdvertisementRestController {
     }
 
     @GetMapping(value = "/{advertisementId}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<AdvertisementFindResponse> findAdvertisementById(@PathVariable final Long advertisementId) {
+    public ResponseEntity<AdvertisementFindResponse> findAdvertisementById(final @PathVariable Long advertisementId) {
         AdvertisementFindResponse advertisement = advertisementService.findAdvertisementById(advertisementId);
         return new ResponseEntity<>(advertisement, HttpStatus.CREATED);
     }
 
-    @GetMapping(value = "/{advertisementId}/restaurants", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<RestaurantFindResponse>> findRestaurantsByAdvertisementId(@PathVariable final Long advertisementId) {
-        List<RestaurantFindResponse> restaurants = advertisementService.findRestaurantsByAdvertisementId(advertisementId);
-        return new ResponseEntity<>(restaurants, HttpStatus.OK);
-    }
-
     @PutMapping(value = "/{advertisementId}", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Void> updateAdvertisementById(@PathVariable final Long advertisementId,
-        @RequestBody @Valid final AdvertisementUpdateRequest advertisementUpdateRequest) {
+    public ResponseEntity<Void> updateAdvertisementById(final @PathVariable Long advertisementId,
+        final @Valid @RequestBody AdvertisementUpdateRequest advertisementUpdateRequest) {
         advertisementService.updateAdvertisementById(advertisementId, advertisementUpdateRequest);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @DeleteMapping(value = "/{advertisementId}")
-    public ResponseEntity<Void> deleteAdvertisementById(@PathVariable final Long advertisementId) {
+    public ResponseEntity<Void> deleteAdvertisementById(final @PathVariable Long advertisementId) {
         advertisementService.deleteAdvertisementById(advertisementId);
         return new ResponseEntity<>(HttpStatus.OK );
     }
 
     @PostMapping(value = "/{advertisementId}/restaurants/{restaurantId}")
-    public ResponseEntity<Void> includeRestaurantInAdvertisement(@PathVariable final Long advertisementId,
-        @PathVariable final Long restaurantId) {
+    public ResponseEntity<Void> includeRestaurantInAdvertisement(final @PathVariable Long advertisementId,
+        final @PathVariable Long restaurantId) {
         advertisementService.includeRestaurantInAdvertisement(advertisementId, restaurantId);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @DeleteMapping(value = "/{advertisementId}/restaurants/{restaurantId}")
-    public ResponseEntity<Void> excludeRestaurantOutOfAdvertisement(@PathVariable final Long advertisementId,
-        @PathVariable final Long restaurantId) {
+    public ResponseEntity<Void> excludeRestaurantOutOfAdvertisement(final @PathVariable Long advertisementId,
+        final @PathVariable Long restaurantId) {
         advertisementService.excludeRestaurantOutOfAdvertisement(advertisementId, restaurantId);
         return new ResponseEntity<>(HttpStatus.OK);
     }

@@ -32,13 +32,13 @@ public class MenuGroupService {
     }
 
     public MenuGroupListResponse findMenuGroupByRestaurant(Long restaurantId) {
-        Restaurant findRestaurant = restaurantService.findRestaurantById(restaurantId);
+        Restaurant findRestaurant = restaurantService.findRestaurantEntityById(restaurantId);
         return mapper.toMenuGroupListResponse(menuGroupRepository.findByRestaurant(findRestaurant));
     }
 
     @Transactional
     public Long addMenuGroup(Long restaurantId, MenuGroupSaveRequest request) {
-        Restaurant findRestaurant = restaurantService.findRestaurantById(restaurantId);
+        Restaurant findRestaurant = restaurantService.findRestaurantEntityById(restaurantId);
         MenuGroup menuGroup = MenuGroup.createMenuGroup(findRestaurant, request.getTitle(),
                 request.getDescription());
         return menuGroupRepository.save(menuGroup).getId();
