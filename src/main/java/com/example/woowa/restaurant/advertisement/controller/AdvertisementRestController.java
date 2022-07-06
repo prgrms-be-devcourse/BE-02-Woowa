@@ -43,34 +43,34 @@ public class AdvertisementRestController {
     }
 
     @GetMapping(value = "/{advertisementId}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<AdvertisementFindResponse> findAdvertisementById(@PathVariable final Long advertisementId) {
+    public ResponseEntity<AdvertisementFindResponse> findAdvertisementById(final @PathVariable Long advertisementId) {
         AdvertisementFindResponse advertisement = advertisementService.findAdvertisementById(advertisementId);
         return new ResponseEntity<>(advertisement, HttpStatus.CREATED);
     }
 
     @PutMapping(value = "/{advertisementId}", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Void> updateAdvertisementById(@PathVariable final Long advertisementId,
+    public ResponseEntity<Void> updateAdvertisementById(final @PathVariable Long advertisementId,
         @RequestBody @Valid final AdvertisementUpdateRequest advertisementUpdateRequest) {
         advertisementService.updateAdvertisementById(advertisementId, advertisementUpdateRequest);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @DeleteMapping(value = "/{advertisementId}")
-    public ResponseEntity<Void> deleteAdvertisementById(@PathVariable final Long advertisementId) {
+    public ResponseEntity<Void> deleteAdvertisementById(final @PathVariable Long advertisementId) {
         advertisementService.deleteAdvertisementById(advertisementId);
         return new ResponseEntity<>(HttpStatus.OK );
     }
 
     @PostMapping(value = "/{advertisementId}/restaurants/{restaurantId}")
-    public ResponseEntity<Void> includeRestaurantInAdvertisement(@PathVariable final Long advertisementId,
-        @PathVariable final Long restaurantId) {
+    public ResponseEntity<Void> includeRestaurantInAdvertisement(final @PathVariable Long advertisementId,
+        final @PathVariable Long restaurantId) {
         advertisementService.includeRestaurantInAdvertisement(advertisementId, restaurantId);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @DeleteMapping(value = "/{advertisementId}/restaurants/{restaurantId}")
-    public ResponseEntity<Void> excludeRestaurantOutOfAdvertisement(@PathVariable final Long advertisementId,
-        @PathVariable final Long restaurantId) {
+    public ResponseEntity<Void> excludeRestaurantOutOfAdvertisement(final @PathVariable Long advertisementId,
+        final @PathVariable Long restaurantId) {
         advertisementService.excludeRestaurantOutOfAdvertisement(advertisementId, restaurantId);
         return new ResponseEntity<>(HttpStatus.OK);
     }
