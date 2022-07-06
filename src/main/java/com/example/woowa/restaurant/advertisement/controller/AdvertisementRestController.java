@@ -5,7 +5,6 @@ import com.example.woowa.restaurant.advertisement.dto.request.AdvertisementUpdat
 import com.example.woowa.restaurant.advertisement.dto.response.AdvertisementCreateResponse;
 import com.example.woowa.restaurant.advertisement.dto.response.AdvertisementFindResponse;
 import com.example.woowa.restaurant.advertisement.service.AdvertisementService;
-import com.example.woowa.restaurant.restaurant.dto.response.RestaurantFindResponse;
 import java.util.List;
 import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -30,8 +29,8 @@ public class AdvertisementRestController {
     private final AdvertisementService advertisementService;
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<AdvertisementCreateResponse> createAdvertisement(@Valid @RequestBody
-        final AdvertisementCreateRequest advertisementCreateRequest) {
+    public ResponseEntity<AdvertisementCreateResponse> createAdvertisement(final @Valid @RequestBody
+        AdvertisementCreateRequest advertisementCreateRequest) {
         AdvertisementCreateResponse advertisement = advertisementService.createAdvertisement(
             advertisementCreateRequest);
         return new ResponseEntity<>(advertisement, HttpStatus.OK);
@@ -47,12 +46,6 @@ public class AdvertisementRestController {
     public ResponseEntity<AdvertisementFindResponse> findAdvertisementById(@PathVariable final Long advertisementId) {
         AdvertisementFindResponse advertisement = advertisementService.findAdvertisementById(advertisementId);
         return new ResponseEntity<>(advertisement, HttpStatus.CREATED);
-    }
-
-    @GetMapping(value = "/{advertisementId}/restaurants", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<RestaurantFindResponse>> findRestaurantsByAdvertisementId(@PathVariable final Long advertisementId) {
-        List<RestaurantFindResponse> restaurants = advertisementService.findRestaurantsByAdvertisementId(advertisementId);
-        return new ResponseEntity<>(restaurants, HttpStatus.OK);
     }
 
     @PutMapping(value = "/{advertisementId}", consumes = MediaType.APPLICATION_JSON_VALUE)
