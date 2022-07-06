@@ -8,7 +8,7 @@ import lombok.RequiredArgsConstructor;
 
 @Getter
 @RequiredArgsConstructor
-public class RestaurantFindResponse {
+public class RestaurantCreateResponse {
 
     private final Long id;
 
@@ -28,16 +28,10 @@ public class RestaurantFindResponse {
 
     private final String description;
 
-    private final Double averageReviewScore;
-
-    private final Integer reviewCount;
-
     private final String address;
 
     private final List<String> categories;
 
     private final LocalDateTime createdAt;
-
-    private final LocalDateTime updatedAt;
 
 }
