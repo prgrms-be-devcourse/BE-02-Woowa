@@ -129,7 +129,6 @@ class OrderApiControllerTest {
 
     }
 
-
     @Test
     @DisplayName("주문을 생성한다.")
     void addOrderTest() throws Exception {
@@ -244,6 +243,22 @@ class OrderApiControllerTest {
     }
 
     @Test
+    @DisplayName("존재하지 않는 가게의 주문을 조회하려 하면 404 NotFound 를 응답한다.")
+    void findOrderByRestaurantNotFoundTest() throws Exception {
+        Long wrongRestaurantId = -1L;
+        OrderListRestaurantRequest request = new OrderListRestaurantRequest(
+                wrongRestaurantId, 0, 3, LocalDate.now().minusMonths(1),
+                LocalDate.now());
+
+        mockMvc.perform(get("/api/v1/restaurants/orders")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON_VALUE)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andDo(print())
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
     @DisplayName("회원의 주문을 조회한다.")
     void findOrderByCustomerTest() throws Exception {
 
@@ -308,6 +323,22 @@ class OrderApiControllerTest {
     }
 
     @Test
+    @DisplayName("존재하지 않는 회원의 주문을 조회하려하면 404 NotFound 를 응답한다.")
+    void findOrderForCustomerTest() throws Exception {
+        String wrongCustomerId = "";
+        OrderListCustomerRequest request = new OrderListCustomerRequest(
+                wrongCustomerId, 0, 1, LocalDate.now().minusMonths(1),
+                LocalDate.now());
+
+        mockMvc.perform(get("/api/v1/customers/orders")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andDo(print())
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
     @DisplayName("회원 주문을 단건 조회한다.")
     void findDetailOrderForCustomerTest() throws Exception {
 
@@ -355,6 +386,16 @@ class OrderApiControllerTest {
     }
 
     @Test
+    @DisplayName("존재하지 않는 주문을 회원이 단건 조회하려하면 404 NotFound 를 응답한다.")
+    void findDetailOrderForCustomerNotFoundTest() throws Exception {
+        Long wrongOrderId = -1L;
+        mockMvc.perform(get("/api/v1/customers/orders/{orderId}", wrongOrderId)
+                        .accept(MediaType.APPLICATION_JSON_VALUE))
+                .andDo(print())
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
     @DisplayName("가게의 주문을 단건 조회한다.")
     void findDetailOrderForRestaurantTest() throws Exception {
         mockMvc.perform(get("/api/v1/restaurants/orders/{orderId}", order.getId())
@@ -395,6 +436,16 @@ class OrderApiControllerTest {
                                 fieldWithPath("menus[].totalPrice").type(JsonFieldType.NUMBER)
                                         .description("가격")
                         )));
+    }
+
+    @Test
+    @DisplayName("존재하지 않는 주문을 가게에서 단건 조회하려하면 404 NotFound 를 응답한다.")
+    void findDetailOrderForRestaurantNotFoundTest() throws Exception {
+        Long wrongOrderId = -1L;
+        mockMvc.perform(get("/api/v1/restaurants/orders/{orderId}", wrongOrderId)
+                        .accept(MediaType.APPLICATION_JSON_VALUE))
+                .andDo(print())
+                .andExpect(status().isNotFound());
     }
 
     @Test
@@ -441,6 +492,23 @@ class OrderApiControllerTest {
     }
 
     @Test
+    @DisplayName("존재하지 않는 가게의 매출 정보를 조회하려 하면 404 NotFound 를 응답한다.")
+    void findOrderStatisticsNotFoundRestaurantTest() throws Exception {
+        Long wrongRestaurantId = -1L;
+        OrderStatisticsRequest request = new OrderStatisticsRequest(
+                wrongRestaurantId, LocalDate.now().minusMonths(1),
+                LocalDate.now());
+
+        mockMvc.perform(get("/api/v1/restaurants/orders/statistics")
+                        .contentType(MediaType.APPLICATION_JSON_VALUE)
+                        .accept(MediaType.APPLICATION_JSON_VALUE)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andDo(print())
+                .andExpect(status().isNotFound());
+
+    }
+
+    @Test
     @DisplayName("주문을 취소한다.")
     void cancelOrderTest() throws Exception {
         mockMvc.perform(patch("/api/v1/orders/{orderId}/cancel", order.getId()))
@@ -451,6 +519,16 @@ class OrderApiControllerTest {
                                 parameterWithName("orderId").description("취소할 주문 ID")
                         )
                 ));
+    }
+
+    @Test
+    @DisplayName("존재하지 않는 주문을 취소하려하면 404 NotFound 를 응답한다.")
+    void cancelOrderNotFoundTest() throws Exception {
+        long wrongOrderId = -1L;
+
+        mockMvc.perform(patch("/api/v1/orders/{orderId}/cancel", wrongOrderId))
+                .andDo(print())
+                .andExpect(status().isNotFound());
     }
 
     @Test
@@ -476,5 +554,18 @@ class OrderApiControllerTest {
                                         .description("조리 예상 시간(분)")
                         )
                 ));
+    }
+
+    @Test
+    @DisplayName("존재하지 않는 주문을 수락하려하면 404 NotFound 를 응답한다.")
+    void acceptOrderNotFoundTest() throws Exception {
+        OrderAcceptRequest request = new OrderAcceptRequest(30);
+        long wrongOrderId = -1L;
+
+        mockMvc.perform(patch("/api/v1/orders/{orderId}/accept", wrongOrderId)
+                        .contentType(MediaType.APPLICATION_JSON_VALUE)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andDo(print())
+                .andExpect(status().isNotFound());
     }
 }
