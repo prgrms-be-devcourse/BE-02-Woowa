@@ -56,7 +56,7 @@ public class RiderController {
         @Valid final RiderUpdateRequest riderUpdateRequest,
         @PathVariable final Long id) {
         riderService.update(id, riderUpdateRequest);
-        return ResponseEntity.created(URI.create("/api/v1/rider/" + id)).build();
+        return ResponseEntity.noContent().build();
     }
 
     @PutMapping("/{id}/status")
