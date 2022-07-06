@@ -10,15 +10,14 @@ public class BaseUserResponse extends BaseTimeDto {
     private final String password;
     private final String name;
     private final String phoneNumber;
-    private final LocalDateTime lastLoginedAt;
 
-    public BaseUserResponse(LocalDateTime createdAt, LocalDateTime updatedAt, String loginId, String password, String name,
-        String phoneNumber, LocalDateTime lastLoginedAt) {
+    public BaseUserResponse(LocalDateTime createdAt, LocalDateTime updatedAt, String loginId,
+        String password, String name,
+        String phoneNumber) {
         super(createdAt, updatedAt);
         this.loginId = loginId;
         this.password = password;
         this.name = name;
         this.phoneNumber = phoneNumber;
-        this.lastLoginedAt = lastLoginedAt;
     }
 }
