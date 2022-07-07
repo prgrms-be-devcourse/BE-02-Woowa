@@ -142,4 +142,10 @@ public class RestaurantService {
             .orElseThrow(() -> new NotFoundException("존재하지 않는 restaurantId 입니다."));
     }
 
+    public List<RestaurantFindResponse> findRestaurantsIsPermittedIsFalse() {
+        return restaurantRepository.findRestaurantByIsPermittedIsFalse().stream()
+            .map(restaurantMapper::toFindResponseDto)
+            .collect(Collectors.toList());
+    }
+
 }

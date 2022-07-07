@@ -22,7 +22,6 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/v1/admins")
 public class AdminController {
   private final AdminService adminService;
-  private final RestaurantService restaurantService;
 
   @PostMapping
   public AdminFindResponse createAdmin(@RequestBody @Valid AdminCreateRequest adminCreateRequest) {
@@ -48,7 +47,7 @@ public class AdminController {
 
   @PatchMapping("/permit/restaurants/{restaurantId}")
   public String permitRestaurant(@PathVariable Long restaurantId) {
-    restaurantService.setPermitted(restaurantId);
+    adminService.permitRestaurant(restaurantId);
     return "restaurant id(" + restaurantId + ") permitted.";
   }
 
