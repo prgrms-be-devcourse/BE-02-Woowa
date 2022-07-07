@@ -9,8 +9,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -35,7 +35,7 @@ public class DeliveryController {
     }
 
     // 추후 security 도입시 riderId받는 부분은 제거.
-    @PatchMapping("/accept/{deliveryId}/{riderId}")
+    @PutMapping("/accept/{deliveryId}/{riderId}")
     public ResponseEntity<Void> acceptDelivery(@PathVariable Long deliveryId,
         @PathVariable Long riderId, @RequestParam @NotNull @PositiveOrZero Integer deliveryMinute,
         Integer cookMinute) {
@@ -43,21 +43,21 @@ public class DeliveryController {
         return ResponseEntity.noContent().build();
     }
 
-    @PatchMapping("/delay/{deliveryId}/{riderId}")
+    @PutMapping("/delay/{deliveryId}/{riderId}")
     public ResponseEntity<Void> delayDelivery(@PathVariable Long deliveryId,
-        @PathVariable Long riderId, @RequestParam @NotNull @PositiveOrZero Integer deliveryMinute) {
-        deliveryService.delay(deliveryId, deliveryMinute);
+        @PathVariable Long riderId, @RequestParam @NotNull @PositiveOrZero Integer delayMinute) {
+        deliveryService.delay(deliveryId, delayMinute);
         return ResponseEntity.noContent().build();
     }
 
-    @PatchMapping("/pickup/{deliveryId}/{riderId}")
+    @PutMapping("/pickup/{deliveryId}/{riderId}")
     public ResponseEntity<Void> pickUpDelivery(@PathVariable Long deliveryId,
         @PathVariable Long riderId) {
         deliveryService.pickUp(riderId);
         return ResponseEntity.noContent().build();
     }
 
-    @PatchMapping("/finish/{deliveryId}/{riderId}")
+    @PutMapping("/finish/{deliveryId}/{riderId}")
     public ResponseEntity<Void> finishDelivery(@PathVariable Long deliveryId,
         @PathVariable Long riderId) {
         deliveryService.finish(riderId);
