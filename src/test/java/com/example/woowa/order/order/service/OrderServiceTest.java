@@ -42,7 +42,6 @@ import com.example.woowa.order.order.mapper.OrderMapper;
 import com.example.woowa.order.order.repository.OrderRepository;
 import com.example.woowa.restaurant.menu.entity.Menu;
 import com.example.woowa.restaurant.menu.enums.MenuStatus;
-import com.example.woowa.restaurant.menu.service.MenuService;
 import com.example.woowa.restaurant.menugroup.entity.MenuGroup;
 import com.example.woowa.restaurant.restaurant.entity.Restaurant;
 import com.example.woowa.restaurant.restaurant.service.RestaurantService;
@@ -53,7 +52,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
-import org.hibernate.annotations.NotFound;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -142,7 +140,7 @@ class OrderServiceTest {
         );
 
         given(customerService.findCustomerEntity(any())).willReturn(customer);
-        given(restaurantService.findRestaurantById(any())).willReturn(restaurant);
+        given(restaurantService.findRestaurantEntityById(any())).willReturn(restaurant);
         given(orderRepository.save(any())).willReturn(order);
         given(orderRepository.findById(orderId)).willReturn(Optional.of(order));
         given(deliveryAreaService.getDeliveryFee(restaurant, "서울특별시 강남구")).willReturn(deliveryFee);
@@ -209,7 +207,7 @@ class OrderServiceTest {
         LocalDate end = LocalDate.now();
         PageRequest pageable = PageRequest.of(0, 3);
 
-        given(restaurantService.findRestaurantById(restaurantId)).willReturn(restaurant);
+        given(restaurantService.findRestaurantEntityById(restaurantId)).willReturn(restaurant);
         Slice<Order> slice = new SliceImpl(Collections.singletonList(order), pageable,
                 false);
 
@@ -250,7 +248,7 @@ class OrderServiceTest {
         Long wrongRestaurantId = -1L;
         LocalDate from = LocalDate.now().minusMonths(1);
         LocalDate end = LocalDate.now();
-        given(restaurantService.findRestaurantById(wrongRestaurantId)).willThrow(
+        given(restaurantService.findRestaurantEntityById(wrongRestaurantId)).willThrow(
                 IllegalArgumentException.class);
 
         // When // Then
@@ -448,7 +446,7 @@ class OrderServiceTest {
                 voucherDiscountPrice,
                 usedPoint);
 
-        given(restaurantService.findRestaurantById(restaurantId)).willReturn(restaurant);
+        given(restaurantService.findRestaurantEntityById(restaurantId)).willReturn(restaurant);
         given(orderRepository.findOrderStatistics(restaurant,
                 LocalDateTime.of(from, LocalTime.of(0, 0)),
                 LocalDateTime.of(end, LocalTime.of(23, 59)),
@@ -478,7 +476,7 @@ class OrderServiceTest {
         LocalDate from = LocalDate.now().minusMonths(1);
         LocalDate end = LocalDate.now();
 
-        given(restaurantService.findRestaurantById(wrongRestaurantId)).willThrow(
+        given(restaurantService.findRestaurantEntityById(wrongRestaurantId)).willThrow(
                 IllegalArgumentException.class);
 
         // When // Then

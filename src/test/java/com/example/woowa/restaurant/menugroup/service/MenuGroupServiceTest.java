@@ -70,7 +70,7 @@ class MenuGroupServiceTest {
     void findMenuGroupByRestaurantTest() {
         // Given
         Long restaurantId = 1L;
-        given(restaurantService.findRestaurantById(restaurantId)).willReturn(restaurant);
+        given(restaurantService.findRestaurantEntityById(restaurantId)).willReturn(restaurant);
         given(menuGroupRepository.findByRestaurant(restaurant)).willReturn(
                 Collections.singletonList(menuGroup));
 
@@ -90,7 +90,7 @@ class MenuGroupServiceTest {
         Long restaurantId = 1L;
 
         given(menuGroupRepository.save(any())).willReturn(menuGroup);
-        given(restaurantService.findRestaurantById(restaurantId)).willReturn(restaurant);
+        given(restaurantService.findRestaurantEntityById(restaurantId)).willReturn(restaurant);
 
         // When
         menuGroupService.addMenuGroup(restaurantId, new MenuGroupSaveRequest(menuGroup.getTitle(),
@@ -105,8 +105,8 @@ class MenuGroupServiceTest {
     void addMenuGroupNotExistsRestaurantTest() {
         // Given
         Long wrongRestaurantId = -1L;
-        when(restaurantService.findRestaurantById(wrongRestaurantId)).thenThrow(
-                IllegalArgumentException.class);
+        when(restaurantService.findRestaurantEntityById(wrongRestaurantId)).thenThrow(
+                NotFoundException.class);
 
         // When // Then
         assertThatThrownBy(

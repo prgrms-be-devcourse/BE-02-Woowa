@@ -58,7 +58,7 @@ public class OrderService {
     @Transactional
     public Long addOrder(OrderSaveRequest request) {
         Customer findCustomer = customerService.findCustomerEntity(request.getLoginId());
-        Restaurant findRestaurant = restaurantService.findRestaurantById(request.getRestaurantId());
+        Restaurant findRestaurant = restaurantService.findRestaurantEntityById(request.getRestaurantId());
         Long voucherId = request.getVoucherId();
         Voucher findVoucher =
                 Objects.isNull(voucherId) ? null : voucherEntityService.findVoucherById(voucherId);
@@ -79,7 +79,7 @@ public class OrderService {
 
     public OrderListRestaurantResponse findOrderByRestaurant(OrderListRestaurantRequest request) {
         validatePeriod(request.getFrom(), request.getEnd());
-        Restaurant findRestaurant = restaurantService.findRestaurantById(request.getRestaurantId());
+        Restaurant findRestaurant = restaurantService.findRestaurantEntityById(request.getRestaurantId());
         Slice<Order> orderSlice = orderRepository.findByRestaurant(findRestaurant,
                 LocalDateTime.of(request.getFrom(), LocalTime.of(0, 0)),
                 LocalDateTime.of(request.getEnd(), LocalTime.of(23, 59)),
@@ -111,7 +111,7 @@ public class OrderService {
 
     public OrderStatisticsResponse findOrderStatistics(OrderStatisticsRequest request) {
         validatePeriod(request.getFrom(), request.getEnd());
-        Restaurant findRestaurant = restaurantService.findRestaurantById(request.getRestaurantId());
+        Restaurant findRestaurant = restaurantService.findRestaurantEntityById(request.getRestaurantId());
         OrderStatistics orderStatistics = orderRepository.findOrderStatistics(findRestaurant,
                 LocalDateTime.of(request.getFrom(), LocalTime.of(0, 0)),
                 LocalDateTime.of(request.getEnd(), LocalTime.of(23, 59)),
