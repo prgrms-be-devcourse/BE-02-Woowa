@@ -1,5 +1,6 @@
 package com.example.woowa.restaurant.restaurant.service;
 
+import com.example.woowa.common.exception.NotFoundException;
 import com.example.woowa.restaurant.category.entity.Category;
 import com.example.woowa.restaurant.category.service.CategoryService;
 import com.example.woowa.restaurant.restaurant.dto.request.RestaurantCreateRequest;
@@ -98,7 +99,7 @@ public class RestaurantService {
 
     public Restaurant findRestaurantEntityById(Long restaurantId) {
         return restaurantRepository.findById(restaurantId)
-            .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 가게 아이디입니다."));
+            .orElseThrow(() -> new NotFoundException("존재하지 않는 Restaurant 입니다."));
     }
 
     public List<Category> findCategories(Long restaurantId) {

@@ -1,5 +1,6 @@
 package com.example.woowa.customer.customer.service;
 
+import com.example.woowa.common.exception.NotFoundException;
 import com.example.woowa.customer.customer.converter.CustomerMapper;
 import com.example.woowa.customer.customer.dto.CustomerCreateRequest;
 import com.example.woowa.customer.customer.dto.CustomerFindResponse;
@@ -56,7 +57,7 @@ public class CustomerService {
     }
 
     public Customer findCustomerEntity(String loginId) {
-        Customer customer = customerRepository.findByLoginId(loginId).orElseThrow(() -> new RuntimeException("login id not existed"));
+        Customer customer = customerRepository.findByLoginId(loginId).orElseThrow(() -> new NotFoundException("존재하지 않는 Customer 입니다."));
         return customer;
     }
 
