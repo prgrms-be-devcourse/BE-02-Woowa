@@ -1,15 +1,20 @@
 package com.example.woowa.restaurant.restaurant.service;
 
+import com.example.woowa.common.exception.NotFoundException;
 import com.example.woowa.restaurant.category.entity.Category;
 import com.example.woowa.restaurant.category.service.CategoryService;
+import com.example.woowa.restaurant.owner.entity.Owner;
+import com.example.woowa.restaurant.owner.service.OwnerService;
 import com.example.woowa.restaurant.restaurant.dto.request.RestaurantCreateRequest;
+import com.example.woowa.restaurant.restaurant.dto.request.RestaurantUpdateRequest;
+import com.example.woowa.restaurant.restaurant.dto.response.RestaurantCreateResponse;
+import com.example.woowa.restaurant.restaurant.dto.response.RestaurantFindResponse;
 import com.example.woowa.restaurant.restaurant.entity.Restaurant;
 import com.example.woowa.restaurant.restaurant.mapper.RestaurantMapper;
 import com.example.woowa.restaurant.restaurant.repository.RestaurantRepository;
 import com.example.woowa.restaurant.restaurntat_category.entity.RestaurantCategory;
 import com.example.woowa.restaurant.restaurntat_category.entity.RestaurantCategoryId;
 import com.example.woowa.restaurant.restaurntat_category.repository.RestaurantCategoryRepository;
-import java.time.LocalTime;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
@@ -23,87 +28,123 @@ public class RestaurantService {
 
     private final RestaurantRepository restaurantRepository;
     private final RestaurantCategoryRepository restaurantCategoryRepository;
+
     private final CategoryService categoryService;
+    private final OwnerService ownerService;
+
     private final RestaurantMapper restaurantMapper;
 
     @Transactional
-    public Long createRestaurant(RestaurantCreateRequest restaurantCreateRequest) {
+    public RestaurantCreateResponse createRestaurantByOwnerId(Long ownerId, RestaurantCreateRequest restaurantCreateRequest) {
+        Owner owner = ownerService.findOwnerEntityById(ownerId);
         Restaurant restaurant = restaurantRepository.save(
             restaurantMapper.toEntity(restaurantCreateRequest));
-
         restaurantCreateRequest.getCategoryIds().forEach(categoryId -> {
             Category category = categoryService.findCategoryEntityById(categoryId);
             RestaurantCategory restaurantCategory = new RestaurantCategory(restaurant, category);
         });
+        owner.addRestaurant(restaurant);
 
-        return restaurant.getId();
+        return restaurantMapper.toCreateResponseDto(restaurant);
     }
 
-    public Restaurant findRestaurantById(Long restaurantId) {
-        return restaurantRepository.findById(restaurantId)
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 restaurantId 입니다."));
+    public List<RestaurantFindResponse> findRestaurants() {
+        return restaurantRepository.findAll().stream()
+            .map(restaurantMapper::toFindResponseDto)
+            .collect(Collectors.toList());
     }
 
-    @Transactional
-    public void removeRestaurant(Long restaurantId) {
-        Restaurant findRestaurant = findRestaurantById(restaurantId);
-        restaurantRepository.delete(findRestaurant);
+    public List<RestaurantFindResponse> findRestaurantsByOwnerId(Long ownerId) {
+        Owner owner = ownerService.findOwnerEntityById(ownerId);
+        return restaurantRepository.findByOwner(owner).stream().
+            map(restaurantMapper::toFindResponseDto).
+            collect(Collectors.toList());
     }
 
-    @Transactional
-    public void updateBusinessHours(Long restaurantId, LocalTime openingTime,
-            LocalTime closingTime) {
-        findRestaurantById(restaurantId).updateBusinessHours(openingTime, closingTime);
+    public RestaurantFindResponse findRestaurantById(Long restaurantId) {
+        return restaurantMapper.toFindResponseDto(findRestaurantEntityById(restaurantId));
     }
 
-    @Transactional
-    public void openRestaurant(Long restaurantId) {
-        findRestaurantById(restaurantId).openRestaurant();
+    public List<RestaurantFindResponse> findRestaurantsByAdvertisementId(Long advertisementId) {
+        return restaurantRepository.findByAdvertisementId(advertisementId).stream()
+            .map(restaurantMapper::toFindResponseDto)
+            .collect(Collectors.toList());
     }
 
-    @Transactional
-    public void closeRestaurant(Long restaurantId) {
-        findRestaurantById(restaurantId).closeRestaurant();
-    }
-
-    @Transactional
-    public void changeRestaurantDescription(Long restaurantId, String newDescription) {
-        findRestaurantById(restaurantId).changeDescription(newDescription);
-    }
-
-    @Transactional
-    public void changeRestaurantPhoneNumber(Long restaurantId, String newPhoneNumber) {
-        findRestaurantById(restaurantId).changePhoneNumber(newPhoneNumber);
+    public List<RestaurantFindResponse> findRestaurantsByCategoryId(Long categoryId) {
+        return restaurantRepository.findByCategoryId(categoryId).stream()
+            .map(restaurantMapper::toFindResponseDto)
+            .collect(Collectors.toList());
     }
 
     @Transactional
-    public void addCategory(Long restaurantId, Long categoryId) {
-        Restaurant restaurant = findRestaurantById(restaurantId);
+    public void deleteRestaurantByOwnerIdAndRestaurantId(Long ownerId, Long restaurantId) {
+        Owner owner = ownerService.findOwnerEntityById(ownerId);
+        Restaurant restaurant = findRestaurantEntityByOwnerIdAndRestaurantId(ownerId, restaurantId);
+
+        owner.removeRestaurant(restaurant);
+    }
+
+    @Transactional
+    public void updateRestaurantById(Long ownerId, Long restaurantId, RestaurantUpdateRequest restaurantUpdateRequest) {
+        Restaurant restaurant = findRestaurantEntityByOwnerIdAndRestaurantId(ownerId, restaurantId);
+        restaurantMapper.updateEntity(restaurantUpdateRequest, restaurant);
+    }
+
+    @Transactional
+    public void openRestaurant(Long ownerId, Long restaurantId) {
+        Restaurant restaurant = findRestaurantEntityByOwnerIdAndRestaurantId(ownerId, restaurantId);
+        restaurant.openRestaurant();
+    }
+
+    @Transactional
+    public void closeRestaurant(Long ownerId, Long restaurantId) {
+        Restaurant restaurant = findRestaurantEntityByOwnerIdAndRestaurantId(ownerId, restaurantId);
+        restaurant.closeRestaurant();
+    }
+
+    @Transactional
+    public void setPermitted(Long restaurantId) {
+        Restaurant restaurant = findRestaurantEntityById(restaurantId);
+        restaurant.setPermitted();
+    }
+
+    @Transactional
+    public void addCategory(Long ownerId, Long restaurantId, Long categoryId) {
+        Restaurant restaurant = findRestaurantEntityByOwnerIdAndRestaurantId(ownerId, restaurantId);
         Category category = categoryService.findCategoryEntityById(categoryId);
 
         RestaurantCategory restaurantCategory = new RestaurantCategory(restaurant, category);
     }
 
     @Transactional
-    public void removeCategory(Long restaurantId, Long categoryId) {
-        Restaurant restaurant = findRestaurantById(restaurantId);
+    public void removeCategory(Long ownerId, Long restaurantId, Long categoryId) {
+        Restaurant restaurant = findRestaurantEntityByOwnerIdAndRestaurantId(ownerId, restaurantId);
         Category category = categoryService.findCategoryEntityById(categoryId);
 
         RestaurantCategory restaurantCategory = restaurantCategoryRepository.findById(
-            new RestaurantCategoryId(restaurantId, categoryId)).get();
+            new RestaurantCategoryId(restaurantId, categoryId)).orElseThrow(() -> new IllegalArgumentException("이 가게는 해당 카테고리에 속하지 않습니다."));
 
-        restaurant.getRestaurantCategories().remove(restaurantCategory);
-        category.getRestaurantCategories().remove(restaurantCategory);
+        restaurantCategoryRepository.delete(restaurantCategory);
+    }
+
+    public Restaurant findRestaurantEntityByOwnerIdAndRestaurantId(Long ownerId, Long restaurantId) {
+        return ownerService.findOwnerEntityById(ownerId).getRestaurants().stream().
+            filter(r -> r.getId() == restaurantId).
+            findFirst().
+            orElseThrow(() ->
+                new NotFoundException(
+                    "사장님(" + ownerId + ")은 가게(" + restaurantId + ")를 소유하고 있지 않습니다."));
     }
 
     public Restaurant findRestaurantEntityById(Long restaurantId) {
         return restaurantRepository.findById(restaurantId)
-            .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 가게 아이디입니다."));
+            .orElseThrow(() -> new NotFoundException("존재하지 않는 restaurantId 입니다."));
     }
 
-    public List<Category> findCategories(Long restaurantId) {
-        return findRestaurantById(restaurantId).getRestaurantCategories().stream()
-            .map(RestaurantCategory::getCategory)
+    public List<RestaurantFindResponse> findRestaurantsIsPermittedIsFalse() {
+        return restaurantRepository.findRestaurantByIsPermittedIsFalse().stream()
+            .map(restaurantMapper::toFindResponseDto)
             .collect(Collectors.toList());
     }
 

@@ -6,6 +6,8 @@ import com.example.woowa.admin.dto.AdminFindResponse;
 import com.example.woowa.admin.dto.AdminUpdateRequest;
 import com.example.woowa.admin.entity.Admin;
 import com.example.woowa.admin.repository.AdminRepository;
+import com.example.woowa.restaurant.restaurant.entity.Restaurant;
+import com.example.woowa.restaurant.restaurant.service.RestaurantService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -15,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional(readOnly = true)
 public class AdminService {
 
+    private final RestaurantService restaurantService;
     private final AdminRepository adminRepository;
     private final AdminMapper adminMapper;
 
@@ -46,4 +49,11 @@ public class AdminService {
     private Admin findAdminEntity(String loginId) {
         return adminRepository.findByLoginId(loginId).orElseThrow(()-> new RuntimeException("admin not existed"));
     }
+
+    @Transactional
+    public void permitRestaurant(Long restaurantId) {
+        Restaurant restaurant = restaurantService.findRestaurantEntityById(restaurantId);
+        restaurant.setPermitted();
+    }
+
 }
