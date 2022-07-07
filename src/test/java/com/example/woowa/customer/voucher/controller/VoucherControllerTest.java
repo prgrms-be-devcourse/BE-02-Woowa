@@ -28,6 +28,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.List;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
@@ -38,7 +39,7 @@ import org.springframework.restdocs.payload.JsonFieldType;
 import org.springframework.test.web.servlet.MockMvc;
 
 @SpringBootTest
-@AutoConfigureMockMvc
+@AutoConfigureMockMvc(addFilters = false)
 @AutoConfigureRestDocs
 class VoucherControllerTest {
   @Autowired
@@ -81,11 +82,19 @@ class VoucherControllerTest {
     return customerFindResponse.getLoginId();
   }
 
+  @BeforeEach
+  void settingBeforeTest() {
+    customerAddressRepository.deleteAll();
+    customerRepository.deleteAll();
+    customerGradeRepository.deleteAll();
+    voucherRepository.deleteAll();
+  }
+
   @AfterEach
   void settingAfterTest() {
-    customerGradeRepository.deleteAll();
-    customerRepository.deleteAll();
     customerAddressRepository.deleteAll();
+    customerRepository.deleteAll();
+    customerGradeRepository.deleteAll();
     voucherRepository.deleteAll();
   }
 

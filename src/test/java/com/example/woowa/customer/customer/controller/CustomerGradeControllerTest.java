@@ -18,6 +18,7 @@ import com.example.woowa.customer.customer.dto.CustomerGradeUpdateRequest;
 import com.example.woowa.customer.customer.repository.CustomerGradeRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -30,7 +31,7 @@ import org.springframework.restdocs.payload.JsonFieldType;
 import org.springframework.test.web.servlet.MockMvc;
 
 @SpringBootTest
-@AutoConfigureMockMvc
+@AutoConfigureMockMvc(addFilters = false)
 @AutoConfigureRestDocs
 class CustomerGradeControllerTest {
   @Autowired
@@ -47,7 +48,7 @@ class CustomerGradeControllerTest {
     customerGradeRepository.deleteAll();
   }
 
-  @AfterAll
+  @AfterEach
   void setting1() {
     customerGradeRepository.deleteAll();
   }
