@@ -1,31 +1,31 @@
 package com.example.woowa.delivery.service;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import com.example.woowa.delivery.entity.AreaCode;
 import com.example.woowa.delivery.entity.DeliveryArea;
 import com.example.woowa.restaurant.restaurant.entity.Restaurant;
 import com.example.woowa.restaurant.restaurant.repository.RestaurantRepository;
+import java.time.LocalTime;
+import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalTime;
-import java.util.List;
-import java.util.Optional;
-
-import static org.assertj.core.api.Assertions.assertThat;
-
-@SpringBootTest
+@ExtendWith(MockitoExtension.class)
 class DeliveryAreaServiceTest {
-    @Autowired
+
+    @Mock
     DeliveryAreaService deliveryAreaService;
 
-    @Autowired
+    @Mock
     AreaCodeService areaCodeService;
 
-    @Autowired
+    @Mock
     RestaurantRepository restaurantRepository;
 
     @BeforeEach
@@ -33,8 +33,8 @@ class DeliveryAreaServiceTest {
     public void save() {
         AreaCode areaCode = areaCodeService.findByAddress("서울특별시 종로구");
         Restaurant restaurant = Restaurant.createRestaurant("테스트 레스토랑", "1234567890",
-                LocalTime.now(), LocalTime.now(), true,
-                "010-123-4567", "테스트용 임시 레스토랑 생성입니다.", "서울시 종로구");
+            LocalTime.now(), LocalTime.now(), true,
+            "010-123-4567", "테스트용 임시 레스토랑 생성입니다.", "서울시 종로구");
 
         DeliveryArea deliveryArea = new DeliveryArea(areaCode, restaurant);
         restaurant.addDeliveryArea(deliveryArea);
