@@ -35,7 +35,8 @@ public class OwnerService {
     public OwnerCreateResponse createOwner(OwnerCreateRequest ownerCreateRequest) {
         Owner owner = ownerRepository.save(ownerMapper.toEntity(ownerCreateRequest));
         owner.changePassword(passwordEncoder.encode(owner.getPassword()));
-        userRepository.save(new User(owner.getLoginId(), owner.getPassword(), owner.getName(), owner.getPhoneNumber(),
+        userRepository.save(new User(owner.getLoginId(), owner.getPassword(), owner.getName(),
+            owner.getPhoneNumber(),
             List.of(roleRepository.findByName(UserRole.ROLE_OWNER.toString()))));
         return ownerMapper.toCreateResponse(owner);
     }
