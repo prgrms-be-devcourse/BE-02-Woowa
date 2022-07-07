@@ -4,10 +4,12 @@ import com.example.woowa.admin.dto.AdminCreateRequest;
 import com.example.woowa.admin.dto.AdminFindResponse;
 import com.example.woowa.admin.dto.AdminUpdateRequest;
 import com.example.woowa.admin.service.AdminService;
+import com.example.woowa.restaurant.restaurant.service.RestaurantService;
 import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -20,6 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/v1/admins")
 public class AdminController {
   private final AdminService adminService;
+  private final RestaurantService restaurantService;
 
   @PostMapping
   public AdminFindResponse createAdmin(@RequestBody @Valid AdminCreateRequest adminCreateRequest) {
@@ -42,4 +45,11 @@ public class AdminController {
     adminService.deleteAdmin(loginId);
     return "delete id - " + loginId;
   }
+
+  @PatchMapping("/permit/restaurants/{restaurantId}")
+  public String permitRestaurant(@PathVariable Long restaurantId) {
+    restaurantService.setPermitted(restaurantId);
+    return "restaurant id(" + restaurantId + ") permitted.";
+  }
+
 }
