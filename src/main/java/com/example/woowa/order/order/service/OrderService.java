@@ -134,7 +134,7 @@ public class OrderService {
 
     public Order findOrderById(Long orderId) {
         return orderRepository.findById(orderId)
-                .orElseThrow(() -> new NotFoundException("존재하지 않는 Order 입니다."));
+                .orElseThrow(() -> new NotFoundException(ErrorMessage.NOT_FOUND_ORDER.getMessage()));
     }
 
     private void validatePeriod(LocalDate from, LocalDate end) {
