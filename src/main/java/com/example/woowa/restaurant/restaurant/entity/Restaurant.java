@@ -79,6 +79,9 @@ public class Restaurant extends BaseTimeEntity {
     @Column(nullable = false)
     private String address;
 
+    @Column(nullable = false)
+    private Boolean isPermitted;
+
     private Restaurant(String name, String businessNumber, LocalTime openingTime,
             LocalTime closingTime,
             Boolean isOpen, String phoneNumber, String description, String address) {
@@ -92,6 +95,7 @@ public class Restaurant extends BaseTimeEntity {
         this.address = address;
         this.reviewCount = 0;
         this.averageReviewScore = 0.0D;
+        this.isPermitted = false;
     }
 
     public static Restaurant createRestaurant(String name, String businessNumber,
@@ -143,6 +147,10 @@ public class Restaurant extends BaseTimeEntity {
   
     public void addRestaurantCategory(RestaurantCategory restaurantCategory) {
         restaurantCategory.setRestaurant(this);
+    }
+
+    public void setPermitted() {
+        this.isPermitted = true;
     }
 
     public void setOwner(Owner owner) {

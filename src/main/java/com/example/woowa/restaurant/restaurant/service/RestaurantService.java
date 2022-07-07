@@ -104,6 +104,12 @@ public class RestaurantService {
     }
 
     @Transactional
+    public void setPermitted(Long restaurantId) {
+        Restaurant restaurant = findRestaurantEntityById(restaurantId);
+        restaurant.setPermitted();
+    }
+
+    @Transactional
     public void addCategory(Long ownerId, Long restaurantId, Long categoryId) {
         Restaurant restaurant = findRestaurantEntityByOwnerIdAndRestaurantId(ownerId, restaurantId);
         Category category = categoryService.findCategoryEntityById(categoryId);
