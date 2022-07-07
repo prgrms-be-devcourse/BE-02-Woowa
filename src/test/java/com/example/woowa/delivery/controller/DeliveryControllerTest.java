@@ -10,6 +10,7 @@ import static org.springframework.restdocs.payload.PayloadDocumentation.response
 import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
 import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
 import static org.springframework.restdocs.request.RequestDocumentation.requestParameters;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -27,7 +28,6 @@ import org.junit.jupiter.api.Test;
 import org.mapstruct.factory.Mappers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.ComponentScan;
@@ -36,17 +36,18 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.payload.JsonFieldType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
 @AutoConfigureRestDocs
-@AutoConfigureMockMvc(addFilters = false)
 @WebMvcTest(value = DeliveryController.class, excludeFilters = {
     @ComponentScan.Filter(
         type = FilterType.ASSIGNABLE_TYPE,
         classes = SecurityConfig.class
-    )
+    ),
 })
 @MockBean(JpaAuditingConfiguration.class)
+@WithMockUser
 class DeliveryControllerTest {
 
     @Autowired
@@ -158,6 +159,7 @@ class DeliveryControllerTest {
         mockMvc.perform(put("/api/v1/delivery/accept/{deliveryId}/{riderId}", 1L, 1L)
                 .param("deliveryMinute", String.valueOf(0))
                 .param("cookMinute", String.valueOf(0))
+                .with(csrf().asHeader())
                 .contentType(MediaType.APPLICATION_JSON)
             ).andExpect(status().is2xxSuccessful())
             .andDo(print())
@@ -179,6 +181,7 @@ class DeliveryControllerTest {
         mockMvc.perform(put("/api/v1/delivery/delay/{deliveryId}/{riderId}", 1L, 1L)
                 .param("delayMinute", String.valueOf(0))
                 .contentType(MediaType.APPLICATION_JSON)
+                .with(csrf().asHeader())
             ).andExpect(status().is2xxSuccessful())
             .andDo(print())
             .andDo(document("accept-delivery",
@@ -197,6 +200,7 @@ class DeliveryControllerTest {
     void pickUpDelivery() throws Exception {
         mockMvc.perform(put("/api/v1/delivery/pickup/{deliveryId}/{riderId}", 1L, 1L)
                 .contentType(MediaType.APPLICATION_JSON)
+                .with(csrf())
             ).andExpect(status().is2xxSuccessful())
             .andDo(print())
             .andDo(document("accept-delivery",
@@ -212,6 +216,7 @@ class DeliveryControllerTest {
     void finishDelivery() throws Exception {
         mockMvc.perform(put("/api/v1/delivery/pickup/{deliveryId}/{riderId}", 1L, 1L)
                 .contentType(MediaType.APPLICATION_JSON)
+                .with(csrf())
             ).andExpect(status().is2xxSuccessful())
             .andDo(print())
             .andDo(document("accept-delivery",

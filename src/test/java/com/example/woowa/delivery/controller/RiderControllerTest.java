@@ -13,6 +13,7 @@ import static org.springframework.restdocs.request.RequestDocumentation.paramete
 import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
 import static org.springframework.restdocs.request.RequestDocumentation.requestParameters;
 import static org.springframework.restdocs.snippet.Attributes.key;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -33,7 +34,6 @@ import org.junit.jupiter.api.Test;
 import org.mapstruct.factory.Mappers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.ComponentScan;
@@ -43,10 +43,10 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.constraints.ConstraintDescriptions;
 import org.springframework.restdocs.payload.JsonFieldType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
 @AutoConfigureRestDocs
-@AutoConfigureMockMvc(addFilters = false)
 @WebMvcTest(value = RiderController.class, excludeFilters = {
     @ComponentScan.Filter(
         type = FilterType.ASSIGNABLE_TYPE,
@@ -54,6 +54,7 @@ import org.springframework.test.web.servlet.MockMvc;
     )
 })
 @MockBean(JpaAuditingConfiguration.class)
+@WithMockUser
 class RiderControllerTest {
 
     final String CONSTRAIN = "constraints";
@@ -81,7 +82,9 @@ class RiderControllerTest {
 
         mockMvc.perform(post("/api/v1/rider")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(riderCreateRequest)))
+                .content(objectMapper.writeValueAsString(riderCreateRequest))
+                .with(csrf().asHeader())
+            )
             .andExpect(status().isCreated())
             .andExpect(header().string("Location", "/api/v1/rider/0"))
             .andDo(print())
@@ -209,6 +212,7 @@ class RiderControllerTest {
         RiderUpdateRequest riderUpdateRequest = new RiderUpdateRequest("name", "010-1234-1234");
 
         mockMvc.perform(put("/api/v1/rider/{id}", 1L)
+                .with(csrf().asHeader())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(riderUpdateRequest))
             ).andExpect(status().is2xxSuccessful())
@@ -227,7 +231,9 @@ class RiderControllerTest {
     @Test
     void changeIsDelivery() throws Exception {
         mockMvc.perform(put("/api/v1/rider/{id}/status", 1L)
-                .contentType(MediaType.APPLICATION_JSON).param("isDelivery", String.valueOf(true))
+                .with(csrf().asHeader())
+                .contentType(MediaType.APPLICATION_JSON)
+                .param("isDelivery", String.valueOf(true))
             ).andExpect(status().is2xxSuccessful())
             .andDo(print())
             .andDo(document("changeStatus-rider",
@@ -242,9 +248,11 @@ class RiderControllerTest {
     }
 
     @Test
+    @WithMockUser
     void addArea() throws Exception {
         mockMvc.perform(post("/api/v1/rider/{riderId}/{areaId}", 1L, 1L)
                 .contentType(MediaType.APPLICATION_JSON)
+                .with(csrf().asHeader())
             ).andExpect(status().is2xxSuccessful())
             .andDo(print())
             .andDo(document("addArea-rider",
