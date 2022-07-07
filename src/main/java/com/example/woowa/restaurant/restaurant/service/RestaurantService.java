@@ -1,6 +1,9 @@
 package com.example.woowa.restaurant.restaurant.service;
 
 import com.example.woowa.common.exception.NotFoundException;
+import com.example.woowa.delivery.entity.AreaCode;
+import com.example.woowa.delivery.entity.DeliveryArea;
+import com.example.woowa.delivery.service.AreaCodeService;
 import com.example.woowa.restaurant.category.entity.Category;
 import com.example.woowa.restaurant.category.service.CategoryService;
 import com.example.woowa.restaurant.owner.entity.Owner;
@@ -31,11 +34,13 @@ public class RestaurantService {
 
     private final CategoryService categoryService;
     private final OwnerService ownerService;
+    private final AreaCodeService areaCodeService;
 
     private final RestaurantMapper restaurantMapper;
 
     @Transactional
-    public RestaurantCreateResponse createRestaurantByOwnerId(Long ownerId, RestaurantCreateRequest restaurantCreateRequest) {
+    public RestaurantCreateResponse createRestaurantByOwnerId(Long ownerId,
+        RestaurantCreateRequest restaurantCreateRequest) {
         Owner owner = ownerService.findOwnerEntityById(ownerId);
         Restaurant restaurant = restaurantRepository.save(
             restaurantMapper.toEntity(restaurantCreateRequest));
@@ -86,7 +91,8 @@ public class RestaurantService {
     }
 
     @Transactional
-    public void updateRestaurantById(Long ownerId, Long restaurantId, RestaurantUpdateRequest restaurantUpdateRequest) {
+    public void updateRestaurantById(Long ownerId, Long restaurantId,
+        RestaurantUpdateRequest restaurantUpdateRequest) {
         Restaurant restaurant = findRestaurantEntityByOwnerIdAndRestaurantId(ownerId, restaurantId);
         restaurantMapper.updateEntity(restaurantUpdateRequest, restaurant);
     }
@@ -123,18 +129,28 @@ public class RestaurantService {
         Category category = categoryService.findCategoryEntityById(categoryId);
 
         RestaurantCategory restaurantCategory = restaurantCategoryRepository.findById(
-            new RestaurantCategoryId(restaurantId, categoryId)).orElseThrow(() -> new IllegalArgumentException("이 가게는 해당 카테고리에 속하지 않습니다."));
+                new RestaurantCategoryId(restaurantId, categoryId))
+            .orElseThrow(() -> new IllegalArgumentException("이 가게는 해당 카테고리에 속하지 않습니다."));
 
         restaurantCategoryRepository.delete(restaurantCategory);
     }
 
-    public Restaurant findRestaurantEntityByOwnerIdAndRestaurantId(Long ownerId, Long restaurantId) {
+    public Restaurant findRestaurantEntityByOwnerIdAndRestaurantId(Long ownerId,
+        Long restaurantId) {
         return ownerService.findOwnerEntityById(ownerId).getRestaurants().stream().
             filter(r -> r.getId() == restaurantId).
             findFirst().
             orElseThrow(() ->
                 new NotFoundException(
                     "사장님(" + ownerId + ")은 가게(" + restaurantId + ")를 소유하고 있지 않습니다."));
+    }
+
+    @Transactional
+    public void setDeliveryArea(Long restaurantId, Long areaCodeId, Integer deleiveryFee) {
+        Restaurant restaurant = findRestaurantEntityById(restaurantId);
+        AreaCode areaCode = areaCodeService.findEntityById(areaCodeId);
+
+        DeliveryArea deliveryArea = new DeliveryArea(areaCode, restaurant, deleiveryFee);
     }
 
     public Restaurant findRestaurantEntityById(Long restaurantId) {
@@ -145,6 +161,18 @@ public class RestaurantService {
     public List<RestaurantFindResponse> findRestaurantsIsPermittedIsFalse() {
         return restaurantRepository.findRestaurantByIsPermittedIsFalse().stream()
             .map(restaurantMapper::toFindResponseDto)
+            .collect(Collectors.toList());
+    }
+
+    public List<RestaurantFindResponse> findRestaurantByAreaCode(Long areaCodeId) {
+        return restaurantRepository.findAll().stream().filter(restaurant -> {
+                for (DeliveryArea deliveryArea : restaurant.getDeliveryAreas()) {
+                    if (deliveryArea.getAreaCode().getId().equals(areaCodeId)) {
+                        return true;
+                    }
+                }
+                return false;
+            }).map(restaurantMapper::toFindResponseDto)
             .collect(Collectors.toList());
     }
 
