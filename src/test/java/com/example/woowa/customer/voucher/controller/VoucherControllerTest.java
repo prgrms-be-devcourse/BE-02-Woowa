@@ -1,5 +1,7 @@
 package com.example.woowa.customer.voucher.controller;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.given;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.post;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
@@ -15,6 +17,7 @@ import com.example.woowa.customer.customer.dto.CustomerAddressCreateRequest;
 import com.example.woowa.customer.customer.dto.CustomerCreateRequest;
 import com.example.woowa.customer.customer.dto.CustomerFindResponse;
 import com.example.woowa.customer.customer.dto.CustomerGradeCreateRequest;
+import com.example.woowa.customer.customer.entity.CustomerGrade;
 import com.example.woowa.customer.customer.repository.CustomerAddressRepository;
 import com.example.woowa.customer.customer.repository.CustomerGradeRepository;
 import com.example.woowa.customer.customer.repository.CustomerRepository;
@@ -24,16 +27,21 @@ import com.example.woowa.customer.voucher.dto.VoucherFindResponse;
 import com.example.woowa.customer.voucher.enums.EventType;
 import com.example.woowa.customer.voucher.enums.VoucherType;
 import com.example.woowa.customer.voucher.repository.VoucherRepository;
+import com.example.woowa.delivery.entity.AreaCode;
+import com.example.woowa.delivery.service.AreaCodeService;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.List;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.payload.JsonFieldType;
 import org.springframework.test.web.servlet.MockMvc;
@@ -41,15 +49,13 @@ import org.springframework.test.web.servlet.MockMvc;
 @SpringBootTest
 @AutoConfigureMockMvc(addFilters = false)
 @AutoConfigureRestDocs
+@ExtendWith(MockitoExtension.class)
 class VoucherControllerTest {
   @Autowired
   MockMvc mockMvc;
 
   @Autowired
   private ObjectMapper objectMapper;
-
-  @Autowired
-  private CustomerGradeService customerGradeService;
 
   @Autowired
   private CustomerRepository customerRepository;
@@ -63,9 +69,28 @@ class VoucherControllerTest {
   @Autowired
   private VoucherRepository voucherRepository;
 
-  void makeDefaultCustomerGrade() {
-    CustomerGradeCreateRequest customerGradeCreateRequest = new CustomerGradeCreateRequest(1, "일반", 3000, 2);
-    customerGradeService.createCustomerGrade(customerGradeCreateRequest);
+  @MockBean
+  private CustomerGradeService customerGradeService;
+
+  @MockBean
+  private AreaCodeService areaCodeService;
+
+  @BeforeEach
+  void settingBeforeTest() {
+    customerRepository.deleteAll();
+    customerAddressRepository.deleteAll();
+    customerGradeRepository.deleteAll();
+    voucherRepository.deleteAll();
+    given(customerGradeService.findDefaultCustomerGrade()).willReturn(new CustomerGrade(1, "일반",3000, 2));
+    given(areaCodeService.findByAddress(any())).willReturn(new AreaCode("1", "서울특별시 동작구", false));
+  }
+
+  @AfterEach
+  void settingAfterTest() {
+    customerRepository.deleteAll();
+    customerAddressRepository.deleteAll();
+    customerGradeRepository.deleteAll();
+    voucherRepository.deleteAll();
   }
 
   String createCustomer() throws Exception {
@@ -82,25 +107,8 @@ class VoucherControllerTest {
     return customerFindResponse.getLoginId();
   }
 
-  @BeforeEach
-  void settingBeforeTest() {
-    customerAddressRepository.deleteAll();
-    customerRepository.deleteAll();
-    customerGradeRepository.deleteAll();
-    voucherRepository.deleteAll();
-  }
-
-  @AfterEach
-  void settingAfterTest() {
-    customerAddressRepository.deleteAll();
-    customerRepository.deleteAll();
-    customerGradeRepository.deleteAll();
-    voucherRepository.deleteAll();
-  }
-
   @Test
   void registerMonthlyVoucher() throws Exception {
-    makeDefaultCustomerGrade();
     String loginId = createCustomer();
 
     mockMvc.perform(
@@ -122,7 +130,6 @@ class VoucherControllerTest {
 
   @Test
   void registerVoucher() throws Exception {
-    makeDefaultCustomerGrade();
     String loginId = createCustomer();
     VoucherCreateRequest voucherCreateRequest = new VoucherCreateRequest(VoucherType.FiXED.toString(),
         EventType.SPECIAL.toString(), 3000, "2022-12-01 12:00");
@@ -211,7 +218,6 @@ class VoucherControllerTest {
 
   @Test
   void findUserVoucher() throws Exception {
-    makeDefaultCustomerGrade();
     String loginId = createCustomer();
 
     mockMvc.perform(
@@ -236,7 +242,6 @@ class VoucherControllerTest {
 
   @Test
   void deleteVoucher() throws Exception {
-    makeDefaultCustomerGrade();
     String loginId = createCustomer();
     String body = mockMvc.perform(
             get("/api/v1/vouchers/month/{loginId}", loginId)

@@ -16,29 +16,30 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.example.woowa.customer.customer.dto.CustomerAddressCreateRequest;
 import com.example.woowa.customer.customer.dto.CustomerCreateRequest;
 import com.example.woowa.customer.customer.dto.CustomerFindResponse;
-import com.example.woowa.customer.customer.dto.CustomerGradeCreateRequest;
+import com.example.woowa.customer.customer.entity.CustomerGrade;
 import com.example.woowa.customer.customer.repository.CustomerAddressRepository;
 import com.example.woowa.customer.customer.repository.CustomerGradeRepository;
 import com.example.woowa.customer.customer.repository.CustomerRepository;
 import com.example.woowa.customer.customer.service.CustomerGradeService;
 import com.example.woowa.customer.customer.service.CustomerService;
-import com.example.woowa.order.order.entity.Order;
+import com.example.woowa.delivery.entity.AreaCode;
+import com.example.woowa.delivery.service.AreaCodeService;
 import com.example.woowa.order.order.service.OrderService;
-import com.example.woowa.order.review.converter.ReviewMapper;
 import com.example.woowa.order.review.dto.ReviewCreateRequest;
 import com.example.woowa.order.review.dto.ReviewFindResponse;
 import com.example.woowa.order.review.dto.ReviewUpdateRequest;
 import com.example.woowa.order.review.repository.ReviewRepository;
-import com.example.woowa.order.review.service.ReviewService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.payload.JsonFieldType;
 import org.springframework.test.web.servlet.MockMvc;
@@ -46,6 +47,7 @@ import org.springframework.test.web.servlet.MockMvc;
 @SpringBootTest
 @AutoConfigureMockMvc(addFilters = false)
 @AutoConfigureRestDocs
+@ExtendWith(MockitoExtension.class)
 class ReviewControllerTest {
   @Autowired
   MockMvc mockMvc;
@@ -60,30 +62,22 @@ class ReviewControllerTest {
   private CustomerRepository customerRepository;
 
   @Autowired
-  private CustomerGradeService customerGradeService;
-
-  @Autowired
   private CustomerGradeRepository customerGradeRepository;
 
   @Autowired
   private CustomerAddressRepository customerAddressRepository;
 
   @Autowired
-  private ReviewService reviewService;
-
-  @Autowired
   private ReviewRepository reviewRepository;
 
-  @Autowired
-  private ReviewMapper reviewMapper;
-
-  @Mock
+  @MockBean
   private OrderService orderService;
 
-  public void makeDefaultCustomerGrade() {
-    CustomerGradeCreateRequest customerGradeCreateRequest = new CustomerGradeCreateRequest(5, "일반", 3000, 2);
-    customerGradeService.createCustomerGrade(customerGradeCreateRequest);
-  }
+  @MockBean
+  private CustomerGradeService customerGradeService;
+
+  @MockBean
+  private AreaCodeService areaCodeService;
 
   public String getCustomerLoginId() {
     CustomerAddressCreateRequest customerAddressCreateRequest = new CustomerAddressCreateRequest("서울특별시 동작구 상도동","빌라 101호","집");
@@ -95,8 +89,13 @@ class ReviewControllerTest {
 
   @BeforeEach
   void settingBeforeTest() {
-    reviewService = new ReviewService(reviewRepository, customerService, orderService, reviewMapper);
-    makeDefaultCustomerGrade();
+    reviewRepository.deleteAll();
+    customerAddressRepository.deleteAll();
+    customerRepository.deleteAll();
+    customerGradeRepository.deleteAll();
+    given(customerGradeService.findDefaultCustomerGrade()).willReturn(new CustomerGrade(1, "일반",3000, 2));
+    given(areaCodeService.findByAddress(any())).willReturn(new AreaCode("1", "서울특별시 동작구", false));
+    given(orderService.findOrderById(any())).willReturn(null);
   }
 
   @AfterEach
@@ -111,7 +110,6 @@ class ReviewControllerTest {
   void createReview() throws Exception {
     String customerId = getCustomerLoginId();
     ReviewCreateRequest reviewCreateRequest = new ReviewCreateRequest("정말정말 맛있습니다.", 5);
-    given(orderService.findOrderById(any())).willReturn(null);
 
     mockMvc.perform(
             post("/api/v1/reviews/{loginId}/{orderId}", customerId, 10)
@@ -137,7 +135,6 @@ class ReviewControllerTest {
   void findReview() throws Exception {
     String customerId = getCustomerLoginId();
     ReviewCreateRequest reviewCreateRequest = new ReviewCreateRequest("정말정말 맛있습니다.", 5);
-    given(orderService.findOrderById(any())).willReturn(null);
 
     String body = mockMvc.perform(
             post("/api/v1/reviews/{loginId}/{orderId}", customerId, 10)
@@ -165,7 +162,6 @@ class ReviewControllerTest {
   void findUserReview() throws Exception {
     String customerId = getCustomerLoginId();
     ReviewCreateRequest reviewCreateRequest = new ReviewCreateRequest("정말정말 맛있습니다.", 5);
-    given(orderService.findOrderById(any())).willReturn(null);
 
     String body = mockMvc.perform(
         post("/api/v1/reviews/{loginId}/{orderId}", customerId, 10)
@@ -192,7 +188,6 @@ class ReviewControllerTest {
   void updateReview() throws Exception {
     String customerId = getCustomerLoginId();
     ReviewCreateRequest reviewCreateRequest = new ReviewCreateRequest("정말정말 맛있습니다.", 5);
-    given(orderService.findOrderById(any())).willReturn(null);
 
     String body = mockMvc.perform(
         post("/api/v1/reviews/{loginId}/{orderId}", customerId, 10)
@@ -227,7 +222,6 @@ class ReviewControllerTest {
   void deleteReview() throws Exception {
     String customerId = getCustomerLoginId();
     ReviewCreateRequest reviewCreateRequest = new ReviewCreateRequest("정말정말 맛있습니다.", 5);
-    given(orderService.findOrderById(any())).willReturn(null);
 
     String body = mockMvc.perform(
         post("/api/v1/reviews/{loginId}/{orderId}", customerId, 10)

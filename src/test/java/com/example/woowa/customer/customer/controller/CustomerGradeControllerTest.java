@@ -17,9 +17,7 @@ import com.example.woowa.customer.customer.dto.CustomerGradeFindResponse;
 import com.example.woowa.customer.customer.dto.CustomerGradeUpdateRequest;
 import com.example.woowa.customer.customer.repository.CustomerGradeRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,12 +42,12 @@ class CustomerGradeControllerTest {
   private CustomerGradeRepository customerGradeRepository;
 
   @BeforeEach
-  void setting() {
+  void settingBeforTest() {
     customerGradeRepository.deleteAll();
   }
 
   @AfterEach
-  void setting1() {
+  void settingAfterTest() {
     customerGradeRepository.deleteAll();
   }
 

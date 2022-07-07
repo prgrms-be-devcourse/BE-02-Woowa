@@ -1,5 +1,7 @@
 package com.example.woowa.customer.customer.controller;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.given;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.delete;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
@@ -15,21 +17,24 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.example.woowa.customer.customer.dto.CustomerAddressCreateRequest;
 import com.example.woowa.customer.customer.dto.CustomerCreateRequest;
 import com.example.woowa.customer.customer.dto.CustomerFindResponse;
-import com.example.woowa.customer.customer.dto.CustomerGradeCreateRequest;
 import com.example.woowa.customer.customer.dto.CustomerUpdateRequest;
+import com.example.woowa.customer.customer.entity.CustomerGrade;
 import com.example.woowa.customer.customer.repository.CustomerAddressRepository;
-import com.example.woowa.customer.customer.repository.CustomerGradeRepository;
 import com.example.woowa.customer.customer.repository.CustomerRepository;
 import com.example.woowa.customer.customer.service.CustomerGradeService;
+import com.example.woowa.delivery.entity.AreaCode;
+import com.example.woowa.delivery.service.AreaCodeService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.payload.JsonFieldType;
 import org.springframework.test.web.servlet.MockMvc;
@@ -37,15 +42,13 @@ import org.springframework.test.web.servlet.MockMvc;
 @SpringBootTest
 @AutoConfigureMockMvc(addFilters = false)
 @AutoConfigureRestDocs
+@ExtendWith(MockitoExtension.class)
 class CustomerControllerTest {
   @Autowired
-  MockMvc mockMvc;
+  private MockMvc mockMvc;
 
   @Autowired
   private ObjectMapper objectMapper;
-
-  @Autowired
-  private CustomerGradeService customerGradeService;
 
   @Autowired
   private CustomerRepository customerRepository;
@@ -53,27 +56,24 @@ class CustomerControllerTest {
   @Autowired
   private CustomerAddressRepository customerAddressRepository;
 
-  @Autowired
-  private CustomerGradeRepository customerGradeRepository;
+  @MockBean
+  private CustomerGradeService customerGradeService;
 
-  public void makeDefaultCustomerGrade() {
-    CustomerGradeCreateRequest customerGradeCreateRequest = new CustomerGradeCreateRequest(1, "일반", 3000, 2);
-    customerGradeService.createCustomerGrade(customerGradeCreateRequest);
-  }
+  @MockBean
+  private AreaCodeService areaCodeService;
 
   @BeforeEach
   void settingBeforeTest() {
     customerRepository.deleteAll();
     customerAddressRepository.deleteAll();
-    customerGradeRepository.deleteAll();
-    makeDefaultCustomerGrade();
+    given(customerGradeService.findDefaultCustomerGrade()).willReturn(new CustomerGrade(1, "일반",3000, 2));
+    given(areaCodeService.findByAddress(any())).willReturn(new AreaCode("1", "서울특별시 동작구", false));
   }
 
   @AfterEach
   void settingAfterTest() {
     customerRepository.deleteAll();
     customerAddressRepository.deleteAll();
-    customerGradeRepository.deleteAll();
   }
 
   @Test

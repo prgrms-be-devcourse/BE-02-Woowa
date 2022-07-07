@@ -17,7 +17,7 @@ include::{snippets}/vouchers-create/response-fields.adoc[]
 
 === Find Voucher
 
-=== GET /api/v1/vouchers
+=== GET /api/v1/vouchers/{loginId}
 
 .Request
 include::{snippets}/customers-find/http-request.adoc[]
@@ -28,7 +28,7 @@ include::{snippets}/customers-find/response-fields.adoc[]
 
 === Find Voucher
 
-=== GET /api/v1/vouchers
+=== GET /api/v1/vouchers/{id}
 
 .Request
 include::{snippets}/vouchers-find/http-request.adoc[]
@@ -39,7 +39,7 @@ include::{snippets}/vouchers-find/response-fields.adoc[]
 
 === Find User Voucher
 
-=== GET /api/v1/vouchers/user
+=== GET /api/v1/vouchers/user/{loginId}
 
 .Request
 include::{snippets}/vouchers-find-users/http-request.adoc[]
@@ -50,7 +50,7 @@ include::{snippets}/vouchers-find-users/response-fields.adoc[]
 
 === Register Monthly Voucher
 
-=== GET /api/v1/vouchers/month
+=== GET /api/v1/vouchers/month/{loginId}
 
 .Request
 include::{snippets}/vouchers-month/http-request.adoc[]
@@ -61,7 +61,7 @@ include::{snippets}/vouchers-month/response-fields.adoc[]
 
 === Register Voucher
 
-=== GET /api/v1/vouchers
+=== GET /api/v1/vouchers/{login}/{code}
 
 .Request
 include::{snippets}/vouchers-register/http-request.adoc[]
@@ -72,7 +72,7 @@ include::{snippets}/vouchers-register/response-fields.adoc[]
 
 === Delete Voucher
 
-=== DELETE /api/v1/vouchers
+=== DELETE /api/v1/vouchers/{loginId}/{id}
 
 .Request
 include::{snippets}/vouchers-delete/http-request.adoc[]

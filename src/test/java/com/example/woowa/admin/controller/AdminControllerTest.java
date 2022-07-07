@@ -16,11 +16,9 @@ import com.example.woowa.admin.dto.AdminCreateRequest;
 import com.example.woowa.admin.dto.AdminUpdateRequest;
 import com.example.woowa.admin.repository.AdminRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
-import org.junit.jupiter.api.TestInstance.Lifecycle;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -30,10 +28,10 @@ import org.springframework.restdocs.payload.JsonFieldType;
 import org.springframework.test.web.servlet.MockMvc;
 
 @SpringBootTest
-@AutoConfigureMockMvc
+@AutoConfigureMockMvc(addFilters = false)
 @AutoConfigureRestDocs
-@TestInstance(Lifecycle.PER_CLASS)
 class AdminControllerTest {
+
   @Autowired
   MockMvc mockMvc;
 
@@ -44,12 +42,12 @@ class AdminControllerTest {
   private AdminRepository adminRepository;
 
   @BeforeEach
-  void setting() {
+  void settingBeforeTest() {
     adminRepository.deleteAll();
   }
 
-  @AfterAll
-  void settingafter() {
+  @AfterEach
+  void settingAfterTest() {
     adminRepository.deleteAll();
   }
 
@@ -131,10 +129,10 @@ class AdminControllerTest {
     AdminCreateRequest adminCreateRequest = new AdminCreateRequest("dev12", "Programmers12!");
 
     mockMvc.perform(
-        post("/api/v1/admins")
-            .contentType(MediaType.TEXT_PLAIN)
-            .content(objectMapper.writeValueAsString(adminCreateRequest))
-    );
+            post("/api/v1/admins")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(adminCreateRequest))
+        );
 
     mockMvc.perform(
             delete("/api/v1/admins/{loginId}",adminCreateRequest.getLoginId())

@@ -17,7 +17,7 @@ include::{snippets}/customers-create/response-fields.adoc[]
 
 === Find Customer
 
-=== GET /api/v1/customers
+=== GET /api/v1/customers/{loginId}
 
 .Request
 include::{snippets}/customers-find/http-request.adoc[]
@@ -26,9 +26,9 @@ include::{snippets}/customers-find/http-request.adoc[]
 include::{snippets}/customers-find/http-response.adoc[]
 include::{snippets}/customers-find/response-fields.adoc[]
 
-=== Update Customer Grades
+=== Update Customer
 
-=== PUT /api/v1/customers/grades
+=== PUT /api/v1/customers/{loginId}
 
 .Request
 include::{snippets}/customers-update/http-request.adoc[]
@@ -38,9 +38,9 @@ include::{snippets}/customers-update/request-fields.adoc[]
 include::{snippets}/customers-update/http-response.adoc[]
 include::{snippets}/customers-update/response-fields.adoc[]
 
-=== Delete Customer Grades
+=== Delete Customer
 
-=== DELETE /api/v1/customers/grades
+=== DELETE /api/v1/customers/{loginId}
 
 .Request
 include::{snippets}/customers-delete/http-request.adoc[]

@@ -5,7 +5,7 @@ endif::[]
 
 === Create Customer Address
 
-=== POST /api/v1/customers/addresses
+=== POST /api/v1/customers/addresses/{loginId}
 
 .Request
 include::{snippets}/customers-addresses-create/http-request.adoc[]
@@ -17,7 +17,7 @@ include::{snippets}/customers-addresses-create/response-fields.adoc[]
 
 === Find Customer Address
 
-=== GET /api/v1/customers/addresses
+=== GET /api/v1/customers/addresses/{loginId}
 
 .Request
 include::{snippets}/customers-addresses-find/http-request.adoc[]
@@ -28,7 +28,7 @@ include::{snippets}/customers-addresses-find/response-fields.adoc[]
 
 === Update Customer Address
 
-=== PUT /api/v1/customers/addresses
+=== PUT /api/v1/customers/addresses/{id}
 
 .Request
 include::{snippets}/customers-addresses-update/http-request.adoc[]
@@ -40,7 +40,7 @@ include::{snippets}/customers-addresses-update/response-fields.adoc[]
 
 === Delete Customer Address
 
-=== DELETE /api/v1/customers/addresses
+=== DELETE /api/v1/customers/addresses/{id}
 
 .Request
 include::{snippets}/customers-addresses-delete/http-request.adoc[]
