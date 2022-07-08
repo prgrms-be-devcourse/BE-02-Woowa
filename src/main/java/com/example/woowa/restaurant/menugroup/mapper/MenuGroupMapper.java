@@ -1,4 +1,4 @@
-package com.example.woowa.restaurant.menugroup;
+package com.example.woowa.restaurant.menugroup.mapper;
 
 import com.example.woowa.restaurant.menugroup.dto.MenuGroupListResponse;
 import com.example.woowa.restaurant.menugroup.dto.MenuGroupResponse;

@@ -6,6 +6,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 
+import com.example.woowa.common.exception.NotFoundException;
 import com.example.woowa.customer.customer.entity.Customer;
 import com.example.woowa.customer.customer.entity.CustomerGrade;
 import com.example.woowa.customer.customer.service.CustomerService;
@@ -41,7 +42,6 @@ import com.example.woowa.order.order.mapper.OrderMapper;
 import com.example.woowa.order.order.repository.OrderRepository;
 import com.example.woowa.restaurant.menu.entity.Menu;
 import com.example.woowa.restaurant.menu.enums.MenuStatus;
-import com.example.woowa.restaurant.menu.service.MenuService;
 import com.example.woowa.restaurant.menugroup.entity.MenuGroup;
 import com.example.woowa.restaurant.restaurant.entity.Restaurant;
 import com.example.woowa.restaurant.restaurant.service.RestaurantService;
@@ -79,9 +79,6 @@ class OrderServiceTest {
 
     @Mock
     DeliveryAreaService deliveryAreaService;
-
-    @Mock
-    MenuService menuService;
 
     @Mock
     DeliveryEntityService deliveryEntityService;
@@ -189,7 +186,7 @@ class OrderServiceTest {
     }
 
     @Test
-    @DisplayName("존재하지 않는 주문을 조회하려 하면 예외가 발생한다.")
+    @DisplayName("존재하지 않는 주문을 조회하려 하면 NotFoundException 예외가 발생한다.")
     void findOrderByNotExistsIdTest() {
         // Given
         Long orderId = 1L;
@@ -198,7 +195,7 @@ class OrderServiceTest {
 
         // When // Then
         assertThatThrownBy(() -> orderService.findOrderById(orderId))
-            .isExactlyInstanceOf(IllegalArgumentException.class);
+                .isExactlyInstanceOf(NotFoundException.class);
     }
 
     @Test
@@ -251,8 +248,9 @@ class OrderServiceTest {
         Long wrongRestaurantId = -1L;
         LocalDate from = LocalDate.now().minusMonths(1);
         LocalDate end = LocalDate.now();
-        given(restaurantService.findRestaurantById(wrongRestaurantId)).willThrow(
-            IllegalArgumentException.class);
+
+        given(restaurantService.findRestaurantEntityById(wrongRestaurantId)).willThrow(
+                IllegalArgumentException.class);
 
         // When // Then
         assertThatThrownBy(() -> orderService.findOrderByRestaurant(
@@ -376,7 +374,7 @@ class OrderServiceTest {
     }
 
     @Test
-    @DisplayName("회원의 존재하지 않는 특정 주문을 조회하려 하면 예외가 발생한다.")
+    @DisplayName("회원의 존재하지 않는 특정 주문을 조회하려 하면 NotFoundException 예외가 발생한다.")
     void findDetailOrderForCustomerNotExistsTest() {
         // Given
         Long wrongOrderId = -1L;
@@ -384,7 +382,7 @@ class OrderServiceTest {
 
         // When // Then
         assertThatThrownBy(() -> orderService.findDetailOrderForCustomer(wrongOrderId))
-            .isExactlyInstanceOf(IllegalArgumentException.class);
+                .isExactlyInstanceOf(NotFoundException.class);
     }
 
     @Test
@@ -421,7 +419,7 @@ class OrderServiceTest {
     }
 
     @Test
-    @DisplayName("가게의 존재하지 않는 특정 주문을 조회하려 하면 예외가 발생한다.")
+    @DisplayName("가게의 존재하지 않는 특정 주문을 조회하려 NotFoundException 예외가 발생한다.")
     void findDetailOrderForRestaurantNotExistsTest() {
         // Given
         Long wrongOrderId = -1L;
@@ -429,8 +427,8 @@ class OrderServiceTest {
 
         // When // Then
         assertThatThrownBy(() -> orderService.findDetailOrderByIdForRestaurant(
-            wrongOrderId))
-            .isExactlyInstanceOf(IllegalArgumentException.class);
+                wrongOrderId))
+                .isExactlyInstanceOf(NotFoundException.class);
     }
 
     @Test
@@ -479,9 +477,9 @@ class OrderServiceTest {
         LocalDate from = LocalDate.now().minusMonths(1);
         LocalDate end = LocalDate.now();
 
-        given(restaurantService.findRestaurantById(wrongRestaurantId)).willThrow(
-            IllegalArgumentException.class);
-
+        given(restaurantService.findRestaurantEntityById(wrongRestaurantId)).willThrow(
+                IllegalArgumentException.class);
+                
         // When // Then
         assertThatThrownBy(() -> orderService.findOrderStatistics(
             new OrderStatisticsRequest(wrongRestaurantId, from, end)))
@@ -518,7 +516,7 @@ class OrderServiceTest {
     }
 
     @Test
-    @DisplayName("존재하지 않는 주문을 취소하려 하면 예외가 발생한다.")
+    @DisplayName("존재하지 않는 주문을 취소하려 하면 NotFoundException 예외가 발생한다.")
     void cancelOrderNotExistsIdTest() {
         // Given
         Long wrongOrderId = -1L;
@@ -526,7 +524,7 @@ class OrderServiceTest {
 
         // When // Then
         assertThatThrownBy(() -> orderService.cancelOrder(wrongOrderId))
-            .isExactlyInstanceOf(IllegalArgumentException.class);
+                .isExactlyInstanceOf(NotFoundException.class);
     }
 
     @Test
@@ -549,7 +547,7 @@ class OrderServiceTest {
     }
 
     @Test
-    @DisplayName("존재하지 않는 주문을 수락하려 하면 예외가 발생한다.")
+    @DisplayName("존재하지 않는 주문을 수락하려 하면 NotFoundException 예외가 발생한다.")
     void acceptOrderNotExistsIdTest() {
         // Given
         Long wrongOrderId = -1L;
@@ -558,8 +556,8 @@ class OrderServiceTest {
 
         // When // Then
         assertThatThrownBy(
-            () -> orderService.acceptOrder(wrongOrderId, new OrderAcceptRequest(cookingTime)))
-            .isExactlyInstanceOf(IllegalArgumentException.class);
+                () -> orderService.acceptOrder(wrongOrderId, new OrderAcceptRequest(cookingTime)))
+                .isExactlyInstanceOf(NotFoundException.class);
     }
 
     private Customer initCustomer() {

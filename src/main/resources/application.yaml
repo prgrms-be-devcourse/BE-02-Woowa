@@ -6,7 +6,8 @@ spring:
     hibernate:
       ddl-auto: update
     properties:
-      hibernate.format_sql: true
-
+      hibernate:
+        format_sql: true
+        default_batch_fetch_size: 500
   profiles:
     include: db

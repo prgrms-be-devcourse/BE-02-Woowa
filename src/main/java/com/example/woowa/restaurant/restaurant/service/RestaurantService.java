@@ -1,9 +1,11 @@
 package com.example.woowa.restaurant.restaurant.service;
 
+import com.example.woowa.common.exception.ErrorMessage;
 import com.example.woowa.common.exception.NotFoundException;
 import com.example.woowa.delivery.entity.AreaCode;
 import com.example.woowa.delivery.entity.DeliveryArea;
 import com.example.woowa.delivery.service.AreaCodeService;
+
 import com.example.woowa.restaurant.category.entity.Category;
 import com.example.woowa.restaurant.category.service.CategoryService;
 import com.example.woowa.restaurant.owner.entity.Owner;
@@ -155,7 +157,7 @@ public class RestaurantService {
 
     public Restaurant findRestaurantEntityById(Long restaurantId) {
         return restaurantRepository.findById(restaurantId)
-            .orElseThrow(() -> new NotFoundException("존재하지 않는 restaurantId 입니다."));
+            .orElseThrow(() -> new NotFoundException(ErrorMessage.NOT_FOUND_RESTAURANT.getMessage()));
     }
 
     public List<RestaurantFindResponse> findRestaurantsIsPermittedIsFalse() {
