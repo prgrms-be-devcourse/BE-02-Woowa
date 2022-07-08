@@ -1,0 +1,25 @@
+== 배달
+
+=== 배달 조회
+
+operation::findById-Delivery[snippets='http-request,http-response,response-body,response-fields,path-parameters']
+
+=== 전체 배달 조회
+
+operation::findByWaitingDelivery[snippets='http-request,http-response,request-parameters,response-body,response-fields']
+
+=== 배달 수락
+
+operation::accept-delivery[snippets='http-request,http-response,request-parameters,path-parameters']
+
+=== 배달 픽업
+
+operation::pickup-delivery[snippets='http-request,http-response,path-parameters']
+
+=== 배달 완료
+
+operation::finish-delivery[snippets='http-request,http-response,path-parameters']
+
+== 배달 지연
+
+operation::delay-delivery[snippets='http-request,http-response,request-parameters,path-parameters']
