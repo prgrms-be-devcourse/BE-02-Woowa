@@ -15,20 +15,11 @@ import com.example.woowa.restaurant.category.dto.response.CategoryFindResponse;
 import com.example.woowa.restaurant.category.entity.Category;
 import com.example.woowa.restaurant.category.mapper.CategoryMapper;
 import com.example.woowa.restaurant.category.repository.CategoryRepository;
-import com.example.woowa.restaurant.owner.dto.request.OwnerCreateRequest;
-import com.example.woowa.restaurant.owner.dto.response.OwnerCreateResponse;
-import com.example.woowa.restaurant.owner.mapper.OwnerMapper;
 import com.example.woowa.restaurant.owner.repository.OwnerRepository;
-import com.example.woowa.restaurant.owner.service.OwnerService;
-import com.example.woowa.restaurant.restaurant.dto.request.RestaurantCreateRequest;
-import com.example.woowa.restaurant.restaurant.dto.response.RestaurantFindResponse;
-import com.example.woowa.restaurant.restaurant.mapper.RestaurantMapper;
 import com.example.woowa.restaurant.restaurant.repository.RestaurantRepository;
-import com.example.woowa.restaurant.restaurant.service.RestaurantService;
 import com.example.woowa.restaurant.restaurntat_category.repository.RestaurantCategoryRepository;
 import com.example.woowa.security.repository.RoleRepository;
 import com.example.woowa.security.repository.UserRepository;
-import java.time.LocalTime;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -40,7 +31,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase.Replace;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 @DataJpaTest
 @AutoConfigureTestDatabase(replace = Replace.NONE)
@@ -66,30 +56,26 @@ class CategoryServiceTest {
 
     private CategoryMapper categoryMapper = Mappers.getMapper(CategoryMapper.class);
 
-    private RestaurantMapper restaurantMapper = Mappers.getMapper(RestaurantMapper.class);
-
-    private OwnerMapper ownerMapper = Mappers.getMapper(OwnerMapper.class);
-
     @Test
     @DisplayName("새로운 카테고리를 생성한다.")
     void testCreateCategory() {
         // Mocked
         CategoryRepository mockedCategoryRepository = mock(CategoryRepository.class);
-        CategoryService categoryService = new CategoryService(mockedCategoryRepository, categoryMapper, null);
+        CategoryService categoryService = new CategoryService(mockedCategoryRepository, categoryMapper);
 
         // Given
         CategoryCreateRequest categoryCreateRequest = new CategoryCreateRequest("한식");
         Category korean = makeCategories("한식").get(0);
         CategoryCreateResponse manualConversion = new CategoryCreateResponse(korean.getId(),
             korean.getName(), korean.getCreatedAt());
+        when(mockedCategoryRepository.save(any(Category.class))).thenReturn(korean);
 
         // When
-        when(mockedCategoryRepository.save(any(Category.class))).thenReturn(korean);
-        CategoryCreateResponse category = categoryService.createCategory(categoryCreateRequest);
+        CategoryCreateResponse result = categoryService.createCategory(categoryCreateRequest);
 
         // Then
         verify(mockedCategoryRepository, times(1)).save(any(Category.class));
-        assertThat(category).usingRecursiveComparison().isEqualTo(manualConversion);
+        assertThat(result).usingRecursiveComparison().isEqualTo(manualConversion);
     }
 
     @Test
@@ -97,7 +83,7 @@ class CategoryServiceTest {
     void testFindCategories() {
         // Mocked
         CategoryRepository mockedCategoryRepository = mock(CategoryRepository.class);
-        CategoryService categoryService = new CategoryService(mockedCategoryRepository, categoryMapper, null);
+        CategoryService categoryService = new CategoryService(mockedCategoryRepository, categoryMapper);
 
         // Given
         List<Category> testers = makeCategories("한식", "중식");
@@ -106,15 +92,15 @@ class CategoryServiceTest {
                 new CategoryFindResponse(category.getId(), category.getName(),
                     category.getCreatedAt(), category.getUpdatedAt()))
             .collect(Collectors.toList());
+        when(mockedCategoryRepository.findAll()).thenReturn(testers);
 
         // When
-        when(mockedCategoryRepository.findAll()).thenReturn(testers);
-        List<CategoryFindResponse> categories = categoryService.findCategories();
+        List<CategoryFindResponse> result = categoryService.findCategories();
 
         // Then
         verify(mockedCategoryRepository, times(1)).findAll();
-        for (int i = 0; i < categories.size(); i++)
-            assertThat(categories.get(i)).usingRecursiveComparison().isEqualTo(manualConversion.get(i));
+        for (int i = 0; i < result.size(); i++)
+            assertThat(result.get(i)).usingRecursiveComparison().isEqualTo(manualConversion.get(i));
     }
 
     @Test
@@ -122,74 +108,27 @@ class CategoryServiceTest {
     void testFindCategoryById() {
         // Mocked
         CategoryRepository mockedCategoryRepository = mock(CategoryRepository.class);
-        CategoryService categoryService = new CategoryService(mockedCategoryRepository, categoryMapper, null);
+        CategoryService categoryService = new CategoryService(mockedCategoryRepository, categoryMapper);
 
         // Given
         Category korean = makeCategories("한식").get(0);
         CategoryFindResponse manualConversion =
             new CategoryFindResponse(korean.getId(), korean.getName(), korean.getCreatedAt(), korean.getUpdatedAt());
+        when(mockedCategoryRepository.findById(1L)).thenReturn(Optional.of(korean));
 
         // When
-        when(mockedCategoryRepository.findById(1L)).thenReturn(Optional.of(korean));
-        CategoryFindResponse category = categoryService.findCategoryById(1L);
+        CategoryFindResponse result = categoryService.findCategoryById(1L);
 
         // Then
         verify(mockedCategoryRepository, times(1)).findById(anyLong());
-        assertThat(category).usingRecursiveComparison().isEqualTo(manualConversion);
-    }
-
-    @Test
-    @DisplayName("특정 카테고리명을 가진 모든 가게를 해당 카테고리 아이디로 조회할 수 있다.")
-    void testFindRestaurantsByCategoryId() {
-        // Given
-        CategoryService categoryService = new CategoryService(categoryRepository, categoryMapper,
-            restaurantMapper);
-        CategoryCreateResponse korean = categoryService.createCategory(
-            new CategoryCreateRequest("한식"));
-        CategoryCreateResponse chinese = categoryService.createCategory(
-            new CategoryCreateRequest("중식"));
-
-        RestaurantService restaurantService = new RestaurantService(restaurantRepository, restaurantCategoryRepository,
-            categoryService, restaurantMapper);
-        OwnerService ownerService = new OwnerService(roleRepository, userRepository, ownerRepository, restaurantService, ownerMapper, restaurantMapper, new BCryptPasswordEncoder());
-        OwnerCreateResponse owner = ownerService.createOwner(
-            new OwnerCreateRequest("abcdefg12345", "aA1234567890", "오너", "010-1111-2222"));
-
-            ownerService.registerRestaurant(owner.getId(), new RestaurantCreateRequest("a",
-                "1234567890",
-                LocalTime.now(),
-                LocalTime.now().plusHours(1),
-                true,
-                "010-3333-4444",
-                "test1",
-                "서울시 종로구",
-                List.of(korean.getId(), chinese.getId())));
-            ownerService.registerRestaurant(owner.getId(), new RestaurantCreateRequest("b",
-                "1234567890",
-                LocalTime.now(),
-                LocalTime.now().plusHours(1),
-                true,
-                "010-5555-6666",
-                "test2",
-                "서울시 종로구",
-                List.of(korean.getId())));
-
-        // When
-        List<RestaurantFindResponse> koreanRestaurants = categoryService.findRestaurantsByCategoryId(
-            korean.getId());
-        List<RestaurantFindResponse> chineseRestaurants = categoryService.findRestaurantsByCategoryId(
-            chinese.getId());
-
-        // Then
-        assertThat(koreanRestaurants.size()).isEqualTo(2);
-        assertThat(chineseRestaurants.size()).isEqualTo(1);
+        assertThat(result).usingRecursiveComparison().isEqualTo(manualConversion);
     }
 
     @Test
     @DisplayName("저장된 카테고리명을 요청된 이름으로 변경한다.")
-    void testChangeCategoryName() {
+    void testUdateCategoryById() {
         // Given
-        CategoryService categoryService = new CategoryService(categoryRepository, categoryMapper, null);
+        CategoryService categoryService = new CategoryService(categoryRepository, categoryMapper);
         CategoryCreateResponse beforeUpdating = categoryService.createCategory(
             new CategoryCreateRequest("한식"));
 
@@ -204,7 +143,7 @@ class CategoryServiceTest {
         assertThat(afterUpdating.getName()).isEqualTo(categoryUpdateRequest.getName());
     }
 
-    static List<Category> makeCategories(String... name) {
+    public static List<Category> makeCategories(String... name) {
         return Arrays.stream(name).map(Category::new).collect(Collectors.toList());
     }
 
