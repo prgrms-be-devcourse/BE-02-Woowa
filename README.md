@@ -48,6 +48,7 @@
 
 ![](https://velog.velcdn.com/images/y005/post/23e6f786-91aa-4fed-913c-b6d800e6d5fe/image.png)
 
+
 ### 4. 협업 관련 문서
 
 - [유저 스토리](https://www.notion.so/backend-devcourse/b6326064bcc949c3b1ab404b11f7df09)
