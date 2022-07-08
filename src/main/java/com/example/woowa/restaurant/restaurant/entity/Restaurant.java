@@ -45,7 +45,7 @@ public class Restaurant extends BaseTimeEntity {
     @OneToMany(mappedBy = "restaurant", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<RestaurantAdvertisement> restaurantAdvertisements = new ArrayList<>();
 
-    @OneToMany(mappedBy = "restaurant")
+    @OneToMany(mappedBy = "restaurant", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<DeliveryArea> deliveryAreas = new ArrayList<>();
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -83,8 +83,8 @@ public class Restaurant extends BaseTimeEntity {
     private Boolean isPermitted;
 
     private Restaurant(String name, String businessNumber, LocalTime openingTime,
-            LocalTime closingTime,
-            Boolean isOpen, String phoneNumber, String description, String address) {
+        LocalTime closingTime,
+        Boolean isOpen, String phoneNumber, String description, String address) {
         this.name = name;
         this.businessNumber = businessNumber;
         this.openingTime = openingTime;
@@ -99,18 +99,18 @@ public class Restaurant extends BaseTimeEntity {
     }
 
     public static Restaurant createRestaurant(String name, String businessNumber,
-            LocalTime openingTime, LocalTime closingTime, Boolean isOpen, String phoneNumber,
-            String description, String address) throws IllegalArgumentException {
+        LocalTime openingTime, LocalTime closingTime, Boolean isOpen, String phoneNumber,
+        String description, String address) throws IllegalArgumentException {
         validateBusinessHours(openingTime, closingTime);
         if (!CRNValidator.isValid(businessNumber))
             throw new IllegalArgumentException("잘못된 사업자등록번호입니다.");
 
         return new Restaurant(name, businessNumber, openingTime, closingTime, isOpen, phoneNumber,
-                description, address);
+            description, address);
     }
 
     public void updateBusinessHours(LocalTime openingTime, LocalTime closingTime)
-            throws IllegalArgumentException {
+        throws IllegalArgumentException {
         validateBusinessHours(openingTime, closingTime);
         this.openingTime = openingTime;
         this.closingTime = closingTime;
@@ -144,7 +144,7 @@ public class Restaurant extends BaseTimeEntity {
     public void addDeliveryArea(DeliveryArea deliveryArea) {
         deliveryAreas.add(deliveryArea);
     }
-  
+
     public void addRestaurantCategory(RestaurantCategory restaurantCategory) {
         restaurantCategory.setRestaurant(this);
     }
@@ -162,7 +162,7 @@ public class Restaurant extends BaseTimeEntity {
     }
 
     private static void validateBusinessHours(LocalTime openingTime, LocalTime closingTime)
-            throws IllegalArgumentException {
+        throws IllegalArgumentException {
         if (closingTime.equals(openingTime)) {
             throw new IllegalArgumentException("openingTime 과 closingTime 은 같을 수 없습니다.");
         }

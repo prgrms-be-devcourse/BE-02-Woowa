@@ -1,6 +1,9 @@
 package com.example.woowa.restaurant.restaurant.service;
 
 import com.example.woowa.common.exception.NotFoundException;
+import com.example.woowa.delivery.entity.AreaCode;
+import com.example.woowa.delivery.entity.DeliveryArea;
+import com.example.woowa.delivery.service.AreaCodeService;
 import com.example.woowa.restaurant.category.entity.Category;
 import com.example.woowa.restaurant.category.service.CategoryService;
 import com.example.woowa.restaurant.owner.entity.Owner;
@@ -31,6 +34,7 @@ public class RestaurantService {
 
     private final CategoryService categoryService;
     private final OwnerService ownerService;
+    private final AreaCodeService areaCodeService;
 
     private final RestaurantMapper restaurantMapper;
 
@@ -126,6 +130,14 @@ public class RestaurantService {
             new RestaurantCategoryId(restaurantId, categoryId)).orElseThrow(() -> new IllegalArgumentException("이 가게는 해당 카테고리에 속하지 않습니다."));
 
         restaurantCategoryRepository.delete(restaurantCategory);
+    }
+
+    @Transactional
+    public void setDeliveryArea(Long restaurantId, Long areaCodeId, Integer deleiveryFee) {
+        Restaurant restaurant = findRestaurantEntityById(restaurantId);
+        AreaCode areaCode = areaCodeService.findEntityById(areaCodeId);
+
+        DeliveryArea deliveryArea = new DeliveryArea(areaCode, restaurant, deleiveryFee);
     }
 
     public Restaurant findRestaurantEntityByOwnerIdAndRestaurantId(Long ownerId, Long restaurantId) {
