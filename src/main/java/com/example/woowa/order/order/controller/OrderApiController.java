@@ -1,4 +1,4 @@
-package com.example.woowa.order.controller;
+package com.example.woowa.order.order.controller;
 
 import com.example.woowa.order.order.dto.customer.OrderCustomerResponse;
 import com.example.woowa.order.order.dto.customer.OrderListCustomerRequest;

@@ -14,9 +14,10 @@ public class RiderResponse extends BaseUserResponse {
 
     private final List<String> riderAreaList;
 
-    public RiderResponse(LocalDateTime createdAt, LocalDateTime updatedAt, String loginId, String password, String name, String phoneNumber,
-        LocalDateTime lastLoginedAt, Long id, Boolean isDelivery, List<String> riderAreaList) {
-        super(createdAt, updatedAt, loginId, password, name, phoneNumber, lastLoginedAt);
+    public RiderResponse(LocalDateTime createdAt, LocalDateTime updatedAt, String loginId,
+        String password, String name, String phoneNumber, Long id, Boolean isDelivery,
+        List<String> riderAreaList) {
+        super(createdAt, updatedAt, loginId, password, name, phoneNumber);
         this.id = id;
         this.isDelivery = isDelivery;
         this.riderAreaList = riderAreaList;

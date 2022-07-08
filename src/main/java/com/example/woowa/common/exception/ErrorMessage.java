@@ -18,7 +18,13 @@ public enum ErrorMessage {
     INVALID_PERIOD_VALUE("조회 기간의 시작일은 마감일 이전이어야 합니다."),
 
     NOT_ORDERABLE_AREA("배달 가능 지역이 아닙니다."),
-    INVALID_ORDER_STATUS_CODE("잘못된 주문상태 code입니다.");
+    INVALID_ORDER_STATUS_CODE("잘못된 주문상태 code입니다."),
+
+    NOT_FOUND_ORDER("존재하지 않는 Order 입니다."),
+    NOT_FOUND_MENU("존재하지 않는 Menu 입니다."),
+    NOT_FOUND_MENU_GROUP("존재하지 않는 MenuGroup 입니다."),
+    NOT_FOUND_RESTAURANT("존재하지 않는 Restaurant 입니다."),
+    NOT_FOUND_CUSTOMER("존재하지 않는 회원입니다.");
 
     private final String message;
 }

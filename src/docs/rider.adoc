@@ -1,0 +1,25 @@
+== 배달기사
+
+=== 회원가입
+
+operation::sign-rider[snippets='http-request,request-fields,http-response']
+
+=== 배달기사 조회
+
+operation::findById-rider[snippets='http-request,http-response']
+
+=== 배달기사 전체조회
+
+operation::paging-rdier[snippets='http-request,http-response']
+
+=== 배달기사 정보 수정
+
+operation::update-rider[snippets='http-request,request-fields,http-response']
+
+=== 배달상태 변경
+
+operation::changeStatus-rider[snippets='http-request,http-response']
+
+=== 배달지역 추가
+
+operation::addArea-rider[snippets='http-request,http-response']
