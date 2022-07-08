@@ -3,10 +3,12 @@ package com.example.woowa.order.order.dto.cart;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
 import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 
 @AllArgsConstructor
 @Getter
+@EqualsAndHashCode
 public class CartSaveRequest {
 
     @NotNull(message = "주문할 메뉴 ID는 필수입니다.")

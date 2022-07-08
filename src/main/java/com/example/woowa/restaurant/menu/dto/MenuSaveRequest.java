@@ -4,11 +4,13 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
 import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import org.hibernate.validator.constraints.Length;
 
 @AllArgsConstructor
 @Getter
+@EqualsAndHashCode
 public class MenuSaveRequest {
 
     @NotNull(message = "메뉴그룹ID는 필수입니다.")

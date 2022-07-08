@@ -3,11 +3,13 @@ package com.example.woowa.restaurant.menu.dto;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Positive;
 import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import org.hibernate.validator.constraints.Length;
 
 @AllArgsConstructor
 @Getter
+@EqualsAndHashCode
 public class MenuUpdateRequest {
 
     @NotBlank(message = "메뉴명은 필수입니다.")

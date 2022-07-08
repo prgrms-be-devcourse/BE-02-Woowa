@@ -5,11 +5,13 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
 import javax.validation.constraints.PositiveOrZero;
 import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import org.springframework.format.annotation.DateTimeFormat;
 
 @AllArgsConstructor
 @Getter
+@EqualsAndHashCode
 public class OrderListCustomerRequest {
 
     @NotNull
