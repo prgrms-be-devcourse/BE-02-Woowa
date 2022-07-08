@@ -16,6 +16,7 @@ import static org.springframework.restdocs.payload.PayloadDocumentation.requestF
 import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
 import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
 import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -29,27 +30,35 @@ import com.example.woowa.restaurant.menugroup.dto.MenuGroupSaveRequest;
 import com.example.woowa.restaurant.menugroup.dto.MenuGroupUpdateRequest;
 import com.example.woowa.restaurant.menugroup.service.MenuGroupService;
 import com.example.woowa.restaurant.restaurant.service.RestaurantService;
+import com.example.woowa.security.configuration.SecurityConfig;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.FilterType;
 import org.springframework.context.annotation.Import;
+import org.springframework.data.jpa.mapping.JpaMetamodelMappingContext;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.payload.JsonFieldType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.transaction.annotation.Transactional;
 
-@SpringBootTest
-@AutoConfigureMockMvc(addFilters = false)
 @AutoConfigureRestDocs
-@Transactional
+@WebMvcTest(value = MenuGroupApiController.class, excludeFilters = {
+        @ComponentScan.Filter(
+                type = FilterType.ASSIGNABLE_TYPE,
+                classes = SecurityConfig.class
+        )
+})
 @Import(RestDocsConfiguration.class)
+@MockBean(JpaMetamodelMappingContext.class)
+@WithMockUser
 class MenuGroupApiControllerTest {
 
     @Autowired
@@ -74,6 +83,7 @@ class MenuGroupApiControllerTest {
                 menuGroupId);
 
         mockMvc.perform(post("/api/v1/restaurant/{restaurantId}/menu-groups", restaurantId)
+                        .with(csrf().asHeader())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(menuGroupSaveRequest)))
                 .andDo(print())
@@ -109,6 +119,7 @@ class MenuGroupApiControllerTest {
         MenuGroupSaveRequest menuGroupSaveRequest = new MenuGroupSaveRequest("", "맛있는 볶음밥");
 
         mockMvc.perform(post("/api/v1/restaurant/{restaurantId}/menu-groups", restaurantId)
+                        .with(csrf().asHeader())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(menuGroupSaveRequest)))
                 .andDo(print())
@@ -126,6 +137,7 @@ class MenuGroupApiControllerTest {
                 NotFoundException.class);
 
         mockMvc.perform(post("/api/v1/restaurant/{restaurantId}/menu-groups", wrongRestaurantId)
+                        .with(csrf().asHeader())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andDo(print())
@@ -255,6 +267,7 @@ class MenuGroupApiControllerTest {
                 "맛있는 사이드 메뉴");
 
         mockMvc.perform(patch("/api/v1/menu-groups/{menuGroupId}", menuGroupId)
+                        .with(csrf().asHeader())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andDo(print())
@@ -285,7 +298,8 @@ class MenuGroupApiControllerTest {
         MenuGroupUpdateRequest request = new MenuGroupUpdateRequest("",
                 "맛있는 사이드 메뉴");
 
-        mockMvc.perform(patch("/api/v1/menu-groups/{menuGroupId}",menuGroupId)
+        mockMvc.perform(patch("/api/v1/menu-groups/{menuGroupId}", menuGroupId)
+                        .with(csrf().asHeader())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andDo(print())
@@ -304,6 +318,7 @@ class MenuGroupApiControllerTest {
                 .updateMenuGroup(wrongMenuGroupId, request);
 
         mockMvc.perform(patch("/api/v1/menu-groups/{menuGroupId}", wrongMenuGroupId)
+                        .with(csrf().asHeader())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andDo(print())
@@ -317,7 +332,8 @@ class MenuGroupApiControllerTest {
     void deleteMenuGroupOkTest() throws Exception {
         long menuGroupId = 1L;
 
-        mockMvc.perform(delete("/api/v1/menu-groups/{menuGroupId}", menuGroupId))
+        mockMvc.perform(delete("/api/v1/menu-groups/{menuGroupId}", menuGroupId)
+                        .with(csrf().asHeader()))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andDo(document("delete-menu-group",
@@ -335,7 +351,8 @@ class MenuGroupApiControllerTest {
         long wrongMenuGroupId = -1L;
         doThrow(NotFoundException.class).when(menuGroupService).deleteMenuGroup(wrongMenuGroupId);
 
-        mockMvc.perform(delete("/api/v1/menu-groups/{menuGroupId}", wrongMenuGroupId))
+        mockMvc.perform(delete("/api/v1/menu-groups/{menuGroupId}", wrongMenuGroupId)
+                        .with(csrf().asHeader()))
                 .andDo(print())
                 .andExpect(status().isNotFound());
 

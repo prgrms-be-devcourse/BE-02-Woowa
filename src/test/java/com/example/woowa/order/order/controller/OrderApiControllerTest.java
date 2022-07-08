@@ -15,6 +15,7 @@ import static org.springframework.restdocs.payload.PayloadDocumentation.requestF
 import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
 import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
 import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -37,6 +38,7 @@ import com.example.woowa.order.order.dto.statistics.OrderStatisticsRequest;
 import com.example.woowa.order.order.dto.statistics.OrderStatisticsResponse;
 import com.example.woowa.order.order.enums.PaymentType;
 import com.example.woowa.order.order.service.OrderService;
+import com.example.woowa.security.configuration.SecurityConfig;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -46,21 +48,28 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.FilterType;
 import org.springframework.context.annotation.Import;
+import org.springframework.data.jpa.mapping.JpaMetamodelMappingContext;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.payload.JsonFieldType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.transaction.annotation.Transactional;
 
-@SpringBootTest
-@AutoConfigureMockMvc(addFilters = false)
 @AutoConfigureRestDocs
+@WebMvcTest(value = OrderApiController.class, excludeFilters = {
+        @ComponentScan.Filter(
+                type = FilterType.ASSIGNABLE_TYPE,
+                classes = SecurityConfig.class
+        )
+})
 @Import(RestDocsConfiguration.class)
-@Transactional
+@MockBean(JpaMetamodelMappingContext.class)
+@WithMockUser
 class OrderApiControllerTest {
 
     @Autowired
@@ -84,7 +93,8 @@ class OrderApiControllerTest {
 
         mockMvc.perform(post("/api/v1/orders")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(request)))
+                        .content(objectMapper.writeValueAsString(request))
+                        .with(csrf().asHeader()))
                 .andDo(print())
                 .andExpect(status().isCreated())
                 .andExpect(header().exists(HttpHeaders.LOCATION))
@@ -563,7 +573,8 @@ class OrderApiControllerTest {
     void cancelOrderTest() throws Exception {
         long orderId = 1L;
 
-        mockMvc.perform(patch("/api/v1/orders/{orderId}/cancel", orderId))
+        mockMvc.perform(patch("/api/v1/orders/{orderId}/cancel", orderId)
+                        .with(csrf().asHeader()))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andDo(document("cancel-order",
@@ -581,7 +592,8 @@ class OrderApiControllerTest {
         long wrongOrderId = -1L;
         doThrow(NotFoundException.class).when(orderService).cancelOrder(wrongOrderId);
 
-        mockMvc.perform(patch("/api/v1/orders/{orderId}/cancel", wrongOrderId))
+        mockMvc.perform(patch("/api/v1/orders/{orderId}/cancel", wrongOrderId)
+                        .with(csrf().asHeader()))
                 .andDo(print())
                 .andExpect(status().isNotFound());
 
@@ -595,6 +607,7 @@ class OrderApiControllerTest {
         OrderAcceptRequest request = new OrderAcceptRequest(30);
 
         mockMvc.perform(patch("/api/v1/orders/{orderId}/accept", orderId)
+                        .with(csrf().asHeader())
                         .contentType(MediaType.APPLICATION_JSON_VALUE)
                         .content(objectMapper.writeValueAsString(request)))
                 .andDo(print())
@@ -624,6 +637,7 @@ class OrderApiControllerTest {
         doThrow(NotFoundException.class).when(orderService).acceptOrder(wrongOrderId, request);
 
         mockMvc.perform(patch("/api/v1/orders/{orderId}/accept", wrongOrderId)
+                        .with(csrf().asHeader())
                         .contentType(MediaType.APPLICATION_JSON_VALUE)
                         .content(objectMapper.writeValueAsString(request)))
                 .andDo(print())

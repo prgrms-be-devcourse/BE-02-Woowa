@@ -18,6 +18,7 @@ import static org.springframework.restdocs.payload.PayloadDocumentation.requestF
 import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
 import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
 import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -30,6 +31,7 @@ import com.example.woowa.restaurant.menu.dto.MenuResponse;
 import com.example.woowa.restaurant.menu.dto.MenuSaveRequest;
 import com.example.woowa.restaurant.menu.dto.MenuUpdateRequest;
 import com.example.woowa.restaurant.menu.service.MenuService;
+import com.example.woowa.security.configuration.SecurityConfig;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -37,21 +39,28 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.FilterType;
 import org.springframework.context.annotation.Import;
+import org.springframework.data.jpa.mapping.JpaMetamodelMappingContext;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.payload.JsonFieldType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.transaction.annotation.Transactional;
 
-@SpringBootTest
-@AutoConfigureMockMvc(addFilters = false)
 @AutoConfigureRestDocs
-@Transactional
+@WebMvcTest(value = MenuApiController.class, excludeFilters = {
+        @ComponentScan.Filter(
+                type = FilterType.ASSIGNABLE_TYPE,
+                classes = SecurityConfig.class
+        )
+})
 @Import(RestDocsConfiguration.class)
+@MockBean(JpaMetamodelMappingContext.class)
+@WithMockUser
 class MenuApiControllerTest {
 
     @Autowired
@@ -75,6 +84,7 @@ class MenuApiControllerTest {
         given(menuService.addMenu(menuSaveRequest)).willReturn(savedMenuId);
 
         mockMvc.perform(post("/api/v1/menus")
+                        .with(csrf().asHeader())
                         .contentType(MediaType.APPLICATION_JSON_VALUE)
                         .accept(MediaType.APPLICATION_JSON_VALUE)
                         .content(objectMapper.writeValueAsString(menuSaveRequest)))
@@ -115,6 +125,7 @@ class MenuApiControllerTest {
                 null);
 
         mockMvc.perform(post("/api/v1/menus")
+                        .with(csrf().asHeader())
                         .contentType(MediaType.APPLICATION_JSON_VALUE)
                         .accept(MediaType.APPLICATION_JSON_VALUE)
                         .content(objectMapper.writeValueAsString(menuSaveRequest)))
@@ -136,6 +147,7 @@ class MenuApiControllerTest {
                 NotFoundException.class);
 
         mockMvc.perform(post("/api/v1/menus")
+                        .with(csrf().asHeader())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(menuSaveRequest)))
                 .andDo(print())
@@ -206,6 +218,7 @@ class MenuApiControllerTest {
         MenuUpdateRequest request = new MenuUpdateRequest("참치 김밥2", "더 맛있는 참치 김밥", 5000);
 
         mockMvc.perform(patch("/api/v1/menus/" + menuId)
+                        .with(csrf().asHeader())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andDo(print())
@@ -235,6 +248,7 @@ class MenuApiControllerTest {
         MenuUpdateRequest menuUpdateRequest = new MenuUpdateRequest(null, null, null);
 
         mockMvc.perform(patch("/api/v1/menus/" + menuId)
+                        .with(csrf().asHeader())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(menuUpdateRequest)))
                 .andDo(print())
@@ -251,6 +265,7 @@ class MenuApiControllerTest {
         doThrow(NotFoundException.class).when(menuService).updateMenu(wrongMenuId, request);
 
         mockMvc.perform(patch("/api/v1/menus/" + wrongMenuId)
+                        .with(csrf().asHeader())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andDo(print())
@@ -267,6 +282,7 @@ class MenuApiControllerTest {
                 true);
 
         mockMvc.perform(patch("/api/v1/menus/{menuId}/main-menu", menuId)
+                        .with(csrf().asHeader())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andDo(print())
@@ -290,9 +306,11 @@ class MenuApiControllerTest {
         long wrongMenuId = -1L;
         MainMenuStatusUpdateRequest request = new MainMenuStatusUpdateRequest(
                 true);
-        doThrow(NotFoundException.class).when(menuService).changeMainMenuStatus(wrongMenuId, request);
+        doThrow(NotFoundException.class).when(menuService)
+                .changeMainMenuStatus(wrongMenuId, request);
 
         mockMvc.perform(patch("/api/v1/menus/{menuId}/main-menu", wrongMenuId)
+                        .with(csrf().asHeader())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andDo(print())
@@ -308,6 +326,7 @@ class MenuApiControllerTest {
         MenuStatusUpdateRequest menuStatusUpdateRequest = new MenuStatusUpdateRequest("sale");
 
         mockMvc.perform(patch("/api/v1/menus/{menuId}/menu-status", menuId)
+                        .with(csrf().asHeader())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(menuStatusUpdateRequest)))
                 .andDo(print())
@@ -334,6 +353,7 @@ class MenuApiControllerTest {
         doThrow(NotFoundException.class).when(menuService).changeMenuStatus(anyLong(), any());
 
         mockMvc.perform(patch("/api/v1/menus/{menuId}/menu-status", wrongMenuId)
+                        .with(csrf().asHeader())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(menuStatusUpdateRequest)))
                 .andDo(print())
@@ -347,7 +367,8 @@ class MenuApiControllerTest {
     void deleteMenuOkTest() throws Exception {
         long menuId = 1L;
 
-        mockMvc.perform(delete("/api/v1/menus/{menuId}", menuId))
+        mockMvc.perform(delete("/api/v1/menus/{menuId}", menuId)
+                        .with(csrf().asHeader()))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andDo(document("delete-menu",
@@ -365,7 +386,8 @@ class MenuApiControllerTest {
         long wrongMenuId = -1L;
         doThrow(NotFoundException.class).when(menuService).deleteMenu(wrongMenuId);
 
-        mockMvc.perform(delete("/api/v1/menus/" + wrongMenuId))
+        mockMvc.perform(delete("/api/v1/menus/" + wrongMenuId)
+                        .with(csrf().asHeader()))
                 .andDo(print())
                 .andExpect(status().isNotFound());
 
