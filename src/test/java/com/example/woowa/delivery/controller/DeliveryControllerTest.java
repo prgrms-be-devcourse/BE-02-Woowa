@@ -15,7 +15,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.example.woowa.TestInitUtil;
-import com.example.woowa.common.config.JpaAuditingConfiguration;
 import com.example.woowa.delivery.dto.DeliveryResponse;
 import com.example.woowa.delivery.entity.Delivery;
 import com.example.woowa.delivery.mapper.DeliveryMapper;
@@ -34,6 +33,7 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.jpa.mapping.JpaMetamodelMappingContext;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.payload.JsonFieldType;
 import org.springframework.security.test.context.support.WithMockUser;
@@ -46,7 +46,7 @@ import org.springframework.test.web.servlet.MockMvc;
         classes = SecurityConfig.class
     ),
 })
-@MockBean(JpaAuditingConfiguration.class)
+@MockBean(JpaMetamodelMappingContext.class)
 @WithMockUser
 class DeliveryControllerTest {
 
@@ -184,7 +184,7 @@ class DeliveryControllerTest {
                 .with(csrf().asHeader())
             ).andExpect(status().is2xxSuccessful())
             .andDo(print())
-            .andDo(document("accept-delivery",
+            .andDo(document("delay-delivery",
                     pathParameters(
                         parameterWithName("deliveryId").description("배달 아이디"),
                         parameterWithName("riderId").description("배달기사 아이디")
@@ -203,7 +203,7 @@ class DeliveryControllerTest {
                 .with(csrf())
             ).andExpect(status().is2xxSuccessful())
             .andDo(print())
-            .andDo(document("accept-delivery",
+            .andDo(document("pickup-delivery",
                     pathParameters(
                         parameterWithName("deliveryId").description("배달 아이디"),
                         parameterWithName("riderId").description("배달기사 아이디")
@@ -219,7 +219,7 @@ class DeliveryControllerTest {
                 .with(csrf())
             ).andExpect(status().is2xxSuccessful())
             .andDo(print())
-            .andDo(document("accept-delivery",
+            .andDo(document("finish-delivery",
                     pathParameters(
                         parameterWithName("deliveryId").description("배달 아이디"),
                         parameterWithName("riderId").description("배달기사 아이디")
