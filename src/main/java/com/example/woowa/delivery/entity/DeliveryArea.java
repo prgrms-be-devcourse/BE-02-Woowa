@@ -1,12 +1,19 @@
 package com.example.woowa.delivery.entity;
 
-import com.example.woowa.delivery.entity.AreaCode;
 import com.example.woowa.restaurant.restaurant.entity.Restaurant;
+import java.util.Objects;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-
-import javax.persistence.*;
 
 @Entity
 @Table(name = "delivery_area")
@@ -39,5 +46,16 @@ public class DeliveryArea {
         this.areaCode = areaCode;
         this.restaurant = restaurant;
         this.deliveryFee = deliveryFee;
+        areaCode.addDeliveryArea(this);
+        restaurant.addDeliveryArea(this);
     }
+
+    public void setRestaurant(Restaurant restaurant) {
+        if (Objects.nonNull(this.restaurant)) {
+            this.restaurant.getDeliveryAreas().remove(this);
+        }
+        this.restaurant = restaurant;
+        this.restaurant.getDeliveryAreas().add(this);
+    }
+
 }

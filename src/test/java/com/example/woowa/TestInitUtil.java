@@ -32,6 +32,7 @@ public class TestInitUtil {
 
         Customer customer = new Customer("dev12", "Programmers123!", LocalDate.of(1997, 05, 17),
             customerGrade);
+
         AreaCode areaCode = new AreaCode("12344", "서울시 관악구 신림동", true);
         CustomerAddress customerAddress = new CustomerAddress(areaCode, "아파트 101호", "회사",
             customer);
@@ -43,6 +44,7 @@ public class TestInitUtil {
         CustomerGrade customerGrade = initCustomerGrade();
         Customer customer = new Customer("dev12", "Programmers123!", LocalDate.of(1997, 05, 17),
             customerGrade);
+
         AreaCode areaCode = new AreaCode("12344", "서울시 관악구 신림동", true);
         CustomerAddress customerAddress = new CustomerAddress(areaCode, "아파트 101호", "회사",
             customer);
@@ -51,7 +53,8 @@ public class TestInitUtil {
     }
 
     public static Voucher initVoucher() {
-        return new Voucher(VoucherType.PERCENT, EventType.MONTH, 2, LocalDateTime.now().plusMonths(1));
+        return new Voucher(VoucherType.PERCENT, EventType.MONTH, 2,
+            LocalDateTime.now().plusMonths(1));
     }
 
     public static Restaurant initRestaurant() {
