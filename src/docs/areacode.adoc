@@ -1,0 +1,5 @@
+== 지역코드
+
+=== 지역코드 초기화
+
+operation::init-areacode[]
