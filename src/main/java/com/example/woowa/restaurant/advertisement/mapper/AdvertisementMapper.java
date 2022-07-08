@@ -1,5 +1,6 @@
 package com.example.woowa.restaurant.advertisement.mapper;
 
+
 import com.example.woowa.common.interfaces.EnumFindable;
 import com.example.woowa.restaurant.advertisement.dto.request.AdvertisementCreateRequest;
 import com.example.woowa.restaurant.advertisement.dto.request.AdvertisementUpdateRequest;

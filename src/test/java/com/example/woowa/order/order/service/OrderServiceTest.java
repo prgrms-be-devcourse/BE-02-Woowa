@@ -89,7 +89,6 @@ class OrderServiceTest {
     CartMapper cartMapper;
     @Mock
     OrderMapper orderMapper;
-    ;
 
     OrderService orderService;
 
@@ -106,8 +105,8 @@ class OrderServiceTest {
     @BeforeEach
     void init() {
         orderService = new OrderService(orderRepository, customerService, restaurantService,
-                voucherEntityService, deliveryAreaService, deliveryEntityService,
-                orderMapper, cartMapper);
+            voucherEntityService, deliveryAreaService, deliveryEntityService,
+            orderMapper, cartMapper);
         customer = initCustomer();
         restaurant = initRestaurant();
         menus = initMenus();
@@ -136,15 +135,15 @@ class OrderServiceTest {
         Menu menu2 = menus.get(1);
 
         int orderPrice =
-                menu1.getPrice() * 1 + menu2.getPrice() * 2;
+            menu1.getPrice() * 1 + menu2.getPrice() * 2;
 
         List<CartSaveRequest> cartSaveRequests = List.of(
-                new CartSaveRequest(menuId1, 1),
-                new CartSaveRequest(menuId2, 2)
+            new CartSaveRequest(menuId1, 1),
+            new CartSaveRequest(menuId2, 2)
         );
 
         given(customerService.findCustomerEntity(any())).willReturn(customer);
-        given(restaurantService.findRestaurantById(any())).willReturn(restaurant);
+        given(restaurantService.findRestaurantEntityById(any())).willReturn(restaurant);
         given(orderRepository.save(any())).willReturn(order);
         given(orderRepository.findById(orderId)).willReturn(Optional.of(order));
         given(deliveryAreaService.getDeliveryFee(restaurant, "서울특별시 강남구")).willReturn(deliveryFee);
@@ -153,8 +152,8 @@ class OrderServiceTest {
         given(cartMapper.toCart(cartSaveRequests.get(1))).willReturn(carts.get(1));
 
         OrderSaveRequest orderSaveRequest = new OrderSaveRequest(customer.getLoginId(),
-                restaurantId, voucherId, usePoint, paymentType, "서울특별시 강남구",
-                cartSaveRequests
+            restaurantId, voucherId, usePoint, paymentType, "서울특별시 강남구",
+            cartSaveRequests
         );
 
         // When
@@ -165,7 +164,7 @@ class OrderServiceTest {
         assertThat(findOrder.getOrderPrice()).isEqualTo(orderPrice);
         assertThat(findOrder.getVoucherDiscountPrice()).isEqualTo(0);
         assertThat(findOrder.getAfterDiscountTotalPrice()).isEqualTo(
-                orderPrice + deliveryFee - usePoint);
+            orderPrice + deliveryFee - usePoint);
         assertThat(findOrder.getOrderStatus()).isEqualTo(OrderStatus.PAYMENT_COMPLETED);
         assertThat(findOrder.getPaymentType()).isEqualTo(paymentType);
         assertThat(findOrder.getUsedPoint()).isEqualTo(usePoint);
@@ -199,7 +198,7 @@ class OrderServiceTest {
 
         // When // Then
         assertThatThrownBy(() -> orderService.findOrderById(orderId))
-                .isExactlyInstanceOf(IllegalArgumentException.class);
+            .isExactlyInstanceOf(IllegalArgumentException.class);
     }
 
     @Test
@@ -211,38 +210,38 @@ class OrderServiceTest {
         LocalDate end = LocalDate.now();
         PageRequest pageable = PageRequest.of(0, 3);
 
-        given(restaurantService.findRestaurantById(restaurantId)).willReturn(restaurant);
+        given(restaurantService.findRestaurantEntityById(restaurantId)).willReturn(restaurant);
         Slice<Order> slice = new SliceImpl(Collections.singletonList(order), pageable,
-                false);
+            false);
 
         List<OrderRestaurantResponse> orderRestaurantResponses = List.of(
-                new OrderRestaurantResponse(order.getCreatedAt(), cartResponses,
-                        order.getOrderPrice(), order.getDeliveryFee(),
-                        order.getAfterDiscountTotalPrice(),
-                        order.getVoucherDiscountPrice() + order.getUsedPoint(),
-                        orderMapper.getOrderStatusStringForRestaurant(order))
+            new OrderRestaurantResponse(order.getCreatedAt(), cartResponses,
+                order.getOrderPrice(), order.getDeliveryFee(),
+                order.getAfterDiscountTotalPrice(),
+                order.getVoucherDiscountPrice() + order.getUsedPoint(),
+                orderMapper.getOrderStatusStringForRestaurant(order))
         );
 
         given(orderRepository.findByRestaurant(restaurant,
-                LocalDateTime.of(from, LocalTime.of(0, 0)),
-                LocalDateTime.of(end, LocalTime.of(23, 59)), pageable)).willReturn(
-                slice);
+            LocalDateTime.of(from, LocalTime.of(0, 0)),
+            LocalDateTime.of(end, LocalTime.of(23, 59)), pageable)).willReturn(
+            slice);
 
         given(orderMapper.toOrderListRestaurantResponse(slice.hasNext(),
-                slice.getNumberOfElements(), slice.getContent())).willReturn(
-                new OrderListRestaurantResponse(slice.hasNext(), slice.getNumberOfElements(),
-                        orderRestaurantResponses));
+            slice.getNumberOfElements(), slice.getContent())).willReturn(
+            new OrderListRestaurantResponse(slice.hasNext(), slice.getNumberOfElements(),
+                orderRestaurantResponses));
 
         // When
         OrderListRestaurantResponse response = orderService.findOrderByRestaurant(
-                new OrderListRestaurantRequest(restaurantId, 0, 3,
-                        from, end));
+            new OrderListRestaurantRequest(restaurantId, 0, 3,
+                from, end));
 
         // Then
         assertThat(response.getHasNextPage()).isFalse();
         assertThat(response.getSize()).isEqualTo(1);
         assertThat(response.getOrders()).usingRecursiveFieldByFieldElementComparator()
-                .isEqualTo(orderRestaurantResponses);
+            .isEqualTo(orderRestaurantResponses);
     }
 
     @Test
@@ -253,12 +252,12 @@ class OrderServiceTest {
         LocalDate from = LocalDate.now().minusMonths(1);
         LocalDate end = LocalDate.now();
         given(restaurantService.findRestaurantById(wrongRestaurantId)).willThrow(
-                IllegalArgumentException.class);
+            IllegalArgumentException.class);
 
         // When // Then
         assertThatThrownBy(() -> orderService.findOrderByRestaurant(
-                new OrderListRestaurantRequest(wrongRestaurantId, 0, 3, from, end)))
-                .isExactlyInstanceOf(IllegalArgumentException.class);
+            new OrderListRestaurantRequest(wrongRestaurantId, 0, 3, from, end)))
+            .isExactlyInstanceOf(IllegalArgumentException.class);
     }
 
     @Test
@@ -271,8 +270,8 @@ class OrderServiceTest {
 
         // When // Then
         assertThatThrownBy(() -> orderService.findOrderByRestaurant(
-                new OrderListRestaurantRequest(restaurantId, 0, 3, from, end)))
-                .isExactlyInstanceOf(IllegalArgumentException.class);
+            new OrderListRestaurantRequest(restaurantId, 0, 3, from, end)))
+            .isExactlyInstanceOf(IllegalArgumentException.class);
     }
 
     @Test
@@ -284,41 +283,41 @@ class OrderServiceTest {
         LocalDate end = LocalDate.now();
         PageRequest pageable = PageRequest.of(0, 3);
         SliceImpl<Order> orderSlice = new SliceImpl<>(Collections.singletonList(order), pageable,
-                false);
+            false);
 
         given(customerService.findCustomerEntity(loginId)).willReturn(customer);
         given(orderRepository.findByCustomer(customer, LocalDateTime.of(from, LocalTime.of(0, 0)),
-                LocalDateTime.of(end, LocalTime.of(23, 59)),
-                pageable)).willReturn(orderSlice
+            LocalDateTime.of(end, LocalTime.of(23, 59)),
+            pageable)).willReturn(orderSlice
         );
 
         List<CartSummeryResponse> summeryResponses = carts.stream()
-                .map(cart -> new CartSummeryResponse(cart.getMenu().getTitle(), cart.getQuantity()))
-                .collect(
-                        Collectors.toList());
+            .map(cart -> new CartSummeryResponse(cart.getMenu().getTitle(), cart.getQuantity()))
+            .collect(
+                Collectors.toList());
 
         List<OrderSummeryResponse> orderSummeryResponses = orderSlice.getContent().stream()
-                .map(o -> new OrderSummeryResponse(o.getId(), o.getCreatedAt(),
-                        orderMapper.getOrderStatusStringForCustomer(order),
-                        order.getRestaurant().getName(), order.getAfterDiscountTotalPrice(),
-                        summeryResponses)).collect(
-                        Collectors.toList());
+            .map(o -> new OrderSummeryResponse(o.getId(), o.getCreatedAt(),
+                orderMapper.getOrderStatusStringForCustomer(order),
+                order.getRestaurant().getName(), order.getAfterDiscountTotalPrice(),
+                summeryResponses)).collect(
+                Collectors.toList());
 
         given(orderMapper.toOrderListCustomerResponse(orderSlice.hasNext(),
-                orderSlice.getNumberOfElements(), orderSlice.getContent()))
-                .willReturn(new OrderListCustomerResponse(orderSlice.hasNext(),
-                        orderSlice.getNumberOfElements(), orderSummeryResponses));
+            orderSlice.getNumberOfElements(), orderSlice.getContent()))
+            .willReturn(new OrderListCustomerResponse(orderSlice.hasNext(),
+                orderSlice.getNumberOfElements(), orderSummeryResponses));
 
         // When
         OrderListCustomerResponse response = orderService.findOrderByCustomer(
-                new OrderListCustomerRequest(loginId, 0, 3,
-                        from, end));
+            new OrderListCustomerRequest(loginId, 0, 3,
+                from, end));
 
         // Then
         assertThat(response.getHasNextPage()).isFalse();
         assertThat(response.getSize()).isEqualTo(1);
         assertThat(response.getOrders()).usingRecursiveFieldByFieldElementComparator()
-                .isEqualTo(orderSummeryResponses);
+            .isEqualTo(orderSummeryResponses);
     }
 
     @Test
@@ -333,8 +332,8 @@ class OrderServiceTest {
 
         // When // Then
         assertThatThrownBy(() -> orderService.findOrderByCustomer(
-                new OrderListCustomerRequest(wrongLoginId, 0, 3, from, end)))
-                .isExactlyInstanceOf(RuntimeException.class);
+            new OrderListCustomerRequest(wrongLoginId, 0, 3, from, end)))
+            .isExactlyInstanceOf(RuntimeException.class);
     }
 
     @Test
@@ -347,8 +346,8 @@ class OrderServiceTest {
 
         // When // Then
         assertThatThrownBy(() -> orderService.findOrderByCustomer(
-                new OrderListCustomerRequest(longinId, 0, 3, from, end)))
-                .isExactlyInstanceOf(IllegalArgumentException.class);
+            new OrderListCustomerRequest(longinId, 0, 3, from, end)))
+            .isExactlyInstanceOf(IllegalArgumentException.class);
     }
 
     @Test
@@ -358,11 +357,11 @@ class OrderServiceTest {
         Long orderId = 1L;
         given(orderRepository.findById(orderId)).willReturn(Optional.of(order));
         given(orderMapper.toOrderCustomerResponse(order)).willReturn(
-                new OrderCustomerResponse(order.getCreatedAt(), cartResponses,
-                        order.getOrderPrice(), order.getDeliveryFee(),
-                        order.getVoucherDiscountPrice(), order.getUsedPoint(),
-                        order.getOrderStatus().getDescription(),
-                        order.getDeliveryAddress()));
+            new OrderCustomerResponse(order.getCreatedAt(), cartResponses,
+                order.getOrderPrice(), order.getDeliveryFee(),
+                order.getVoucherDiscountPrice(), order.getUsedPoint(),
+                order.getOrderStatus().getDescription(),
+                order.getDeliveryAddress()));
 
         // When
         OrderCustomerResponse response = orderService.findDetailOrderForCustomer(orderId);
@@ -371,9 +370,9 @@ class OrderServiceTest {
         assertThat(response.getMenus().size()).isEqualTo(carts.size());
         assertThat(response.getUsedPoint()).isEqualTo(order.getUsedPoint());
         assertThat(response.getOrderPrice()).isEqualTo(
-                order.getOrderPrice());
+            order.getOrderPrice());
         assertThat(response.getVoucherDiscountPrice()).isEqualTo(
-                order.getVoucherDiscountPrice());
+            order.getVoucherDiscountPrice());
     }
 
     @Test
@@ -385,7 +384,7 @@ class OrderServiceTest {
 
         // When // Then
         assertThatThrownBy(() -> orderService.findDetailOrderForCustomer(wrongOrderId))
-                .isExactlyInstanceOf(IllegalArgumentException.class);
+            .isExactlyInstanceOf(IllegalArgumentException.class);
     }
 
     @Test
@@ -395,30 +394,30 @@ class OrderServiceTest {
         Long orderId = 1L;
 
         OrderRestaurantResponse orderRestaurantResponse = new OrderRestaurantResponse(
-                order.getCreatedAt(),
-                cartResponses,
-                order.getOrderPrice(), order.getDeliveryFee(),
-                order.getAfterDiscountTotalPrice(),
-                order.getVoucherDiscountPrice() + order.getUsedPoint(),
-                orderMapper.getOrderStatusStringForRestaurant(order)
+            order.getCreatedAt(),
+            cartResponses,
+            order.getOrderPrice(), order.getDeliveryFee(),
+            order.getAfterDiscountTotalPrice(),
+            order.getVoucherDiscountPrice() + order.getUsedPoint(),
+            orderMapper.getOrderStatusStringForRestaurant(order)
         );
 
         given(orderRepository.findById(orderId)).willReturn(Optional.of(order));
         given(orderMapper.toOrderRestaurantResponse(order)).willReturn(
-                orderRestaurantResponse);
+            orderRestaurantResponse);
 
         // When
         OrderRestaurantResponse response = orderService.findDetailOrderByIdForRestaurant(
-                orderId);
+            orderId);
 
         // Then
         assertThat(response.getMenus().size()).isEqualTo(carts.size());
         assertThat(response.getTotalDiscountPrice()).isEqualTo(
-                order.getUsedPoint() + order.getVoucherDiscountPrice());
+            order.getUsedPoint() + order.getVoucherDiscountPrice());
         assertThat(response.getOrderPrice()).isEqualTo(
-                order.getOrderPrice());
+            order.getOrderPrice());
         assertThat(response.getAfterDiscountTotalPrice()).isEqualTo(
-                order.getAfterDiscountTotalPrice());
+            order.getAfterDiscountTotalPrice());
     }
 
     @Test
@@ -430,8 +429,8 @@ class OrderServiceTest {
 
         // When // Then
         assertThatThrownBy(() -> orderService.findDetailOrderByIdForRestaurant(
-                wrongOrderId))
-                .isExactlyInstanceOf(IllegalArgumentException.class);
+            wrongOrderId))
+            .isExactlyInstanceOf(IllegalArgumentException.class);
     }
 
     @Test
@@ -447,24 +446,24 @@ class OrderServiceTest {
         long usedPoint = 10_000L;
 
         OrderStatistics orderStatistics = new OrderStatistics(orderCount, orderPrice,
-                voucherDiscountPrice,
-                usedPoint);
+            voucherDiscountPrice,
+            usedPoint);
 
-        given(restaurantService.findRestaurantById(restaurantId)).willReturn(restaurant);
+        given(restaurantService.findRestaurantEntityById(restaurantId)).willReturn(restaurant);
         given(orderRepository.findOrderStatistics(restaurant,
-                LocalDateTime.of(from, LocalTime.of(0, 0)),
-                LocalDateTime.of(end, LocalTime.of(23, 59)),
-                DeliveryStatus.DELIVERY_FINISH))
-                .willReturn(orderStatistics);
+            LocalDateTime.of(from, LocalTime.of(0, 0)),
+            LocalDateTime.of(end, LocalTime.of(23, 59)),
+            DeliveryStatus.DELIVERY_FINISH))
+            .willReturn(orderStatistics);
         given(orderMapper.toOrderStatisticsResponse(orderStatistics)).willReturn(
-                new OrderStatisticsResponse(orderStatistics.getOrderCount(),
-                        orderStatistics.getOrderPrice(),
-                        orderStatistics.getVoucherDiscountPrice()
-                                + orderStatistics.getUsedPoint()));
+            new OrderStatisticsResponse(orderStatistics.getOrderCount(),
+                orderStatistics.getOrderPrice(),
+                orderStatistics.getVoucherDiscountPrice()
+                    + orderStatistics.getUsedPoint()));
 
         // When
         OrderStatisticsResponse statistics = orderService.findOrderStatistics(
-                new OrderStatisticsRequest(restaurantId, from, end));
+            new OrderStatisticsRequest(restaurantId, from, end));
 
         // Then
         assertThat(statistics.getOrderCount()).isEqualTo(orderCount);
@@ -481,12 +480,12 @@ class OrderServiceTest {
         LocalDate end = LocalDate.now();
 
         given(restaurantService.findRestaurantById(wrongRestaurantId)).willThrow(
-                IllegalArgumentException.class);
+            IllegalArgumentException.class);
 
         // When // Then
         assertThatThrownBy(() -> orderService.findOrderStatistics(
-                new OrderStatisticsRequest(wrongRestaurantId, from, end)))
-                .isExactlyInstanceOf(IllegalArgumentException.class);
+            new OrderStatisticsRequest(wrongRestaurantId, from, end)))
+            .isExactlyInstanceOf(IllegalArgumentException.class);
     }
 
     @Test
@@ -499,8 +498,8 @@ class OrderServiceTest {
 
         // When // Then
         assertThatThrownBy(() -> orderService.findOrderStatistics(
-                new OrderStatisticsRequest(restaurantId, from, end)))
-                .isExactlyInstanceOf(IllegalArgumentException.class);
+            new OrderStatisticsRequest(restaurantId, from, end)))
+            .isExactlyInstanceOf(IllegalArgumentException.class);
     }
 
 
@@ -527,7 +526,7 @@ class OrderServiceTest {
 
         // When // Then
         assertThatThrownBy(() -> orderService.cancelOrder(wrongOrderId))
-                .isExactlyInstanceOf(IllegalArgumentException.class);
+            .isExactlyInstanceOf(IllegalArgumentException.class);
     }
 
     @Test
@@ -559,8 +558,8 @@ class OrderServiceTest {
 
         // When // Then
         assertThatThrownBy(
-                () -> orderService.acceptOrder(wrongOrderId, new OrderAcceptRequest(cookingTime)))
-                .isExactlyInstanceOf(IllegalArgumentException.class);
+            () -> orderService.acceptOrder(wrongOrderId, new OrderAcceptRequest(cookingTime)))
+            .isExactlyInstanceOf(IllegalArgumentException.class);
     }
 
     private Customer initCustomer() {
@@ -570,9 +569,9 @@ class OrderServiceTest {
 
     private Restaurant initRestaurant() {
         return Restaurant.createRestaurant("김밥나라", "000-00-00000",
-                LocalTime.of(9, 0, 0), LocalTime.of(23, 0, 0),
-                false, "00-000-0000",
-                "안녕하세요 저희 김밥나라는 정성을 다해 요리합니다.", "서울 특별시 강남구");
+            LocalTime.of(9, 0, 0), LocalTime.of(23, 0, 0),
+            false, "00-000-0000",
+            "안녕하세요 저희 김밥나라는 정성을 다해 요리합니다.", "서울 특별시 강남구");
     }
 
     private List<Cart> initCarts() {
@@ -589,23 +588,23 @@ class OrderServiceTest {
 
     private Order initOrder() {
         return Order.createOrder(customer, restaurant, null, "서울특별시 강남구", 0,
-                PaymentType.CREDIT_CARD, carts, 3000);
+            PaymentType.CREDIT_CARD, carts, 3000);
     }
 
     private Delivery initDelivery(Order order) {
         return Delivery.createDelivery(order, order.getRestaurant().getAddress(),
-                order.getDeliveryAddress(), order.getDeliveryFee());
+            order.getDeliveryAddress(), order.getDeliveryFee());
     }
 
     private List<CartResponse> initCartResponses() {
         return carts.stream()
-                .map(cart -> new CartResponse(cart.getMenu().getTitle(), cart.getQuantity(),
-                        cart.getMenu().getPrice() * cart.getQuantity()))
-                .collect(Collectors.toList());
+            .map(cart -> new CartResponse(cart.getMenu().getTitle(), cart.getQuantity(),
+                cart.getMenu().getPrice() * cart.getQuantity()))
+            .collect(Collectors.toList());
     }
 
     private Voucher initVoucher() {
         return new Voucher(VoucherType.FiXED, EventType.SPECIAL, 1000,
-                LocalDateTime.now().plusMonths(1));
+            LocalDateTime.now().plusMonths(1));
     }
 }

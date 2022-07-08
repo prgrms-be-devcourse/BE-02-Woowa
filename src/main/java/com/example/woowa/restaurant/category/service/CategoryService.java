@@ -1,5 +1,6 @@
 package com.example.woowa.restaurant.category.service;
 
+import com.example.woowa.common.exception.NotFoundException;
 import com.example.woowa.restaurant.category.dto.request.CategoryCreateRequest;
 import com.example.woowa.restaurant.category.dto.request.CategoryUpdateRequest;
 import com.example.woowa.restaurant.category.dto.response.CategoryCreateResponse;
@@ -7,8 +8,6 @@ import com.example.woowa.restaurant.category.dto.response.CategoryFindResponse;
 import com.example.woowa.restaurant.category.entity.Category;
 import com.example.woowa.restaurant.category.mapper.CategoryMapper;
 import com.example.woowa.restaurant.category.repository.CategoryRepository;
-import com.example.woowa.restaurant.restaurant.dto.response.RestaurantFindResponse;
-import com.example.woowa.restaurant.restaurant.mapper.RestaurantMapper;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
@@ -21,8 +20,8 @@ import org.springframework.transaction.annotation.Transactional;
 public class CategoryService {
 
     private final CategoryRepository categoryRepository;
+
     private final CategoryMapper categoryMapper;
-    private final RestaurantMapper restaurantMapper;
 
     @Transactional
     public CategoryCreateResponse createCategory(CategoryCreateRequest categoryCreateRequest) {
@@ -39,13 +38,7 @@ public class CategoryService {
 
     public CategoryFindResponse findCategoryById(Long categoryId) {
         return categoryMapper.toFindResponseDto(categoryRepository.findById(categoryId)
-            .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 카테고리 아이디입니다.")));
-    }
-
-    public List<RestaurantFindResponse> findRestaurantsByCategoryId(Long categoryId) {
-        return findCategoryEntityById(categoryId).getRestaurantCategories().stream()
-            .map(restaurantCategory -> restaurantMapper.toFindResponseDto(restaurantCategory.getRestaurant()))
-            .collect(Collectors.toList());
+            .orElseThrow(() -> new NotFoundException("존재하지 않는 카테고리 아이디입니다.")));
     }
 
     @Transactional
@@ -61,7 +54,7 @@ public class CategoryService {
 
     public Category findCategoryEntityById(Long categoryId) {
         return categoryRepository.findById(categoryId)
-            .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 카테고리 아이디입니다."));
+            .orElseThrow(() -> new NotFoundException("존재하지 않는 카테고리 아이디입니다."));
     }
 
 }

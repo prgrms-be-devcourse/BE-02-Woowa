@@ -32,22 +32,17 @@ import lombok.NoArgsConstructor;
 @Getter
 public class Restaurant extends BaseTimeEntity {
 
+    @OneToMany(mappedBy = "restaurant")
+    private final List<MenuGroup> menuGroups = new ArrayList<>();
+    @OneToMany(mappedBy = "restaurant", cascade = CascadeType.ALL, orphanRemoval = true)
+    private final List<RestaurantCategory> restaurantCategories = new ArrayList<>();
+    @OneToMany(mappedBy = "restaurant", cascade = CascadeType.ALL, orphanRemoval = true)
+    private final List<RestaurantAdvertisement> restaurantAdvertisements = new ArrayList<>();
+    @OneToMany(mappedBy = "restaurant", cascade = CascadeType.ALL, orphanRemoval = true)
+    private final List<DeliveryArea> deliveryAreas = new ArrayList<>();
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
-    @OneToMany(mappedBy = "restaurant")
-    private List<MenuGroup> menuGroups = new ArrayList<>();
-
-    @OneToMany(mappedBy = "restaurant", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<RestaurantCategory> restaurantCategories = new ArrayList<>();
-
-    @OneToMany(mappedBy = "restaurant", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<RestaurantAdvertisement> restaurantAdvertisements = new ArrayList<>();
-
-    @OneToMany(mappedBy = "restaurant")
-    private List<DeliveryArea> deliveryAreas = new ArrayList<>();
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "owner_id")
     private Owner owner;
@@ -79,9 +74,12 @@ public class Restaurant extends BaseTimeEntity {
     @Column(nullable = false)
     private String address;
 
+    @Column(nullable = false)
+    private Boolean isPermitted;
+
     private Restaurant(String name, String businessNumber, LocalTime openingTime,
-            LocalTime closingTime,
-            Boolean isOpen, String phoneNumber, String description, String address) {
+        LocalTime closingTime,
+        Boolean isOpen, String phoneNumber, String description, String address) {
         this.name = name;
         this.businessNumber = businessNumber;
         this.openingTime = openingTime;
@@ -92,19 +90,30 @@ public class Restaurant extends BaseTimeEntity {
         this.address = address;
         this.reviewCount = 0;
         this.averageReviewScore = 0.0D;
+        this.isPermitted = false;
     }
 
     public static Restaurant createRestaurant(String name, String businessNumber,
-            LocalTime openingTime, LocalTime closingTime, Boolean isOpen, String phoneNumber,
-            String description, String address) throws IllegalArgumentException {
+        LocalTime openingTime, LocalTime closingTime, Boolean isOpen, String phoneNumber,
+        String description, String address) throws IllegalArgumentException {
         validateBusinessHours(openingTime, closingTime);
+        if (!CRNValidator.isValid(businessNumber)) {
+            throw new IllegalArgumentException("잘못된 사업자등록번호입니다.");
+        }
 
         return new Restaurant(name, businessNumber, openingTime, closingTime, isOpen, phoneNumber,
-                description, address);
+            description, address);
+    }
+
+    private static void validateBusinessHours(LocalTime openingTime, LocalTime closingTime)
+        throws IllegalArgumentException {
+        if (closingTime.equals(openingTime)) {
+            throw new IllegalArgumentException("openingTime 과 closingTime 은 같을 수 없습니다.");
+        }
     }
 
     public void updateBusinessHours(LocalTime openingTime, LocalTime closingTime)
-            throws IllegalArgumentException {
+        throws IllegalArgumentException {
         validateBusinessHours(openingTime, closingTime);
         this.openingTime = openingTime;
         this.closingTime = closingTime;
@@ -138,9 +147,13 @@ public class Restaurant extends BaseTimeEntity {
     public void addDeliveryArea(DeliveryArea deliveryArea) {
         deliveryAreas.add(deliveryArea);
     }
-  
+
     public void addRestaurantCategory(RestaurantCategory restaurantCategory) {
         restaurantCategory.setRestaurant(this);
+    }
+
+    public void setPermitted() {
+        this.isPermitted = true;
     }
 
     public void setOwner(Owner owner) {
@@ -151,10 +164,4 @@ public class Restaurant extends BaseTimeEntity {
         this.owner.getRestaurants().add(this);
     }
 
-    private static void validateBusinessHours(LocalTime openingTime, LocalTime closingTime)
-            throws IllegalArgumentException {
-        if (closingTime.equals(openingTime)) {
-            throw new IllegalArgumentException("openingTime 과 closingTime 은 같을 수 없습니다.");
-        }
-    }
 }

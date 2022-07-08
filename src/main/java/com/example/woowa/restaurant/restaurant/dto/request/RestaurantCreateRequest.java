@@ -18,11 +18,9 @@ public class RestaurantCreateRequest {
     private final String businessNumber;
 
     // validate
-    @DateTimeFormat(pattern = "HH:mm:ss")
     private final LocalTime openingTime;
 
     // validate
-    @DateTimeFormat(pattern = "HH:mm:ss")
     private final LocalTime closingTime;
 
     private final Boolean isOpen;

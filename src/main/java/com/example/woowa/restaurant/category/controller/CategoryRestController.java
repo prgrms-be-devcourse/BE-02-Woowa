@@ -5,7 +5,6 @@ import com.example.woowa.restaurant.category.dto.request.CategoryUpdateRequest;
 import com.example.woowa.restaurant.category.dto.response.CategoryCreateResponse;
 import com.example.woowa.restaurant.category.dto.response.CategoryFindResponse;
 import com.example.woowa.restaurant.category.service.CategoryService;
-import com.example.woowa.restaurant.restaurant.dto.response.RestaurantFindResponse;
 import java.util.List;
 import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -29,9 +28,9 @@ public class CategoryRestController {
     private final CategoryService categoryService;
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<CategoryCreateResponse> createCategory(@Valid @RequestBody final CategoryCreateRequest categoryCreateRequest) {
+    public ResponseEntity<CategoryCreateResponse> createCategory(final @Valid @RequestBody CategoryCreateRequest categoryCreateRequest) {
         CategoryCreateResponse newCategory = categoryService.createCategory(categoryCreateRequest);
-        return new ResponseEntity<>(newCategory, HttpStatus.OK);
+        return new ResponseEntity<>(newCategory, HttpStatus.CREATED);
     }
 
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
@@ -41,27 +40,20 @@ public class CategoryRestController {
     }
 
     @GetMapping(value = "{categoryId}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<CategoryFindResponse> findCategoryById(@PathVariable final Long categoryId) {
+    public ResponseEntity<CategoryFindResponse> findCategoryById(final @PathVariable Long categoryId) {
         CategoryFindResponse category = categoryService.findCategoryById(categoryId);
         return new ResponseEntity<>(category, HttpStatus.OK);
     }
 
-    @GetMapping(value = "{categoryId}/restaurants", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<RestaurantFindResponse>> findRestaurantByCategoryId(@PathVariable final Long categoryId) {
-        List<RestaurantFindResponse> restaurants = categoryService.findRestaurantsByCategoryId(categoryId);
-        return new ResponseEntity<>(restaurants, HttpStatus.OK);
-    }
-
-
     @PutMapping(value = "/{categoryId}", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Void> updateCategoryById(@PathVariable final Long categoryId,
-        @RequestBody @Valid final CategoryUpdateRequest categoryUpdateRequest) {
+    public ResponseEntity<Void> updateCategoryById(final @PathVariable Long categoryId,
+        final @Valid @RequestBody CategoryUpdateRequest categoryUpdateRequest) {
         categoryService.updateCategoryById(categoryId, categoryUpdateRequest);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @DeleteMapping(value = "/{categoryId}")
-    public ResponseEntity<Void> deleteCategoryById(@PathVariable final Long categoryId) {
+    public ResponseEntity<Void> deleteCategoryById(final @PathVariable Long categoryId) {
         categoryService.deleteCategory(categoryId);
         return new ResponseEntity<>(HttpStatus.OK);
     }
