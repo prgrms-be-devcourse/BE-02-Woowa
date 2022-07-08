@@ -1,5 +1,8 @@
 package com.example.woowa.order.order.controller;
 
+import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.then;
+import static org.mockito.Mockito.doThrow;
 import static org.springframework.restdocs.headers.HeaderDocumentation.headerWithName;
 import static org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders;
 import static org.springframework.restdocs.headers.HeaderDocumentation.responseHeaders;
@@ -17,43 +20,35 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.example.woowa.RestDocsConfiguration;
-import com.example.woowa.customer.customer.entity.Customer;
-import com.example.woowa.customer.customer.entity.CustomerGrade;
-import com.example.woowa.customer.customer.repository.CustomerGradeRepository;
-import com.example.woowa.customer.customer.repository.CustomerRepository;
-import com.example.woowa.customer.voucher.repository.VoucherRepository;
-import com.example.woowa.delivery.entity.AreaCode;
-import com.example.woowa.delivery.entity.DeliveryArea;
-import com.example.woowa.delivery.repository.AreaCodeRepository;
-import com.example.woowa.delivery.repository.DeliveryAreaRepository;
+import com.example.woowa.common.exception.NotFoundException;
+import com.example.woowa.order.order.dto.cart.CartResponse;
 import com.example.woowa.order.order.dto.cart.CartSaveRequest;
+import com.example.woowa.order.order.dto.cart.CartSummeryResponse;
+import com.example.woowa.order.order.dto.customer.OrderCustomerResponse;
 import com.example.woowa.order.order.dto.customer.OrderListCustomerRequest;
+import com.example.woowa.order.order.dto.customer.OrderListCustomerResponse;
 import com.example.woowa.order.order.dto.customer.OrderSaveRequest;
+import com.example.woowa.order.order.dto.customer.OrderSummeryResponse;
 import com.example.woowa.order.order.dto.restaurant.OrderAcceptRequest;
 import com.example.woowa.order.order.dto.restaurant.OrderListRestaurantRequest;
+import com.example.woowa.order.order.dto.restaurant.OrderListRestaurantResponse;
+import com.example.woowa.order.order.dto.restaurant.OrderRestaurantResponse;
 import com.example.woowa.order.order.dto.statistics.OrderStatisticsRequest;
-import com.example.woowa.order.order.entity.Cart;
-import com.example.woowa.order.order.entity.Order;
+import com.example.woowa.order.order.dto.statistics.OrderStatisticsResponse;
 import com.example.woowa.order.order.enums.PaymentType;
-import com.example.woowa.order.order.repository.OrderRepository;
-import com.example.woowa.restaurant.menu.entity.Menu;
-import com.example.woowa.restaurant.menu.enums.MenuStatus;
-import com.example.woowa.restaurant.menu.repository.MenuRepository;
-import com.example.woowa.restaurant.menugroup.entity.MenuGroup;
-import com.example.woowa.restaurant.menugroup.repository.MenuGroupRepository;
-import com.example.woowa.restaurant.restaurant.entity.Restaurant;
-import com.example.woowa.restaurant.restaurant.repository.RestaurantRepository;
+import com.example.woowa.order.order.service.OrderService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.time.LocalDate;
-import java.time.LocalTime;
+import java.time.LocalDateTime;
 import java.util.Collections;
-import org.junit.jupiter.api.BeforeEach;
+import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -72,75 +67,24 @@ class OrderApiControllerTest {
     MockMvc mockMvc;
     @Autowired
     ObjectMapper objectMapper;
-    @Autowired
-    RestaurantRepository restaurantRepository;
-    @Autowired
-    MenuGroupRepository menuGroupRepository;
-    @Autowired
-    MenuRepository menuRepository;
-    @Autowired
-    VoucherRepository voucherRepository;
-    @Autowired
-    CustomerRepository customerRepository;
-    @Autowired
-    CustomerGradeRepository customerGradeRepository;
-    @Autowired
-    AreaCodeRepository areaCodeRepository;
-    @Autowired
-    DeliveryAreaRepository deliveryAreaRepository;
-    @Autowired
-    OrderRepository orderRepository;
-
-    Restaurant restaurant;
-    MenuGroup menuGroup;
-    Menu menu;
-    Customer customer;
-    Order order;
-
-    @BeforeEach
-    void init() {
-        AreaCode areaCode = areaCodeRepository.save(
-                new AreaCode("1111000000", "서울특별시 종로구", false));
-
-        CustomerGrade customerGrade = customerGradeRepository.save(
-                new CustomerGrade(10, "VIP", 1000, 3));
-        customer = customerRepository.save(
-                new Customer("dev12", "Programmers123", LocalDate.of(2000, 1, 1), customerGrade));
-
-        restaurant = restaurantRepository.save(
-                Restaurant.createRestaurant("김밥나라", "000-00-00000",
-                        LocalTime.of(9, 0, 0), LocalTime.of(23, 0, 0),
-                        false, "00-000-0000",
-                        "안녕하세요 저희 김밥나라는 정성을 다해 요리합니다.", "서울특별시 종로구"));
-
-        DeliveryArea deliveryArea = deliveryAreaRepository.save(
-                new DeliveryArea(areaCode, restaurant, 3000));
-
-        menuGroup = menuGroupRepository.save(
-                MenuGroup.createMenuGroup(restaurant, "김밥류", "맛잇는 김밥"));
-
-        menu = menuRepository.save(
-                Menu.createMenu(menuGroup, "참치 김밥", 4500, "맛있는 참치 김밥", false,
-                        MenuStatus.SALE));
-
-        order = orderRepository.save(Order.createOrder(customer, restaurant, null, "서울특별시 종로구", 0,
-                PaymentType.CREDIT_CARD,
-                Collections.singletonList(new Cart(menu, 2)), deliveryArea.getDeliveryFee()));
-
-    }
+    @MockBean
+    OrderService orderService;
 
     @Test
     @DisplayName("주문을 생성한다.")
     void addOrderTest() throws Exception {
-        OrderSaveRequest orderSaveRequest = new OrderSaveRequest(customer.getLoginId(),
-                restaurant.getId(),
+        long savedOrderId = 1L;
+        OrderSaveRequest request = new OrderSaveRequest("dev12",
+                1L,
                 null, 0,
                 PaymentType.CREDIT_CARD, "서울특별시 종로구",
-                Collections.singletonList(new CartSaveRequest(menu.getId(), 2)));
+                Collections.singletonList(new CartSaveRequest(1L, 2)));
+
+        given(orderService.addOrder(request)).willReturn(savedOrderId);
 
         mockMvc.perform(post("/api/v1/orders")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(orderSaveRequest)))
+                        .content(objectMapper.writeValueAsString(request)))
                 .andDo(print())
                 .andExpect(status().isCreated())
                 .andExpect(header().exists(HttpHeaders.LOCATION))
@@ -170,17 +114,39 @@ class OrderApiControllerTest {
                                 headerWithName(HttpHeaders.LOCATION).description("생성된 주문의 경로")
                         )
                 ));
+
+        then(orderService).should().addOrder(request);
     }
 
     @Test
     @DisplayName("가게에서 주문을 조회한다.")
     void findOrderByRestaurantTest() throws Exception {
+        long restaurantId = 1L;
         OrderListRestaurantRequest request = new OrderListRestaurantRequest(
-                restaurant.getId(), 0, 3, LocalDate.now().minusMonths(1),
+                restaurantId, 0, 3, LocalDate.now().minusMonths(1),
                 LocalDate.now());
 
+        List<OrderRestaurantResponse> orderRestaurantResponses = List.of(
+                new OrderRestaurantResponse(LocalDateTime.now(),
+                        Collections.singletonList(
+                                new CartResponse("참치 김밥", 1, 4500)), 4500, 3000,
+                        7500, 0, "PAYMENT_COMPLETED"),
+                new OrderRestaurantResponse(LocalDateTime.now(),
+                        Collections.singletonList(new CartResponse("돈가스", 1, 7000)),
+                        7000, 3000, 7500, 2500, "ACCEPTED")
+        );
+
+        OrderListRestaurantResponse response = new OrderListRestaurantResponse(
+                false,
+                2,
+                orderRestaurantResponses
+        );
+
+        given(orderService.findOrderByRestaurant(request)).willReturn(
+                response);
+
         mockMvc.perform(get("/api/v1/restaurants/orders")
-                        .contentType(MediaType.APPLICATION_JSON)
+                        .contentType(MediaType.APPLICATION_JSON_VALUE)
                         .accept(MediaType.APPLICATION_JSON_VALUE)
                         .content(objectMapper.writeValueAsString(request)))
                 .andDo(print())
@@ -240,6 +206,8 @@ class OrderApiControllerTest {
                                         .description("가격")
                         )
                 ));
+
+        then(orderService).should().findOrderByRestaurant(request);
     }
 
     @Test
@@ -250,21 +218,42 @@ class OrderApiControllerTest {
                 wrongRestaurantId, 0, 3, LocalDate.now().minusMonths(1),
                 LocalDate.now());
 
+        given(orderService.findOrderByRestaurant(request)).willThrow(NotFoundException.class);
+
         mockMvc.perform(get("/api/v1/restaurants/orders")
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON_VALUE)
                         .content(objectMapper.writeValueAsString(request)))
                 .andDo(print())
                 .andExpect(status().isNotFound());
+
+        then(orderService).should().findOrderByRestaurant(request);
     }
 
     @Test
     @DisplayName("회원의 주문을 조회한다.")
     void findOrderByCustomerTest() throws Exception {
-
         OrderListCustomerRequest request = new OrderListCustomerRequest(
-                customer.getLoginId(), 0, 1, LocalDate.now().minusMonths(1),
+                "dev12", 0, 10, LocalDate.now().minusMonths(1),
                 LocalDate.now());
+
+        List<OrderSummeryResponse> orderSummeryResponses = List.of(
+                new OrderSummeryResponse(1L, LocalDateTime.now(), "ACCEPTED", "김밥나라", 15000,
+                        Collections.singletonList(new CartSummeryResponse("돈가스", 2))),
+                new OrderSummeryResponse(1L, LocalDateTime.now(), "ACCEPTED", "맥도날드", 13000,
+                        List.of(
+                                new CartSummeryResponse("1955버거 세트", 1),
+                                new CartSummeryResponse("빅맥 세트", 1)
+                        ))
+        );
+
+        OrderListCustomerResponse response = new OrderListCustomerResponse(
+                false,
+                2,
+                orderSummeryResponses
+        );
+
+        given(orderService.findOrderByCustomer(request)).willReturn(response);
 
         mockMvc.perform(get("/api/v1/customers/orders")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -320,6 +309,8 @@ class OrderApiControllerTest {
                                         .description("수량")
                         )
                 ));
+
+        then(orderService).should().findOrderByCustomer(request);
     }
 
     @Test
@@ -330,19 +321,39 @@ class OrderApiControllerTest {
                 wrongCustomerId, 0, 1, LocalDate.now().minusMonths(1),
                 LocalDate.now());
 
+        given(orderService.findOrderByCustomer(request)).willThrow(NotFoundException.class);
+
         mockMvc.perform(get("/api/v1/customers/orders")
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andDo(print())
                 .andExpect(status().isNotFound());
+
+        then(orderService).should().findOrderByCustomer(request);
     }
 
     @Test
     @DisplayName("회원 주문을 단건 조회한다.")
     void findDetailOrderForCustomerTest() throws Exception {
+        long orderId = 1L;
 
-        mockMvc.perform(get("/api/v1/customers/orders/{orderId}", order.getId())
+        List<CartResponse> cartResponses = List.of(
+                new CartResponse("참치 김밥", 1, 4500),
+                new CartResponse("치즈 라면", 1, 5000),
+                new CartResponse("돈가스", 1, 7000)
+        );
+
+        OrderCustomerResponse request = new OrderCustomerResponse(
+                LocalDateTime.now(),
+                cartResponses,
+                16500, 3000, 3000, 0, "ACCEPTED", "서울특별시 강남구"
+        );
+
+        given(orderService.findDetailOrderForCustomer(orderId)).willReturn(
+                request);
+
+        mockMvc.perform(get("/api/v1/customers/orders/{orderId}", orderId)
                         .accept(MediaType.APPLICATION_JSON_VALUE))
                 .andDo(print())
                 .andExpect(status().isOk())
@@ -383,22 +394,46 @@ class OrderApiControllerTest {
                                         .description("가격")
                         )
                 ));
+
+        then(orderService).should().findDetailOrderForCustomer(orderId);
     }
 
     @Test
     @DisplayName("존재하지 않는 주문을 회원이 단건 조회하려하면 404 NotFound 를 응답한다.")
     void findDetailOrderForCustomerNotFoundTest() throws Exception {
         Long wrongOrderId = -1L;
+        given(orderService.findDetailOrderForCustomer(wrongOrderId)).willThrow(
+                NotFoundException.class);
+
         mockMvc.perform(get("/api/v1/customers/orders/{orderId}", wrongOrderId)
                         .accept(MediaType.APPLICATION_JSON_VALUE))
                 .andDo(print())
                 .andExpect(status().isNotFound());
+
+        then(orderService).should().findDetailOrderForCustomer(wrongOrderId);
     }
 
     @Test
     @DisplayName("가게의 주문을 단건 조회한다.")
     void findDetailOrderForRestaurantTest() throws Exception {
-        mockMvc.perform(get("/api/v1/restaurants/orders/{orderId}", order.getId())
+        long orderId = 1L;
+
+        List<CartResponse> cartResponses = List.of(
+                new CartResponse("참치 김밥", 1, 4500),
+                new CartResponse("치즈 라면", 1, 5000),
+                new CartResponse("돈가스", 1, 7000)
+        );
+
+        OrderRestaurantResponse request = new OrderRestaurantResponse(
+                LocalDateTime.now(),
+                cartResponses,
+                16500, 3000, 13000, 6500, "PAYMENT_COMPLETED"
+        );
+
+        given(orderService.findDetailOrderByIdForRestaurant(orderId)).willReturn(
+                request);
+
+        mockMvc.perform(get("/api/v1/restaurants/orders/{orderId}", orderId)
                         .accept(MediaType.APPLICATION_JSON_VALUE))
                 .andDo(print())
                 .andExpect(status().isOk())
@@ -436,24 +471,34 @@ class OrderApiControllerTest {
                                 fieldWithPath("menus[].totalPrice").type(JsonFieldType.NUMBER)
                                         .description("가격")
                         )));
+
+        then(orderService).should().findDetailOrderByIdForRestaurant(orderId);
     }
 
     @Test
     @DisplayName("존재하지 않는 주문을 가게에서 단건 조회하려하면 404 NotFound 를 응답한다.")
     void findDetailOrderForRestaurantNotFoundTest() throws Exception {
         Long wrongOrderId = -1L;
+        given(orderService.findDetailOrderByIdForRestaurant(wrongOrderId)).willThrow(
+                NotFoundException.class);
+
         mockMvc.perform(get("/api/v1/restaurants/orders/{orderId}", wrongOrderId)
                         .accept(MediaType.APPLICATION_JSON_VALUE))
                 .andDo(print())
                 .andExpect(status().isNotFound());
+
+        then(orderService).should().findDetailOrderByIdForRestaurant(wrongOrderId);
     }
 
     @Test
     @DisplayName("기간별 가게 주문 횟수와 매출 정보를 조회한다.")
     void findOrderStatisticsTest() throws Exception {
         OrderStatisticsRequest request = new OrderStatisticsRequest(
-                restaurant.getId(), LocalDate.now().minusMonths(1),
+                1L, LocalDate.now().minusMonths(1),
                 LocalDate.now());
+
+        given(orderService.findOrderStatistics(request)).willReturn(
+                new OrderStatisticsResponse(10L, 150000L, 35000L));
 
         mockMvc.perform(get("/api/v1/restaurants/orders/statistics")
                         .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -489,6 +534,8 @@ class OrderApiControllerTest {
                                         .description("할인 금액")
                         )
                 ));
+
+        then(orderService).should().findOrderStatistics(request);
     }
 
     @Test
@@ -499,6 +546,8 @@ class OrderApiControllerTest {
                 wrongRestaurantId, LocalDate.now().minusMonths(1),
                 LocalDate.now());
 
+        given(orderService.findOrderStatistics(request)).willThrow(NotFoundException.class);
+
         mockMvc.perform(get("/api/v1/restaurants/orders/statistics")
                         .contentType(MediaType.APPLICATION_JSON_VALUE)
                         .accept(MediaType.APPLICATION_JSON_VALUE)
@@ -506,12 +555,15 @@ class OrderApiControllerTest {
                 .andDo(print())
                 .andExpect(status().isNotFound());
 
+        then(orderService).should().findOrderStatistics(request);
     }
 
     @Test
     @DisplayName("주문을 취소한다.")
     void cancelOrderTest() throws Exception {
-        mockMvc.perform(patch("/api/v1/orders/{orderId}/cancel", order.getId()))
+        long orderId = 1L;
+
+        mockMvc.perform(patch("/api/v1/orders/{orderId}/cancel", orderId))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andDo(document("cancel-order",
@@ -519,24 +571,30 @@ class OrderApiControllerTest {
                                 parameterWithName("orderId").description("취소할 주문 ID")
                         )
                 ));
+
+        then(orderService).should().cancelOrder(orderId);
     }
 
     @Test
     @DisplayName("존재하지 않는 주문을 취소하려하면 404 NotFound 를 응답한다.")
     void cancelOrderNotFoundTest() throws Exception {
         long wrongOrderId = -1L;
+        doThrow(NotFoundException.class).when(orderService).cancelOrder(wrongOrderId);
 
         mockMvc.perform(patch("/api/v1/orders/{orderId}/cancel", wrongOrderId))
                 .andDo(print())
                 .andExpect(status().isNotFound());
+
+        then(orderService).should().cancelOrder(wrongOrderId);
     }
 
     @Test
     @DisplayName("주문을 수락한다.")
     void acceptOrderTest() throws Exception {
+        long orderId = 1L;
         OrderAcceptRequest request = new OrderAcceptRequest(30);
 
-        mockMvc.perform(patch("/api/v1/orders/{orderId}/accept", order.getId())
+        mockMvc.perform(patch("/api/v1/orders/{orderId}/accept", orderId)
                         .contentType(MediaType.APPLICATION_JSON_VALUE)
                         .content(objectMapper.writeValueAsString(request)))
                 .andDo(print())
@@ -554,6 +612,8 @@ class OrderApiControllerTest {
                                         .description("조리 예상 시간(분)")
                         )
                 ));
+
+        then(orderService).should().acceptOrder(orderId, request);
     }
 
     @Test
@@ -561,11 +621,14 @@ class OrderApiControllerTest {
     void acceptOrderNotFoundTest() throws Exception {
         OrderAcceptRequest request = new OrderAcceptRequest(30);
         long wrongOrderId = -1L;
+        doThrow(NotFoundException.class).when(orderService).acceptOrder(wrongOrderId, request);
 
         mockMvc.perform(patch("/api/v1/orders/{orderId}/accept", wrongOrderId)
                         .contentType(MediaType.APPLICATION_JSON_VALUE)
                         .content(objectMapper.writeValueAsString(request)))
                 .andDo(print())
                 .andExpect(status().isNotFound());
+
+        then(orderService).should().acceptOrder(wrongOrderId, request);
     }
 }
