@@ -3,6 +3,7 @@ package com.example.woowa.delivery.controller;
 import com.example.woowa.delivery.service.AreaCodeService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -13,6 +14,7 @@ public class AreaCodeController {
 
     private final AreaCodeService areaCodeService;
 
+    @PostMapping
     public ResponseEntity<Void> init() {
         areaCodeService.init();
         return ResponseEntity.noContent().build();

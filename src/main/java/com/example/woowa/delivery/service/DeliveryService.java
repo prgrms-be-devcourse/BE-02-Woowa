@@ -1,7 +1,6 @@
 package com.example.woowa.delivery.service;
 
 import com.example.woowa.common.exception.ErrorMessage;
-import com.example.woowa.delivery.dto.DeliveryCreateRequest;
 import com.example.woowa.delivery.dto.DeliveryResponse;
 import com.example.woowa.delivery.entity.Delivery;
 import com.example.woowa.delivery.entity.Rider;
@@ -25,14 +24,6 @@ public class DeliveryService {
     private final DeliveryMapper deliveryMapper;
 
     private final RiderService riderService;
-
-    @Transactional
-    public Long save(DeliveryCreateRequest deliveryCreateRequest) {
-        // 작업
-        Delivery delivery = deliveryMapper.toEntity(deliveryCreateRequest);
-        deliveryRepository.save(delivery);
-        return delivery.getId();
-    }
 
     public Page<DeliveryResponse> findWaitingDelivery(PageRequest pageRequest) {
         return deliveryRepository.findByDeliveryStatus(pageRequest, DeliveryStatus.DELIVERY_WAITING)
