@@ -19,7 +19,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.example.woowa.TestInitUtil;
-import com.example.woowa.common.config.JpaAuditingConfiguration;
 import com.example.woowa.delivery.dto.RiderCreateRequest;
 import com.example.woowa.delivery.dto.RiderResponse;
 import com.example.woowa.delivery.dto.RiderUpdateRequest;
@@ -40,6 +39,7 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.jpa.mapping.JpaMetamodelMappingContext;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.constraints.ConstraintDescriptions;
 import org.springframework.restdocs.payload.JsonFieldType;
@@ -53,7 +53,7 @@ import org.springframework.test.web.servlet.MockMvc;
         classes = SecurityConfig.class
     )
 })
-@MockBean(JpaAuditingConfiguration.class)
+@MockBean(JpaMetamodelMappingContext.class)
 @WithMockUser
 class RiderControllerTest {
 
