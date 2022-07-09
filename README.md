@@ -48,6 +48,6 @@
 
 ![](https://velog.velcdn.com/images/y005/post/23e6f786-91aa-4fed-913c-b6d800e6d5fe/image.png)
 
-### 4. [REST API 문서]()
+### 4. [REST API 문서](https://prgrms-be-devcourse.github.io/BE-02-Woowa/)
 
 ### 5. [프로젝트 회고록](https://deluxe-mahogany-9ff.notion.site/daf8f5966ba44cf88758e5cb544ea182)
