@@ -2,7 +2,7 @@
 :icons: font
 :source-highlighter: highlightjs
 :toc: left
-:toclevels: 3
+:toclevels: 2
 :sectlinks:
 
 :operation-request-fields-title: 요청 필드
@@ -11,8 +11,12 @@
 :operation-http-response-title: HTTP 응답 예시
 :operation-response-headers-title: 응답 헤더
 :operation-response-fields-title: 응답 필드
-:operation-request-body-title: 응답 바디
-:operation-path-parameters-title: 요청 파라미터
+:operation-request-body-title: 요청 바디
+:operation-response-body-title: 응답 바디
+:operation-path-parameters-title: PATH 파라미터
+:operation-request-parameters-title: 요청 파라미터
+:operation-curl-request-title: Crul 요청 예시
+
 
 == HTTP 메서드
 
