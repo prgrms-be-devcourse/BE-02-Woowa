@@ -20,6 +20,6 @@ operation::pickup-delivery[snippets='http-request,http-response,path-parameters'
 
 operation::finish-delivery[snippets='http-request,http-response,path-parameters']
 
-== 배달 지연
+=== 배달 지연
 
 operation::delay-delivery[snippets='http-request,http-response,request-parameters,path-parameters']
