@@ -1,0 +1,31 @@
+== 고객
+
+=== 고객 생성
+
+고객을 생성할 수 있습니다.
+
+operation::customers-create[snippets='http-request,http-response,response-fields']
+
+=== 고객 조회
+
+고객을 단건 조회할 수 있습니다.
+
+operation::customers-find[snippets='http-request,path-parameters,http-response,response-fields']
+
+=== 고객 정보 업데이트
+
+고객의 정보를 업데이트 할 수 있습니다.
+
+operation::customers-update[snippets='http-request,path-parameters,http-response,response-fields']
+
+=== 고객 매달 정보 업데이트
+
+매달 1일 고객의 주문 횟수와 정기 쿠폰 발행 여부를 업데이트 할 수 있습니다.
+
+operation::customers-update-firstday[snippets='http-request,path-parameters,http-response,response-fields']
+
+=== 고객 삭제
+
+고객을 삭제할 수 있습니다.
+
+operation::customers-delete[snippets='http-request,path-parameters,http-response']

@@ -34,10 +34,6 @@ public enum VoucherType implements EnumFindable {
 
     private final String type;
 
-    VoucherType(String type) {
-        this.type = type;
-    }
-
     @Override
     public String getType() {
         return type;
@@ -46,6 +42,10 @@ public enum VoucherType implements EnumFindable {
     @Override
     public String toString() {
         return getType();
+    }
+
+    VoucherType(String type) {
+        this.type = type;
     }
 
     public int discount(int currentPrice, int amount) {

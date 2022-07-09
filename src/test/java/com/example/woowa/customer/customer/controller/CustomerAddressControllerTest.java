@@ -1,5 +1,9 @@
 package com.example.woowa.customer.customer.controller;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.BDDMockito.given;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.delete;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
@@ -7,38 +11,46 @@ import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuild
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.put;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
-import static org.springframework.restdocs.payload.PayloadDocumentation.responseBody;
 import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
+import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
+import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import com.example.woowa.RestDocsConfiguration;
 import com.example.woowa.customer.customer.dto.CustomerAddressCreateRequest;
 import com.example.woowa.customer.customer.dto.CustomerAddressFindResponse;
 import com.example.woowa.customer.customer.dto.CustomerAddressUpdateRequest;
-import com.example.woowa.customer.customer.dto.CustomerCreateRequest;
-import com.example.woowa.customer.customer.dto.CustomerFindResponse;
-import com.example.woowa.customer.customer.dto.CustomerGradeCreateRequest;
-import com.example.woowa.customer.customer.repository.CustomerAddressRepository;
-import com.example.woowa.customer.customer.repository.CustomerGradeRepository;
-import com.example.woowa.customer.customer.repository.CustomerRepository;
-import com.example.woowa.customer.customer.service.CustomerGradeService;
-import com.fasterxml.jackson.core.type.TypeReference;
+import com.example.woowa.customer.customer.service.CustomerAddressService;
+import com.example.woowa.security.configuration.SecurityConfig;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.ArrayList;
 import java.util.List;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.FilterType;
+import org.springframework.context.annotation.Import;
+import org.springframework.data.jpa.mapping.JpaMetamodelMappingContext;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.payload.JsonFieldType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
-@SpringBootTest
-@AutoConfigureMockMvc
 @AutoConfigureRestDocs
+@WebMvcTest(value = CustomerAddressController.class, excludeFilters = {
+    @ComponentScan.Filter(
+        type = FilterType.ASSIGNABLE_TYPE,
+        classes = SecurityConfig.class
+    ),
+})
+@Import(RestDocsConfiguration.class)
+@MockBean(JpaMetamodelMappingContext.class)
+@WithMockUser
 class CustomerAddressControllerTest {
   @Autowired
   MockMvc mockMvc;
@@ -46,62 +58,28 @@ class CustomerAddressControllerTest {
   @Autowired
   private ObjectMapper objectMapper;
 
-  @Autowired
-  private CustomerGradeService customerGradeService;
-
-  @Autowired
-  private CustomerRepository customerRepository;
-
-  @Autowired
-  private CustomerAddressRepository customerAddressRepository;
-
-  @Autowired
-  private CustomerGradeRepository customerGradeRepository;
-
-  public void makeDefaultCustomerGrade() {
-    CustomerGradeCreateRequest customerGradeCreateRequest = new CustomerGradeCreateRequest(1, "일반", 3000, 2);
-    customerGradeService.createCustomerGrade(customerGradeCreateRequest);
-  }
-
-  @BeforeEach
-  void settingBeforeTest() {
-    makeDefaultCustomerGrade();
-  }
-
-  @AfterEach
-  void settingAfterTest() {
-    customerRepository.deleteAll();
-    customerAddressRepository.deleteAll();
-    customerGradeRepository.deleteAll();
-  }
-
-  String createCustomer() throws Exception {
-    CustomerAddressCreateRequest customerAddressCreateRequest = new CustomerAddressCreateRequest("서울특별시 동작구 상도동","빌라 101호","집");
-    CustomerCreateRequest customerCreateRequest = new CustomerCreateRequest("dev12","Programmers123!", "2000-01-01", customerAddressCreateRequest);
-
-    String body = mockMvc.perform(
-        post("/api/v1/customers")
-            .contentType(MediaType.APPLICATION_JSON)
-            .content(objectMapper.writeValueAsString(customerCreateRequest))
-    ).andReturn().getResponse().getContentAsString();
-
-    CustomerFindResponse customerFindResponse = objectMapper.readValue(body, CustomerFindResponse.class);
-    return customerFindResponse.getLoginId();
-  }
+  @MockBean
+  private CustomerAddressService customerAddressService;
 
   @Test
   void createCustomerAddress() throws Exception {
-    String id = createCustomer();
-    CustomerAddressCreateRequest customerAddressCreateRequest = new CustomerAddressCreateRequest("서울특별시 동작구 상도동", "아파트 101호","집");
+    CustomerAddressCreateRequest customerAddressCreateRequest = new CustomerAddressCreateRequest("서울특별시 서초구 서초동", "1000-1 101호", "집");
+    CustomerAddressFindResponse customerAddressFindResponse = new CustomerAddressFindResponse(1l, "서울특별시 서초구 서초동 1000-1 101호", "집");
+
+    given(customerAddressService.createCustomerAddress(anyString(), any())).willReturn(customerAddressFindResponse);
 
     mockMvc.perform(
-            post("/api/v1/customers/addresses/{loginId}", id)
+            post("/api/v1/customers/addresses/{loginId}", "dev12")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(customerAddressCreateRequest))
+                .with(csrf().asHeader())
         )
         .andExpect(status().isOk())
         .andDo(print())
         .andDo(document("customers-addresses-create",
+            pathParameters(
+                parameterWithName("loginId").description("조회할 고객 로그인 ID")
+            ),
             requestFields(
                 fieldWithPath("defaultAddress").type(JsonFieldType.STRING).description("기본 주소"),
                 fieldWithPath("detailAddress").type(JsonFieldType.STRING).description("상세 주소"),
@@ -117,13 +95,20 @@ class CustomerAddressControllerTest {
 
   @Test
   void readCustomerAddresses() throws Exception {
-    String id = createCustomer();
+    CustomerAddressFindResponse customerAddressFindResponse = new CustomerAddressFindResponse(1l, "서울특별시 서초구 서초동 1000-1 101호", "집");
+    List<CustomerAddressFindResponse> result = new ArrayList<>();
+    result.add(customerAddressFindResponse);
+    given(customerAddressService.findCustomerAddresses(anyString())).willReturn(result);
+
     mockMvc.perform(
-            get("/api/v1/customers/addresses/{loginId}", id)
+            get("/api/v1/customers/addresses/{loginId}", "dev12")
         )
         .andExpect(status().isOk())
         .andDo(print())
         .andDo(document("customers-addresses-find",
+            pathParameters(
+                parameterWithName("loginId").description("조회할 고객 로그인 ID")
+            ),
             responseFields(
                 fieldWithPath("[].id").type(JsonFieldType.NUMBER).description("주소 아이디"),
                 fieldWithPath("[].address").type(JsonFieldType.STRING).description("주소"),
@@ -134,22 +119,22 @@ class CustomerAddressControllerTest {
 
   @Test
   void updateCustomerAddress() throws Exception {
-    String id = createCustomer();
-    String body = mockMvc.perform(
-            get("/api/v1/customers/addresses/{loginId}", id)
-        ).andReturn().getResponse().getContentAsString();
-    List<CustomerAddressFindResponse> result = objectMapper.readValue(body, new TypeReference<List<CustomerAddressFindResponse>>() {});
-    Long addressId = result.get(0).getId();
-    CustomerAddressUpdateRequest customerAddressUpdateRequest = new CustomerAddressUpdateRequest("서울특별시 서초구 방배동", "빌라 201호","회사");
+    CustomerAddressFindResponse customerAddressFindResponse = new CustomerAddressFindResponse(1l, "서울특별시 서초구 서초동 1000-1 101호", "집");
+    given(customerAddressService.updateCustomerAddress(anyLong(), any())).willReturn(customerAddressFindResponse);
 
+    CustomerAddressUpdateRequest customerAddressUpdateRequest = new CustomerAddressUpdateRequest("서울특별시 서초구 서초동", "아파트 101호","집");
     mockMvc.perform(
-            put("/api/v1/customers/addresses/{id}", addressId)
+            put("/api/v1/customers/addresses/{id}", 1)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(customerAddressUpdateRequest))
+                .with(csrf().asHeader())
         )
         .andExpect(status().isOk())
         .andDo(print())
         .andDo(document("customers-addresses-update",
+            pathParameters(
+                parameterWithName("id").description("수정할 주소 ID")
+            ),
             requestFields(
                 fieldWithPath("defaultAddress").type(JsonFieldType.STRING).description("기본 주소"),
                 fieldWithPath("detailAddress").type(JsonFieldType.STRING).description("상세 주소"),
@@ -165,20 +150,16 @@ class CustomerAddressControllerTest {
 
   @Test
   void deleteCustomerAddress() throws Exception {
-    String id = createCustomer();
-    String body = mockMvc.perform(
-        get("/api/v1/customers/addresses/{loginId}", id)
-    ).andReturn().getResponse().getContentAsString();
-    List<CustomerAddressFindResponse> result = objectMapper.readValue(body, new TypeReference<List<CustomerAddressFindResponse>>() {});
-    Long addressId = result.get(0).getId();
-
     mockMvc.perform(
-            delete("/api/v1/customers/addresses/{id}", addressId)
+            delete("/api/v1/customers/addresses/{id}", 1)
+                .with(csrf().asHeader())
         )
         .andExpect(status().isOk())
         .andDo(print())
         .andDo(document("customers-addresses-delete",
-            responseBody()
+            pathParameters(
+                parameterWithName("id").description("삭제할 고객 로그인 ID")
+            )
         ));
   }
 }

@@ -5,6 +5,7 @@ import static lombok.AccessLevel.PROTECTED;
 import com.example.woowa.common.base.BaseTimeEntity;
 import com.example.woowa.delivery.entity.AreaCode;
 import java.time.LocalDateTime;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EntityListeners;

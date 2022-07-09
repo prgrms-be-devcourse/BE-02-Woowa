@@ -1,0 +1,25 @@
+== 고객 주소
+
+=== 고객 주소 생성
+
+고객 주소를 생성할 수 있습니다.
+
+operation::customers-addresses-create[snippets='http-request,path-parameters,http-response,response-fields']
+
+=== 고객 주소 조회
+
+고객 주소를 단건 조회할 수 있습니다.
+
+operation::customers-addresses-find[snippets='http-request,path-parameters,http-response,response-fields']
+
+=== 고객 주소 정보 업데이트
+
+고객 주소의 정보를 업데이트 할 수 있습니다.
+
+operation::customers-addresses-update[snippets='http-request,path-parameters,http-response,response-fields']
+
+=== 고객 주소 삭제
+
+고객 주소를 삭제할 수 있습니다.
+
+operation::customers-addresses-delete[snippets='http-request,path-parameters,http-response']

@@ -74,7 +74,7 @@ public class VoucherService {
     }
 
     public VoucherFindResponse findVoucher(Long id) {
-        Voucher voucher = findVoucherEntity(id);
+        Voucher voucher = findVoucherById(id);
         return voucherMapper.toVoucherDto(voucher);
     }
 
@@ -85,13 +85,14 @@ public class VoucherService {
 
     @Transactional
     public void deleteVoucher(String customerLoginId, Long id) {
-        Voucher voucher = findVoucherEntity(id);
+        Voucher voucher = findVoucherById(id);
         Customer customer = customerService.findCustomerEntity(customerLoginId);
         customer.removeVoucher(voucher);
         voucherRepository.deleteById(id);
     }
 
-    private Voucher findVoucherEntity(Long id) {
-        return voucherRepository.findById(id).orElseThrow(() -> new RuntimeException("voucher not existed"));
+    public Voucher findVoucherById(Long voucherId) {
+        return voucherRepository.findById(voucherId)
+            .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 voucherId 입니다."));
     }
 }

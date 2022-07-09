@@ -1,0 +1,31 @@
+== 쿠폰
+
+=== 쿠폰 생성
+
+쿠폰을 생성할 수 있습니다.
+
+operation::vouchers-create[snippets='http-request,request-fields,http-response']
+
+=== 쿠폰 조회
+
+쿠폰을 단건 조회할 수 있습니다.
+
+operation::vouchers-find[snippets='http-request,path-parameters,http-response,response-fields']
+
+=== 정기 쿠폰 등록
+
+고객 등급에 따라 정기 쿠폰을 등록할 수 있습니다.
+
+operation::vouchers-month[snippets='http-request,path-parameters,http-response,response-fields']
+
+=== 쿠폰 등록
+
+고객이 쿠폰을 등록할 수 있습니다.
+
+operation::vouchers-register[snippets='http-request,path-parameters,http-response,response-fields']
+
+=== 쿠폰 삭제
+
+쿠폰을 삭제할 수 있습니다.
+
+operation::vouchers-delete[snippets='http-request,path-parameters,http-response']

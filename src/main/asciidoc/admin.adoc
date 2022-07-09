@@ -1,0 +1,25 @@
+== 관리자
+
+=== 관리자 생성
+
+관리자를 생성할 수 있습니다.
+
+operation::admins-create[snippets='http-request,request-fields,http-response,response-fields']
+
+=== 관리자 조회
+
+관리자를 단건 조회할 수 있습니다.
+
+operation::admins-find[snippets='http-request,path-parameters,http-response,response-fields']
+
+=== 관리자 정보 업데이트
+
+관리자의 정보를 업데이트 할 수 있습니다.
+
+operation::admins-update[snippets='http-request,request-fields,http-response,response-fields']
+
+=== 관리자 삭제
+
+관리자를 삭제할 수 있습니다.
+
+operation::admins-delete[snippets='http-request,path-parameters,http-response']
