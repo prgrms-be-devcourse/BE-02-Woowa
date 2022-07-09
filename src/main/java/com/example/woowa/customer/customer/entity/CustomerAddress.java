@@ -41,7 +41,7 @@ public class CustomerAddress extends BaseTimeEntity {
     @JoinColumn(nullable = false)
     private Customer customer;
 
-    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @OneToOne(fetch = FetchType.LAZY)
     private AreaCode areaCode;
 
     @Column

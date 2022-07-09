@@ -60,3 +60,9 @@
 include::menu.adoc[]
 include::menu-group.adoc[]
 include::order.adoc[]
+
+include::admin.adoc[]
+include::customer.adoc[]
+include::customer-addresses.adoc[]
+include::customer-grade.adoc[]
+include::voucher.adoc[]
