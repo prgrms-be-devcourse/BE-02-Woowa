@@ -56,31 +56,27 @@ class CategoryServiceTest {
 
     private final CategoryMapper categoryMapper = Mappers.getMapper(CategoryMapper.class);
 
-    public static List<Category> makeCategories(String... name) {
-        return Arrays.stream(name).map(Category::new).collect(Collectors.toList());
-    }
-
     @Test
     @DisplayName("새로운 카테고리를 생성한다.")
     void testCreateCategory() {
         // Mocked
         CategoryRepository mockedCategoryRepository = mock(CategoryRepository.class);
-        CategoryService categoryService = new CategoryService(mockedCategoryRepository,
-            categoryMapper);
+        CategoryService categoryService = new CategoryService(mockedCategoryRepository, categoryMapper);
+
 
         // Given
         CategoryCreateRequest categoryCreateRequest = new CategoryCreateRequest("한식");
         Category korean = makeCategories("한식").get(0);
         CategoryCreateResponse manualConversion = new CategoryCreateResponse(korean.getId(),
             korean.getName(), korean.getCreatedAt());
+        when(mockedCategoryRepository.save(any(Category.class))).thenReturn(korean);
 
         // When
-        when(mockedCategoryRepository.save(any(Category.class))).thenReturn(korean);
-        CategoryCreateResponse category = categoryService.createCategory(categoryCreateRequest);
+        CategoryCreateResponse result = categoryService.createCategory(categoryCreateRequest);
 
         // Then
         verify(mockedCategoryRepository, times(1)).save(any(Category.class));
-        assertThat(category).usingRecursiveComparison().isEqualTo(manualConversion);
+        assertThat(result).usingRecursiveComparison().isEqualTo(manualConversion);
     }
 
     @Test
@@ -88,8 +84,8 @@ class CategoryServiceTest {
     void testFindCategories() {
         // Mocked
         CategoryRepository mockedCategoryRepository = mock(CategoryRepository.class);
-        CategoryService categoryService = new CategoryService(mockedCategoryRepository,
-            categoryMapper);
+        CategoryService categoryService = new CategoryService(mockedCategoryRepository, categoryMapper);
+
 
         // Given
         List<Category> testers = makeCategories("한식", "중식");
@@ -98,17 +94,16 @@ class CategoryServiceTest {
                 new CategoryFindResponse(category.getId(), category.getName(),
                     category.getCreatedAt(), category.getUpdatedAt()))
             .collect(Collectors.toList());
+        when(mockedCategoryRepository.findAll()).thenReturn(testers);
 
         // When
-        when(mockedCategoryRepository.findAll()).thenReturn(testers);
-        List<CategoryFindResponse> categories = categoryService.findCategories();
+        List<CategoryFindResponse> result = categoryService.findCategories();
 
         // Then
         verify(mockedCategoryRepository, times(1)).findAll();
-        for (int i = 0; i < categories.size(); i++) {
-            assertThat(categories.get(i)).usingRecursiveComparison()
-                .isEqualTo(manualConversion.get(i));
-        }
+        for (int i = 0; i < result.size(); i++)
+            assertThat(result.get(i)).usingRecursiveComparison().isEqualTo(manualConversion.get(i));
+
     }
 
     @Test
@@ -116,22 +111,21 @@ class CategoryServiceTest {
     void testFindCategoryById() {
         // Mocked
         CategoryRepository mockedCategoryRepository = mock(CategoryRepository.class);
-        CategoryService categoryService = new CategoryService(mockedCategoryRepository,
-            categoryMapper);
+        CategoryService categoryService = new CategoryService(mockedCategoryRepository, categoryMapper);
 
         // Given
         Category korean = makeCategories("한식").get(0);
         CategoryFindResponse manualConversion =
-            new CategoryFindResponse(korean.getId(), korean.getName(), korean.getCreatedAt(),
-                korean.getUpdatedAt());
+            new CategoryFindResponse(korean.getId(), korean.getName(), korean.getCreatedAt(), korean.getUpdatedAt());
+        when(mockedCategoryRepository.findById(1L)).thenReturn(Optional.of(korean));
 
         // When
-        when(mockedCategoryRepository.findById(1L)).thenReturn(Optional.of(korean));
-        CategoryFindResponse category = categoryService.findCategoryById(1L);
+        CategoryFindResponse result = categoryService.findCategoryById(1L);
 
         // Then
         verify(mockedCategoryRepository, times(1)).findById(anyLong());
-        assertThat(category).usingRecursiveComparison().isEqualTo(manualConversion);
+        assertThat(result).usingRecursiveComparison().isEqualTo(manualConversion);
+
     }
 
     @Test
@@ -152,4 +146,9 @@ class CategoryServiceTest {
         assertThat(afterUpdating.getId()).isEqualTo(beforeUpdating.getId());
         assertThat(afterUpdating.getName()).isEqualTo(categoryUpdateRequest.getName());
     }
+    
+    public static List<Category> makeCategories(String... name) {
+        return Arrays.stream(name).map(Category::new).collect(Collectors.toList());
+    }
+
 }
