@@ -1,0 +1,11 @@
+:hardbreaks:
+ifndef::snippets[]
+:snippets: ../../ target/generated-snippets
+endif::[]
+== 카테고리
+=== 카테고리 생성
+
+operation::category-create[snippets='http-request, ']
+
+
+
