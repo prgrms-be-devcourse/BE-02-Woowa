@@ -49,13 +49,13 @@ public class CategoryRestController {
     public ResponseEntity<Void> updateCategoryById(final @PathVariable Long categoryId,
         final @Valid @RequestBody CategoryUpdateRequest categoryUpdateRequest) {
         categoryService.updateCategoryById(categoryId, categoryUpdateRequest);
-        return new ResponseEntity<>(HttpStatus.OK);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     @DeleteMapping(value = "/{categoryId}")
     public ResponseEntity<Void> deleteCategoryById(final @PathVariable Long categoryId) {
         categoryService.deleteCategory(categoryId);
-        return new ResponseEntity<>(HttpStatus.OK);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
 }

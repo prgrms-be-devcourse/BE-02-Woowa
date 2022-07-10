@@ -181,7 +181,7 @@ class CategoryRestControllerTest {
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(objectMapper.writeValueAsString(updateRequest))
                     .with(csrf().asHeader()))
-            .andExpect(status().isOk())
+            .andExpect(status().isNoContent())
             .andDo(document("category-update",
                 pathParameters(
                   parameterWithName("categoryId").description("저장된 카테고리 아이디")
@@ -210,7 +210,7 @@ class CategoryRestControllerTest {
                 delete(BASE_URL_TEMPLATE.concat("categories/{categoryId}"), mockSavedEntityId)
                     .characterEncoding(StandardCharsets.UTF_8)
                     .with(csrf().asHeader()))
-            .andExpect(status().isOk())
+            .andExpect(status().isNoContent())
             .andDo(document("category-delete",
                 pathParameters(
                     parameterWithName("categoryId").description("저장된 카테고리 아이디")
