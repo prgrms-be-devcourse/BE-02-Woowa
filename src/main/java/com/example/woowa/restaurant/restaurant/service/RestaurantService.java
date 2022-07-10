@@ -5,6 +5,7 @@ import com.example.woowa.common.exception.NotFoundException;
 import com.example.woowa.delivery.entity.AreaCode;
 import com.example.woowa.delivery.entity.DeliveryArea;
 import com.example.woowa.delivery.service.AreaCodeService;
+import com.example.woowa.delivery.service.DeliveryAreaService;
 import com.example.woowa.restaurant.category.entity.Category;
 import com.example.woowa.restaurant.category.service.CategoryService;
 import com.example.woowa.restaurant.owner.entity.Owner;
@@ -36,7 +37,7 @@ public class RestaurantService {
     private final CategoryService categoryService;
     private final OwnerService ownerService;
     private final AreaCodeService areaCodeService;
-
+    private final DeliveryAreaService deliveryAreaService;
     private final RestaurantMapper restaurantMapper;
 
     @Transactional
@@ -136,14 +137,6 @@ public class RestaurantService {
         restaurantCategoryRepository.delete(restaurantCategory);
     }
 
-    @Transactional
-    public void setDeliveryArea(Long restaurantId, Long areaCodeId, Integer deleiveryFee) {
-        Restaurant restaurant = findRestaurantEntityById(restaurantId);
-        AreaCode areaCode = areaCodeService.findEntityById(areaCodeId);
-
-        DeliveryArea deliveryArea = new DeliveryArea(areaCode, restaurant, deleiveryFee);
-    }
-
     public Restaurant findRestaurantEntityByOwnerIdAndRestaurantId(Long ownerId, Long restaurantId) {
         return ownerService.findOwnerEntityById(ownerId).getRestaurants().stream().
             filter(r -> r.getId() == restaurantId).
@@ -173,15 +166,11 @@ public class RestaurantService {
     }
 
     public List<RestaurantFindResponse> findRestaurantByAreaCode(Long areaCodeId) {
-        return restaurantRepository.findAll().stream().filter(restaurant -> {
-                for (DeliveryArea deliveryArea : restaurant.getDeliveryAreas()) {
-                    if (deliveryArea.getAreaCode().getId().equals(areaCodeId)) {
-                        return true;
-                    }
-                }
-                return false;
-            }).map(restaurantMapper::toFindResponseDto)
-            .collect(Collectors.toList());
+        AreaCode areaCode = areaCodeService.findEntityById(areaCodeId);
+        return deliveryAreaService.findDeliveryAreaEntityWithRestaurant(areaCode).stream()
+                .map(deliveryArea -> restaurantMapper.toFindResponseDto(
+                        deliveryArea.getRestaurant()))
+                .collect(Collectors.toList());
     }
 
 }

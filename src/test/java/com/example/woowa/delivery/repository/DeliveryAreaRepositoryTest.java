@@ -1,12 +1,17 @@
 package com.example.woowa.delivery.repository;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import com.example.woowa.delivery.entity.AreaCode;
 import com.example.woowa.delivery.entity.DeliveryArea;
+import com.example.woowa.restaurant.owner.entity.Owner;
+import com.example.woowa.restaurant.owner.repository.OwnerRepository;
+import com.example.woowa.restaurant.owner.service.OwnerService;
 import com.example.woowa.restaurant.restaurant.entity.Restaurant;
 import com.example.woowa.restaurant.restaurant.repository.RestaurantRepository;
 import java.time.LocalTime;
+import java.util.List;
 import java.util.Optional;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -27,14 +32,21 @@ class DeliveryAreaRepositoryTest {
     @Autowired
     AreaCodeRepository areaCodeRepository;
 
+    @Autowired
+    OwnerRepository ownerRepository;
+
     Restaurant restaurant;
 
     DeliveryArea deliveryArea;
+    AreaCode savedAreaCode;
+    @Autowired
+    OwnerService ownerService;
 
     @BeforeEach
     void init() {
-        AreaCode savedAreaCode = areaCodeRepository.save(
+        savedAreaCode = areaCodeRepository.save(
                 new AreaCode("1111010100", "서울특별시 종로구 청운동", false));
+
 
         restaurant = restaurantRepository.save(
                 Restaurant.createRestaurant("김밥나라", "000-00-00000", LocalTime.of(9, 0, 0),
@@ -42,6 +54,10 @@ class DeliveryAreaRepositoryTest {
 
         deliveryArea = deliveryAreaRepository.save(
                 new DeliveryArea(savedAreaCode, restaurant, 3000));
+
+        Owner owner = ownerRepository.save(
+                new Owner("dev12", "programmers12!", "kim", "000-0000-0000"));
+        restaurant.setOwner(owner);
     }
 
     @Test
@@ -54,7 +70,18 @@ class DeliveryAreaRepositoryTest {
                 restaurant, "서울특별시 종로구 청운동");
 
         // Then
-        Assertions.assertThat(deliveryArea).isNotEmpty();
-        Assertions.assertThat(deliveryArea).usingRecursiveComparison().isEqualTo(deliveryArea);
+        assertThat(deliveryArea).isNotEmpty();
+        assertThat(deliveryArea).usingRecursiveComparison().isEqualTo(deliveryArea);
+    }
+
+    @Test
+    @DisplayName("지역코드별 배달 지역을 조회한다.")
+    void findByAreaCodeTest() {
+        // When
+        List<DeliveryArea> deliveryAreas = deliveryAreaRepository.findByAreaCode(savedAreaCode);
+
+        // Then
+        assertThat(deliveryAreas.size()).isEqualTo(1);
+        assertThat(deliveryAreas).containsExactly(deliveryArea);
     }
 }
