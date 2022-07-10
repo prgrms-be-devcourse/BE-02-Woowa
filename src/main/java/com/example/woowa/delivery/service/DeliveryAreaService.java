@@ -1,9 +1,11 @@
 package com.example.woowa.delivery.service;
 
 import com.example.woowa.common.exception.ErrorMessage;
+import com.example.woowa.delivery.entity.AreaCode;
 import com.example.woowa.delivery.entity.DeliveryArea;
 import com.example.woowa.delivery.repository.DeliveryAreaRepository;
 import com.example.woowa.restaurant.restaurant.entity.Restaurant;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -24,4 +26,7 @@ public class DeliveryAreaService {
                 .getDeliveryFee();
     }
 
+    public List<DeliveryArea> findDeliveryAreaEntityWithRestaurant(AreaCode areaCode) {
+        return deliveryAreaRepository.findByAreaCode(areaCode);
+    }
 }
