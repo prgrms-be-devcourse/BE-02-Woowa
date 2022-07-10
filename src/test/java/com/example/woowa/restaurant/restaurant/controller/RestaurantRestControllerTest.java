@@ -456,7 +456,7 @@ class RestaurantRestControllerTest {
                     .with(csrf().asHeader()))
             .andExpect(status().isNoContent())
             .andDo(print())
-            .andDo(document("restaurant-open/close",
+            .andDo(document("restaurant-open-close",
                 pathParameters(
                     parameterWithName("ownerId").description("사장님 아이디"),
                     parameterWithName("restaurantId").description("가게 아이디")
