@@ -1,0 +1,31 @@
+== 사장님
+
+=== 사장님 생성
+
+새로운 사장님을 생성할 수 있습니다.
+
+operation::owner-create[snippets='http-request,request-fields,http-response,response-fields']
+
+=== 사장님 삭제
+
+사장님 엔티티를 삭제할 수 있습니다.
+
+operation::owner-delete[snippets='http-request,path-parameters']
+
+=== 사장님 전체 조회
+
+저장된 모든 사장님 정보를 조회할 수 있습니다.
+
+operation::owner-findAll[snippets='http-request,http-response,response-fields']
+
+=== 사장님 단건 조회
+
+저장된 하나의 사장님 정보를 조회할 수 있습니다.
+
+operation::owner-findById[snippets='http-request,path-parameters,http-response,response-fields']
+
+=== 사장님 변경
+
+저장된 하나의 사장님 정보를 변경할 수 있습니다.
+
+operation::owner-update[snippets='http-request,path-parameters,request-body,request-fields']
