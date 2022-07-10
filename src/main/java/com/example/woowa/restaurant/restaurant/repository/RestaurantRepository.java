@@ -22,5 +22,4 @@ public interface RestaurantRepository extends JpaRepository<Restaurant, Long> {
     List<Restaurant> findByCategoryId(@Param("categoryId") Long categoryId);
 
     List<Restaurant> findRestaurantByIsPermittedIsFalse();
-
 }

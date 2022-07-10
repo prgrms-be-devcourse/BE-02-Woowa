@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import com.example.woowa.restaurant.menugroup.dto.MenuGroupListResponse;
 import com.example.woowa.restaurant.menugroup.dto.MenuGroupResponse;
 import com.example.woowa.restaurant.menugroup.entity.MenuGroup;
+import com.example.woowa.restaurant.menugroup.mapper.MenuGroupMapper;
 import com.example.woowa.restaurant.menugroup.repository.MenuGroupRepository;
 import com.example.woowa.restaurant.restaurant.entity.Restaurant;
 import com.example.woowa.restaurant.restaurant.repository.RestaurantRepository;

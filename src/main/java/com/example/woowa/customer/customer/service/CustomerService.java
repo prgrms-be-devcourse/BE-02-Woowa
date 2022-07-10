@@ -1,5 +1,7 @@
 package com.example.woowa.customer.customer.service;
 
+import com.example.woowa.common.exception.ErrorMessage;
+import com.example.woowa.common.exception.NotFoundException;
 import com.example.woowa.customer.customer.converter.CustomerMapper;
 import com.example.woowa.customer.customer.dto.CustomerCreateRequest;
 import com.example.woowa.customer.customer.dto.CustomerFindResponse;
@@ -56,7 +58,8 @@ public class CustomerService {
     }
 
     public Customer findCustomerEntity(String loginId) {
-        Customer customer = customerRepository.findByLoginId(loginId).orElseThrow(() -> new RuntimeException("login id not existed"));
+        Customer customer = customerRepository.findByLoginId(loginId).orElseThrow(() -> new NotFoundException(
+                ErrorMessage.NOT_FOUND_CUSTOMER.getMessage()));
         return customer;
     }
 

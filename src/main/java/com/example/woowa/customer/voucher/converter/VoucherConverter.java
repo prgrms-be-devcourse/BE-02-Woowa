@@ -13,7 +13,7 @@ public class VoucherConverter {
 
     public static VoucherFindResponse toVoucherDto(Voucher voucher) {
         return new VoucherFindResponse(voucher.getId(), voucher.getVoucherType().getType(),
-            voucher.getEventType().getType(), voucher.getDiscountValue(),
+            voucher.getEventType().toString(), voucher.getDiscountValue(),
             voucher.getExpirationDate(),
             voucher.getCode());
     }

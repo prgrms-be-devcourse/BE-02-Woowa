@@ -7,12 +7,13 @@ import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.when;
 
-import com.example.woowa.restaurant.menugroup.MenuGroupMapperImpl;
+import com.example.woowa.common.exception.NotFoundException;
 import com.example.woowa.restaurant.menugroup.dto.MenuGroupListResponse;
 import com.example.woowa.restaurant.menugroup.dto.MenuGroupResponse;
 import com.example.woowa.restaurant.menugroup.dto.MenuGroupSaveRequest;
 import com.example.woowa.restaurant.menugroup.dto.MenuGroupUpdateRequest;
 import com.example.woowa.restaurant.menugroup.entity.MenuGroup;
+import com.example.woowa.restaurant.menugroup.mapper.MenuGroupMapperImpl;
 import com.example.woowa.restaurant.menugroup.repository.MenuGroupRepository;
 import com.example.woowa.restaurant.restaurant.entity.Restaurant;
 import com.example.woowa.restaurant.restaurant.service.RestaurantService;
@@ -47,7 +48,7 @@ class MenuGroupServiceTest {
     void init() {
         mapper = new MenuGroupMapperImpl();
         menuGroupService = new MenuGroupService(menuGroupRepository, restaurantService,
-                mapper);
+            mapper);
 
         String name = "김밥나라";
         String businessNumber = "000-00-00000";
@@ -58,8 +59,8 @@ class MenuGroupServiceTest {
         String address = "서울 특별시 강남구";
 
         restaurant = Restaurant.createRestaurant(name, businessNumber, openingTime, closingTime,
-                false, phoneNumber,
-                description, address);
+            false, phoneNumber,
+            description, address);
 
         menuGroup = MenuGroup.createMenuGroup(restaurant, "김밥류", "국내산 쌀 사용");
     }
@@ -69,9 +70,9 @@ class MenuGroupServiceTest {
     void findMenuGroupByRestaurantTest() {
         // Given
         Long restaurantId = 1L;
-        given(restaurantService.findRestaurantById(restaurantId)).willReturn(restaurant);
+        given(restaurantService.findRestaurantEntityById(restaurantId)).willReturn(restaurant);
         given(menuGroupRepository.findByRestaurant(restaurant)).willReturn(
-                Collections.singletonList(menuGroup));
+            Collections.singletonList(menuGroup));
 
         // When
         MenuGroupListResponse response = menuGroupService.findMenuGroupByRestaurant(restaurantId);
@@ -79,7 +80,7 @@ class MenuGroupServiceTest {
         // Then
         assertThat(response.getMenuGroups().size()).isEqualTo(1);
         assertThat(response.getMenuGroups()).usingRecursiveFieldByFieldElementComparator()
-                .isEqualTo(Collections.singletonList(mapper.toMenuGroupResponse(menuGroup)));
+            .isEqualTo(Collections.singletonList(mapper.toMenuGroupResponse(menuGroup)));
     }
 
     @Test
@@ -89,30 +90,31 @@ class MenuGroupServiceTest {
         Long restaurantId = 1L;
 
         given(menuGroupRepository.save(any())).willReturn(menuGroup);
-        given(restaurantService.findRestaurantById(restaurantId)).willReturn(restaurant);
+        given(restaurantService.findRestaurantEntityById(restaurantId)).willReturn(restaurant);
 
         // When
         menuGroupService.addMenuGroup(restaurantId, new MenuGroupSaveRequest(menuGroup.getTitle(),
-                menuGroup.getDescription()));
+            menuGroup.getDescription()));
 
         // Then
         then(menuGroupRepository).should().save(any());
     }
 
     @Test
-    @DisplayName("존재하지 않는 레스토랑에 메뉴그룹을 추가하려 하면 예외가 발생한다.")
+    @DisplayName("존재하지 않는 레스토랑에 메뉴그룹을 추가하려 하면 NotFoundException 이 발생한다.")
     void addMenuGroupNotExistsRestaurantTest() {
         // Given
         Long wrongRestaurantId = -1L;
-        when(restaurantService.findRestaurantById(wrongRestaurantId)).thenThrow(
-                IllegalArgumentException.class);
+
+        when(restaurantService.findRestaurantEntityById(wrongRestaurantId)).thenThrow(
+                NotFoundException.class);
 
         // When // Then
         assertThatThrownBy(
                 () -> menuGroupService.addMenuGroup(wrongRestaurantId,
                         new MenuGroupSaveRequest(menuGroup.getTitle(),
                                 menuGroup.getDescription())))
-                .isExactlyInstanceOf(IllegalArgumentException.class);
+                .isExactlyInstanceOf(NotFoundException.class);
     }
 
     @Test
@@ -127,11 +129,11 @@ class MenuGroupServiceTest {
 
         // Then
         assertThat(response).usingRecursiveComparison()
-                .isEqualTo(mapper.toMenuGroupResponse(menuGroup));
+            .isEqualTo(mapper.toMenuGroupResponse(menuGroup));
     }
 
     @Test
-    @DisplayName("존재하지 않는 ID로 메뉴 그룹을 조회하면 예외가 발생한다.")
+    @DisplayName("존재하지 않는 ID로 메뉴 그룹을 조회하면 NotFoundException 이 발생한다.")
     void findMenuGroupByNotExistsIdTest() {
         // Given
         Long wrongMenuGroupId = -1L;
@@ -139,7 +141,7 @@ class MenuGroupServiceTest {
 
         // When // Then
         assertThatThrownBy(() -> menuGroupService.findMenuById(wrongMenuGroupId))
-                .isExactlyInstanceOf(IllegalArgumentException.class);
+                .isExactlyInstanceOf(NotFoundException.class);
     }
 
     @Test
@@ -153,7 +155,7 @@ class MenuGroupServiceTest {
 
         // When
         menuGroupService.updateMenuGroup(menuGroupId,
-                new MenuGroupUpdateRequest(newTitle, newDescription));
+            new MenuGroupUpdateRequest(newTitle, newDescription));
 
         // Then
         MenuGroup findMenuGroup = menuGroupService.findMenuGroupEntityById(menuGroupId);
@@ -162,7 +164,7 @@ class MenuGroupServiceTest {
     }
 
     @Test
-    @DisplayName("존재하지 않는 메뉴그룹을 업데이트하려 하면 예외가 발생한다.")
+    @DisplayName("존재하지 않는 메뉴그룹을 업데이트하려 하면 NotFoundException 이 발생한다.")
     void updateMenuGroupNotExistsIdTest() {
         // Given
         Long wrongMenuGroupId = -1L;
@@ -174,7 +176,7 @@ class MenuGroupServiceTest {
         assertThatThrownBy(
                 () -> menuGroupService.updateMenuGroup(wrongMenuGroupId,
                         new MenuGroupUpdateRequest(newTitle, newDescription)))
-                .isExactlyInstanceOf(IllegalArgumentException.class);
+                .isExactlyInstanceOf(NotFoundException.class);
     }
 
     @Test
@@ -192,7 +194,7 @@ class MenuGroupServiceTest {
     }
 
     @Test
-    @DisplayName("존재하지 않는 메뉴그룹을 삭제하려 하면 예외가 발생한다.")
+    @DisplayName("존재하지 않는 메뉴그룹을 삭제하려 하면 NotFoundException 이 발생한다.")
     void deleteMenuGroupNotExistsIdTest() {
         // Given
         Long wrongMenuGroupId = -1L;
@@ -200,6 +202,6 @@ class MenuGroupServiceTest {
 
         // When // Then
         assertThatThrownBy(() -> menuGroupService.deleteMenuGroup(wrongMenuGroupId))
-                .isExactlyInstanceOf(IllegalArgumentException.class);
+                .isExactlyInstanceOf(NotFoundException.class);
     }
 }

@@ -1,6 +1,8 @@
 package com.example.woowa.order.review.controller;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.delete;
@@ -10,42 +12,45 @@ import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuild
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
 import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
+import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
+import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import com.example.woowa.customer.customer.dto.CustomerAddressCreateRequest;
-import com.example.woowa.customer.customer.dto.CustomerCreateRequest;
-import com.example.woowa.customer.customer.dto.CustomerFindResponse;
-import com.example.woowa.customer.customer.dto.CustomerGradeCreateRequest;
-import com.example.woowa.customer.customer.repository.CustomerAddressRepository;
-import com.example.woowa.customer.customer.repository.CustomerGradeRepository;
-import com.example.woowa.customer.customer.repository.CustomerRepository;
-import com.example.woowa.customer.customer.service.CustomerGradeService;
-import com.example.woowa.customer.customer.service.CustomerService;
-import com.example.woowa.order.order.entity.Order;
-import com.example.woowa.order.order.service.OrderService;
-import com.example.woowa.order.review.converter.ReviewMapper;
+import com.example.woowa.RestDocsConfiguration;
 import com.example.woowa.order.review.dto.ReviewCreateRequest;
 import com.example.woowa.order.review.dto.ReviewFindResponse;
 import com.example.woowa.order.review.dto.ReviewUpdateRequest;
-import com.example.woowa.order.review.repository.ReviewRepository;
 import com.example.woowa.order.review.service.ReviewService;
+import com.example.woowa.security.configuration.SecurityConfig;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
+import java.util.ArrayList;
+import java.util.List;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.FilterType;
+import org.springframework.context.annotation.Import;
+import org.springframework.data.jpa.mapping.JpaMetamodelMappingContext;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.payload.JsonFieldType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
-@SpringBootTest
-@AutoConfigureMockMvc
 @AutoConfigureRestDocs
+@WebMvcTest(value = ReviewController.class, excludeFilters = {
+    @ComponentScan.Filter(
+        type = FilterType.ASSIGNABLE_TYPE,
+        classes = SecurityConfig.class
+    ),
+})
+@Import(RestDocsConfiguration.class)
+@MockBean(JpaMetamodelMappingContext.class)
+@WithMockUser
 class ReviewControllerTest {
   @Autowired
   MockMvc mockMvc;
@@ -53,74 +58,30 @@ class ReviewControllerTest {
   @Autowired
   private ObjectMapper objectMapper;
 
-  @Autowired
-  private CustomerService customerService;
-
-  @Autowired
-  private CustomerRepository customerRepository;
-
-  @Autowired
-  private CustomerGradeService customerGradeService;
-
-  @Autowired
-  private CustomerGradeRepository customerGradeRepository;
-
-  @Autowired
-  private CustomerAddressRepository customerAddressRepository;
-
-  @Autowired
+  @MockBean
   private ReviewService reviewService;
-
-  @Autowired
-  private ReviewRepository reviewRepository;
-
-  @Autowired
-  private ReviewMapper reviewMapper;
-
-  @Mock
-  private OrderService orderService;
-
-  public void makeDefaultCustomerGrade() {
-    CustomerGradeCreateRequest customerGradeCreateRequest = new CustomerGradeCreateRequest(5, "일반", 3000, 2);
-    customerGradeService.createCustomerGrade(customerGradeCreateRequest);
-  }
-
-  public String getCustomerLoginId() {
-    CustomerAddressCreateRequest customerAddressCreateRequest = new CustomerAddressCreateRequest("서울특별시 동작구 상도동","빌라 101호","집");
-    CustomerCreateRequest customerCreateRequest = new CustomerCreateRequest("dev12","Programmers123!", "2000-01-01", customerAddressCreateRequest);
-    CustomerFindResponse customerFindResponse = customerService.createCustomer(
-        customerCreateRequest);
-    return customerFindResponse.getLoginId();
-  }
-
-  @BeforeEach
-  void settingBeforeTest() {
-    reviewService = new ReviewService(reviewRepository, customerService, orderService, reviewMapper);
-    makeDefaultCustomerGrade();
-  }
-
-  @AfterEach
-  void settingAfterTest() {
-    reviewRepository.deleteAll();
-    customerAddressRepository.deleteAll();
-    customerRepository.deleteAll();
-    customerGradeRepository.deleteAll();
-  }
 
   @Test
   void createReview() throws Exception {
-    String customerId = getCustomerLoginId();
-    ReviewCreateRequest reviewCreateRequest = new ReviewCreateRequest("정말정말 맛있습니다.", 5);
-    given(orderService.findOrderById(any())).willReturn(null);
+    ReviewFindResponse reviewFindResponse = new ReviewFindResponse(1l, "정말정말 맛있습니다.", 5);
+
+    given(reviewService.createReview(anyString(), anyLong(), any())).willReturn(reviewFindResponse);
+    ReviewCreateRequest reviewCreateRequest = new ReviewCreateRequest(reviewFindResponse.getContent(),
+        reviewFindResponse.getScoreType());
 
     mockMvc.perform(
-            post("/api/v1/reviews/{loginId}/{orderId}", customerId, 10)
+            post("/api/v1/reviews/{loginId}/{orderId}", "dev12", 1)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(reviewCreateRequest))
+                .with(csrf().asHeader())
         )
         .andExpect(status().isOk())
         .andDo(print())
         .andDo(document("reviews-create",
+            pathParameters(
+                parameterWithName("loginId").description("고객 로그인 ID"),
+                parameterWithName("orderId").description("리뷰할 주문 ID")
+            ),
             requestFields(
                 fieldWithPath("content").type(JsonFieldType.STRING).description("리뷰 내용"),
                 fieldWithPath("scoreType").type(JsonFieldType.NUMBER).description("평점")
@@ -135,17 +96,9 @@ class ReviewControllerTest {
 
   @Test
   void findReview() throws Exception {
-    String customerId = getCustomerLoginId();
-    ReviewCreateRequest reviewCreateRequest = new ReviewCreateRequest("정말정말 맛있습니다.", 5);
-    given(orderService.findOrderById(any())).willReturn(null);
+    ReviewFindResponse reviewFindResponse = new ReviewFindResponse(1l, "정말정말 맛있습니다.", 5);
 
-    String body = mockMvc.perform(
-            post("/api/v1/reviews/{loginId}/{orderId}", customerId, 10)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(reviewCreateRequest))
-        ).andReturn().getResponse().getContentAsString();
-
-    ReviewFindResponse reviewFindResponse = objectMapper.readValue(body, ReviewFindResponse.class);
+    given(reviewService.findReview(anyLong())).willReturn(reviewFindResponse);
 
     mockMvc.perform(
             get("/api/v1/reviews/{id}", reviewFindResponse.getId())
@@ -153,6 +106,9 @@ class ReviewControllerTest {
         .andExpect(status().isOk())
         .andDo(print())
         .andDo(document("reviews-find",
+            pathParameters(
+                parameterWithName("id").description("조회할 리뷰 ID")
+            ),
             responseFields(
                 fieldWithPath("id").type(JsonFieldType.NUMBER).description("생성된 리뷰 아이디"),
                 fieldWithPath("content").type(JsonFieldType.STRING).description("리뷰 내용"),
@@ -163,23 +119,23 @@ class ReviewControllerTest {
 
   @Test
   void findUserReview() throws Exception {
-    String customerId = getCustomerLoginId();
-    ReviewCreateRequest reviewCreateRequest = new ReviewCreateRequest("정말정말 맛있습니다.", 5);
-    given(orderService.findOrderById(any())).willReturn(null);
+    List<ReviewFindResponse> result = new ArrayList<>();
+    ReviewFindResponse reviewFindResponse1 = new ReviewFindResponse(1l, "정말정말 맛있습니다.", 5);
+    ReviewFindResponse reviewFindResponse2 = new ReviewFindResponse(2l, "정말정말 맛없습니다.", 1);
+    result.add(reviewFindResponse1);
+    result.add(reviewFindResponse2);
 
-    String body = mockMvc.perform(
-        post("/api/v1/reviews/{loginId}/{orderId}", customerId, 10)
-            .contentType(MediaType.APPLICATION_JSON)
-            .content(objectMapper.writeValueAsString(reviewCreateRequest))
-    ).andReturn().getResponse().getContentAsString();
+    given(reviewService.findUserReview(anyString())).willReturn(result);
 
-    ReviewFindResponse reviewFindResponse = objectMapper.readValue(body, ReviewFindResponse.class);
     mockMvc.perform(
-            get("/api/v1/reviews/user/{loginId}", customerId)
+            get("/api/v1/reviews/user/{loginId}", "dev12")
         )
         .andExpect(status().isOk())
         .andDo(print())
         .andDo(document("reviews-user-find",
+            pathParameters(
+                parameterWithName("loginId").description("고객 로그인 ID")
+            ),
             responseFields(
                 fieldWithPath("[].id").type(JsonFieldType.NUMBER).description("생성된 리뷰 아이디"),
                 fieldWithPath("[].content").type(JsonFieldType.STRING).description("리뷰 내용"),
@@ -190,27 +146,23 @@ class ReviewControllerTest {
 
   @Test
   void updateReview() throws Exception {
-    String customerId = getCustomerLoginId();
-    ReviewCreateRequest reviewCreateRequest = new ReviewCreateRequest("정말정말 맛있습니다.", 5);
-    given(orderService.findOrderById(any())).willReturn(null);
+    ReviewFindResponse reviewFindResponse = new ReviewFindResponse(1l, "정말정말 맛있습니다.", 5);
 
-    String body = mockMvc.perform(
-        post("/api/v1/reviews/{loginId}/{orderId}", customerId, 10)
-            .contentType(MediaType.APPLICATION_JSON)
-            .content(objectMapper.writeValueAsString(reviewCreateRequest))
-    ).andReturn().getResponse().getContentAsString();
-
-    ReviewFindResponse reviewFindResponse = objectMapper.readValue(body, ReviewFindResponse.class);
+    given(reviewService.updateReview(anyLong(), any())).willReturn(reviewFindResponse);
     ReviewUpdateRequest reviewUpdateRequest = new ReviewUpdateRequest("정말정말 맛없습니다.", 1);
 
     mockMvc.perform(
             put("/api/v1/reviews/{id}", reviewFindResponse.getId())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(reviewUpdateRequest))
+                .with(csrf().asHeader())
         )
         .andExpect(status().isOk())
         .andDo(print())
         .andDo(document("reviews-update",
+            pathParameters(
+                parameterWithName("id").description("수정할 리뷰 ID")
+            ),
             requestFields(
                 fieldWithPath("content").type(JsonFieldType.STRING).description("리뷰 내용"),
                 fieldWithPath("scoreType").type(JsonFieldType.NUMBER).description("평점")
@@ -225,24 +177,16 @@ class ReviewControllerTest {
 
   @Test
   void deleteReview() throws Exception {
-    String customerId = getCustomerLoginId();
-    ReviewCreateRequest reviewCreateRequest = new ReviewCreateRequest("정말정말 맛있습니다.", 5);
-    given(orderService.findOrderById(any())).willReturn(null);
-
-    String body = mockMvc.perform(
-        post("/api/v1/reviews/{loginId}/{orderId}", customerId, 10)
-            .contentType(MediaType.APPLICATION_JSON)
-            .content(objectMapper.writeValueAsString(reviewCreateRequest))
-    ).andReturn().getResponse().getContentAsString();
-
-    ReviewFindResponse reviewFindResponse = objectMapper.readValue(body, ReviewFindResponse.class);
-
     mockMvc.perform(
-            delete("/api/v1/reviews/{id}", reviewFindResponse.getId())
+            delete("/api/v1/reviews/{id}", 1)
+                .with(csrf().asHeader())
         )
         .andExpect(status().isOk())
         .andDo(print())
-        .andDo(document("reviews-delete"
+        .andDo(document("reviews-delete",
+            pathParameters(
+                parameterWithName("id").description("삭제할 리뷰 ID")
+            )
         ));
   }
 }

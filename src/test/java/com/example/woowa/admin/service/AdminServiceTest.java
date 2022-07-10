@@ -33,7 +33,7 @@ class AdminServiceTest {
   @DisplayName("관리자 생성")
   void createAdmin() {
     AdminCreateRequest  adminCreateRequest = new AdminCreateRequest("dev12", "Programmers12!");
-    adminService.createAdmin(adminCreateRequest).getLoginId();
+    adminService.createAdmin(adminCreateRequest);
 
     Assertions.assertThat(adminRepository.count()).isEqualTo(1l);
   }

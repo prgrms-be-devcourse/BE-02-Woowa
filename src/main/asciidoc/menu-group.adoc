@@ -1,0 +1,31 @@
+가== 메뉴그룹
+
+=== 메뉴그룹 생성
+
+메뉴그룹을 생성할 수 있습니다.
+
+operation::add-menu-group[snippets='http-request,request-headers,path-parameters,request-fields,http-response,response-headers']
+
+=== 메뉴그룹 단건 조회
+
+메뉴그룹을 단건 조회할 수 있습니다.
+
+operation::find-menu-group[snippets='http-request,request-headers,path-parameters,http-response,response-headers,response-fields']
+
+=== 가게 메뉴그룹 조회
+
+가게의 메뉴그룹을 조회할 수 있다.
+
+operation::find-menu-group-list[snippets='http-request,path-parameters,request-headers,http-response,response-headers,response-fields']
+
+=== 메뉴그룹 업데이트
+
+메뉴그룹 정보를 수정할 수 있다.
+
+operation::update-menu-group[snippets='http-request,path-parameters,request-headers,request-fields,http-response']
+
+=== 메뉴그룹 삭제
+
+메뉴그룹을 삭제할 수 있습니다.
+
+operation::delete-menu-group[snippets='http-request,path-parameters,http-response']

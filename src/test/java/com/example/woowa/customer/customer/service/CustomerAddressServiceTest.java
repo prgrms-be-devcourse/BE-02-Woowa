@@ -1,5 +1,6 @@
 package com.example.woowa.customer.customer.service;
 
+import com.example.woowa.customer.customer.converter.CustomerMapper;
 import com.example.woowa.customer.customer.dto.CustomerAddressCreateRequest;
 import com.example.woowa.customer.customer.dto.CustomerAddressFindResponse;
 import com.example.woowa.customer.customer.dto.CustomerAddressUpdateRequest;
@@ -17,16 +18,23 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
+@ExtendWith(MockitoExtension.class)
 class CustomerAddressServiceTest {
   @Autowired
   private CustomerService customerService;
 
   @Autowired
   private CustomerRepository customerRepository;
+
+  @Autowired
+  private CustomerMapper customerMapper;
 
   @Autowired
   private CustomerGradeService customerGradeService;
@@ -40,13 +48,8 @@ class CustomerAddressServiceTest {
   @Autowired
   private CustomerAddressRepository customerAddressRepository;
 
-  @Autowired
+  @Mock
   private AreaCodeService areaCodeService;
-
-  @Test
-  void init() {
-    areaCodeService.init();
-  }
 
   public void makeDefaultCustomerGrade() {
     CustomerGradeCreateRequest customerGradeCreateRequest = new CustomerGradeCreateRequest(5, "일반", 3000, 2);
@@ -63,6 +66,10 @@ class CustomerAddressServiceTest {
 
   @BeforeEach
   void settingBeforeTest() {
+    customerService = new CustomerService(customerAddressRepository, customerRepository, customerGradeService, areaCodeService, customerMapper);
+    customerAddressRepository.deleteAll();
+    customerRepository.deleteAll();
+    customerGradeRepository.deleteAll();
     makeDefaultCustomerGrade();
   }
 
@@ -71,6 +78,11 @@ class CustomerAddressServiceTest {
     customerAddressRepository.deleteAll();
     customerRepository.deleteAll();
     customerGradeRepository.deleteAll();
+  }
+
+  @Test
+  void test() {
+    areaCodeService.init();
   }
 
   @Test
@@ -91,9 +103,9 @@ class CustomerAddressServiceTest {
   void findCustomerAddress() {
     CustomerAddressCreateRequest customerAddressCreateRequest = new CustomerAddressCreateRequest("서울특별시 동작구 상도동", "아파트 101호","회사");
     String loginId = getCustomerLoginId();
-
     customerAddressService.createCustomerAddress(loginId,
         customerAddressCreateRequest);
+
     List<CustomerAddressFindResponse> customerAddressFindResponseList = customerAddressService.findCustomerAddresses(loginId);
 
     Assertions.assertThat(customerAddressFindResponseList.size()).isEqualTo(2);

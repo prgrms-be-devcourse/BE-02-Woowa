@@ -1,6 +1,7 @@
 package com.example.woowa.order.order.service;
 
 import com.example.woowa.common.exception.ErrorMessage;
+import com.example.woowa.common.exception.NotFoundException;
 import com.example.woowa.customer.customer.entity.Customer;
 import com.example.woowa.customer.customer.service.CustomerService;
 import com.example.woowa.customer.voucher.entity.Voucher;
@@ -133,7 +134,7 @@ public class OrderService {
 
     public Order findOrderById(Long orderId) {
         return orderRepository.findById(orderId)
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 orderId 입니다."));
+                .orElseThrow(() -> new NotFoundException(ErrorMessage.NOT_FOUND_ORDER.getMessage()));
     }
 
     private void validatePeriod(LocalDate from, LocalDate end) {

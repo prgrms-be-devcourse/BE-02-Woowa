@@ -19,8 +19,9 @@
 ## Project Description
  배달의 민족 서비스 기능을 REST API로 제공할 수 있는 프로젝트입니다.
 
+
 ### 1. 목표
-배달의 민족 서비스의 비즈니스 모델 반영과 고객, 가맹점 사장, 관리자과 같이 다양한 사용자 입장에서 필요한 기능들을 최대한으로 구현해보는 것을 목표로 했습니다.
+배달의 민족 서비스의 비즈니스 모델 반영과 다양한 사용자 입장(고객, 가맹점 사장, 관리자)에서 필요한 기능들을 최대한으로 구현해보는 것을 목표로 했습니다.
 
 ### 2. 기능
 - 가게 관련
@@ -43,11 +44,10 @@
 - 관리자 관련
   - 광고 상품 관리
 
-### 3. [ERD](https://www.erdcloud.com/d/yuhmyZS3qAH3mDu6Z)
+### 3. ERD
 
 ![](https://velog.velcdn.com/images/y005/post/23e6f786-91aa-4fed-913c-b6d800e6d5fe/image.png)
 
-### 4. 협업 관련 문서
+### 4. [REST API 문서](https://prgrms-be-devcourse.github.io/BE-02-Woowa/)
 
-- [유저 스토리](https://www.notion.so/backend-devcourse/b6326064bcc949c3b1ab404b11f7df09)
-- [회의록](https://www.notion.so/backend-devcourse/728551f974ec41bca2b65182ef937d80?v=d2698a2a6bfc49cbb154790551f2df05)
+### 5. [프로젝트 회고록](https://deluxe-mahogany-9ff.notion.site/daf8f5966ba44cf88758e5cb544ea182)

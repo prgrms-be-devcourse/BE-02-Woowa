@@ -1,5 +1,6 @@
 package com.example.woowa.restaurant.restaurant.service;
 
+import com.example.woowa.common.exception.ErrorMessage;
 import com.example.woowa.common.exception.NotFoundException;
 import com.example.woowa.delivery.entity.AreaCode;
 import com.example.woowa.delivery.entity.DeliveryArea;
@@ -39,7 +40,8 @@ public class RestaurantService {
     private final RestaurantMapper restaurantMapper;
 
     @Transactional
-    public RestaurantCreateResponse createRestaurantByOwnerId(Long ownerId, RestaurantCreateRequest restaurantCreateRequest) {
+    public RestaurantCreateResponse createRestaurantByOwnerId(Long ownerId,
+        RestaurantCreateRequest restaurantCreateRequest) {
         Owner owner = ownerService.findOwnerEntityById(ownerId);
         Restaurant restaurant = restaurantRepository.save(
             restaurantMapper.toEntity(restaurantCreateRequest));
@@ -90,7 +92,8 @@ public class RestaurantService {
     }
 
     @Transactional
-    public void updateRestaurantById(Long ownerId, Long restaurantId, RestaurantUpdateRequest restaurantUpdateRequest) {
+    public void updateRestaurantById(Long ownerId, Long restaurantId,
+        RestaurantUpdateRequest restaurantUpdateRequest) {
         Restaurant restaurant = findRestaurantEntityByOwnerIdAndRestaurantId(ownerId, restaurantId);
         restaurantMapper.updateEntity(restaurantUpdateRequest, restaurant);
     }
@@ -127,7 +130,8 @@ public class RestaurantService {
         Category category = categoryService.findCategoryEntityById(categoryId);
 
         RestaurantCategory restaurantCategory = restaurantCategoryRepository.findById(
-            new RestaurantCategoryId(restaurantId, categoryId)).orElseThrow(() -> new IllegalArgumentException("이 가게는 해당 카테고리에 속하지 않습니다."));
+                new RestaurantCategoryId(restaurantId, categoryId))
+            .orElseThrow(() -> new IllegalArgumentException("이 가게는 해당 카테고리에 속하지 않습니다."));
 
         restaurantCategoryRepository.delete(restaurantCategory);
     }
@@ -149,14 +153,34 @@ public class RestaurantService {
                     "사장님(" + ownerId + ")은 가게(" + restaurantId + ")를 소유하고 있지 않습니다."));
     }
 
+    @Transactional
+    public void setDeliveryArea(Long restaurantId, Long areaCodeId, Integer deleiveryFee) {
+        Restaurant restaurant = findRestaurantEntityById(restaurantId);
+        AreaCode areaCode = areaCodeService.findEntityById(areaCodeId);
+
+        DeliveryArea deliveryArea = new DeliveryArea(areaCode, restaurant, deleiveryFee);
+    }
+
     public Restaurant findRestaurantEntityById(Long restaurantId) {
         return restaurantRepository.findById(restaurantId)
-            .orElseThrow(() -> new NotFoundException("존재하지 않는 restaurantId 입니다."));
+            .orElseThrow(() -> new NotFoundException(ErrorMessage.NOT_FOUND_RESTAURANT.getMessage()));
     }
 
     public List<RestaurantFindResponse> findRestaurantsIsPermittedIsFalse() {
         return restaurantRepository.findRestaurantByIsPermittedIsFalse().stream()
             .map(restaurantMapper::toFindResponseDto)
+            .collect(Collectors.toList());
+    }
+
+    public List<RestaurantFindResponse> findRestaurantByAreaCode(Long areaCodeId) {
+        return restaurantRepository.findAll().stream().filter(restaurant -> {
+                for (DeliveryArea deliveryArea : restaurant.getDeliveryAreas()) {
+                    if (deliveryArea.getAreaCode().getId().equals(areaCodeId)) {
+                        return true;
+                    }
+                }
+                return false;
+            }).map(restaurantMapper::toFindResponseDto)
             .collect(Collectors.toList());
     }
 

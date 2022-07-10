@@ -1,6 +1,8 @@
 package com.example.woowa.restaurant.menugroup.service;
 
-import com.example.woowa.restaurant.menugroup.MenuGroupMapper;
+import com.example.woowa.common.exception.ErrorMessage;
+import com.example.woowa.common.exception.NotFoundException;
+import com.example.woowa.restaurant.menugroup.mapper.MenuGroupMapper;
 import com.example.woowa.restaurant.menugroup.dto.MenuGroupListResponse;
 import com.example.woowa.restaurant.menugroup.dto.MenuGroupResponse;
 import com.example.woowa.restaurant.menugroup.dto.MenuGroupSaveRequest;
@@ -24,7 +26,7 @@ public class MenuGroupService {
 
     public MenuGroup findMenuGroupEntityById(Long menuGroupId) {
         return menuGroupRepository.findById(menuGroupId)
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 menuGroupId 입니다."));
+                .orElseThrow(() -> new NotFoundException(ErrorMessage.NOT_FOUND_MENU_GROUP.getMessage()));
     }
 
     public MenuGroupResponse findMenuById(Long menuGroupId) {

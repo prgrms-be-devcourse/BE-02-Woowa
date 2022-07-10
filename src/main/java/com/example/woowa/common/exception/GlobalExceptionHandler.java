@@ -1,5 +1,6 @@
 package com.example.woowa.common.exception;
 
+import javax.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,20 +23,26 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(RuntimeException.class)
     protected ResponseEntity<ErrorResponse> handleBusinessException(final RuntimeException e) {
-        final ErrorResponse response = ErrorResponse.of(e.getMessage(), 400);
+        final ErrorResponse response = ErrorResponse.of(e.getMessage(), HttpServletResponse.SC_BAD_REQUEST);
         return new ResponseEntity<>(response, HttpStatus.valueOf(response.getStatus()));
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     protected ResponseEntity<ErrorResponse> handleMethodArgumentNotValidException(MethodArgumentNotValidException e) {
-        final ErrorResponse response = ErrorResponse.of(e.getMessage(), 400, e.getBindingResult());
+        final ErrorResponse response = ErrorResponse.of(e.getMessage(), HttpServletResponse.SC_BAD_REQUEST, e.getBindingResult());
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(BindException.class)
     protected ResponseEntity<ErrorResponse> handleBindException(BindException e) {
-        final ErrorResponse response = ErrorResponse.of(e.getMessage(), 400, e.getBindingResult());
+        final ErrorResponse response = ErrorResponse.of(e.getMessage(), HttpServletResponse.SC_BAD_REQUEST, e.getBindingResult());
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(NotFoundException.class)
+    protected ResponseEntity<ErrorResponse> handleNotFoundException(NotFoundException e) {
+        final ErrorResponse response = ErrorResponse.of(e.getMessage(), HttpServletResponse.SC_NOT_FOUND);
+        return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
     }
 }
 

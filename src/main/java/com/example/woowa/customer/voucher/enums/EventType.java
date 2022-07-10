@@ -1,8 +1,6 @@
 package com.example.woowa.customer.voucher.enums;
 
-
 import com.example.woowa.common.interfaces.EnumFindable;
-
 
 public enum EventType implements EnumFindable {
     MONTH("month"),

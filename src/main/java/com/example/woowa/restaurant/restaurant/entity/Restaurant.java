@@ -32,21 +32,18 @@ import lombok.NoArgsConstructor;
 @Getter
 public class Restaurant extends BaseTimeEntity {
 
+    @OneToMany(mappedBy = "restaurant")
+    private final List<MenuGroup> menuGroups = new ArrayList<>();
+    @OneToMany(mappedBy = "restaurant", cascade = CascadeType.ALL, orphanRemoval = true)
+    private final List<RestaurantCategory> restaurantCategories = new ArrayList<>();
+    @OneToMany(mappedBy = "restaurant", cascade = CascadeType.ALL, orphanRemoval = true)
+
+    private final List<RestaurantAdvertisement> restaurantAdvertisements = new ArrayList<>();
+    @OneToMany(mappedBy = "restaurant", cascade = CascadeType.ALL, orphanRemoval = true)
+    private final List<DeliveryArea> deliveryAreas = new ArrayList<>();
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
-    @OneToMany(mappedBy = "restaurant")
-    private List<MenuGroup> menuGroups = new ArrayList<>();
-
-    @OneToMany(mappedBy = "restaurant", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<RestaurantCategory> restaurantCategories = new ArrayList<>();
-
-    @OneToMany(mappedBy = "restaurant", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<RestaurantAdvertisement> restaurantAdvertisements = new ArrayList<>();
-
-    @OneToMany(mappedBy = "restaurant", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<DeliveryArea> deliveryAreas = new ArrayList<>();
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "owner_id")
@@ -102,8 +99,9 @@ public class Restaurant extends BaseTimeEntity {
         LocalTime openingTime, LocalTime closingTime, Boolean isOpen, String phoneNumber,
         String description, String address) throws IllegalArgumentException {
         validateBusinessHours(openingTime, closingTime);
-        if (!CRNValidator.isValid(businessNumber))
+        if (!CRNValidator.isValid(businessNumber)) {
             throw new IllegalArgumentException("잘못된 사업자등록번호입니다.");
+        }
 
         return new Restaurant(name, businessNumber, openingTime, closingTime, isOpen, phoneNumber,
             description, address);
@@ -167,5 +165,4 @@ public class Restaurant extends BaseTimeEntity {
             throw new IllegalArgumentException("openingTime 과 closingTime 은 같을 수 없습니다.");
         }
     }
-
 }

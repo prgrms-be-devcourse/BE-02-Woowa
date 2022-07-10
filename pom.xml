@@ -3,34 +3,32 @@
   xmlns="http://maven.apache.org/POM/4.0.0"
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
   <artifactId>woowa</artifactId>
+  <packaging>jar</packaging>
   <build>
     <plugins>
       <plugin>
+        <groupId>org.asciidoctor</groupId>
         <artifactId>asciidoctor-maven-plugin</artifactId>
-        <dependencies>
-          <dependency>
-            <artifactId>spring-restdocs-asciidoctor</artifactId>
-            <groupId>org.springframework.restdocs</groupId>
-            <version>${spring-restdocs.version}</version>
-          </dependency>
-
-        </dependencies>
         <executions>
           <execution>
+            <id>generate-docs</id>
+            <phase>prepare-package</phase>
+            <goals>
+              <goal>process-asciidoc</goal>
+            </goals>
             <configuration>
               <backend>html</backend>
               <doctype>book</doctype>
             </configuration>
-            <goals>
-              <goal>process-asciidoc</goal>
-            </goals>
-            <id>generate-docs</id>
-            <phase>prepare-package</phase>
           </execution>
         </executions>
-        <groupId>org.asciidoctor</groupId>
-        <version>1.5.8</version>
-
+        <dependencies>
+          <dependency>
+            <groupId>org.springframework.restdocs</groupId>
+            <artifactId>spring-restdocs-asciidoctor</artifactId>
+            <version>${spring-restdocs.version}</version>
+          </dependency>
+        </dependencies>
       </plugin>
 
       <plugin>
@@ -114,6 +112,13 @@
     <dependency>
       <artifactId>spring-boot-starter-security</artifactId>
       <groupId>org.springframework.boot</groupId>
+    </dependency>
+    <!-- https://mvnrepository.com/artifact/org.springframework.security/spring-security-test -->
+    <dependency>
+      <artifactId>spring-security-test</artifactId>
+      <groupId>org.springframework.security</groupId>
+      <scope>test</scope>
+      <version>5.7.2</version>
     </dependency>
     <dependency>
       <artifactId>java-jwt</artifactId>

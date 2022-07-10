@@ -1,5 +1,8 @@
 package com.example.woowa.customer.customer.controller;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.BDDMockito.given;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.delete;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
@@ -7,31 +10,44 @@ import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuild
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.put;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
-import static org.springframework.restdocs.payload.PayloadDocumentation.responseBody;
 import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
+import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
+import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import com.example.woowa.RestDocsConfiguration;
 import com.example.woowa.customer.customer.dto.CustomerGradeCreateRequest;
 import com.example.woowa.customer.customer.dto.CustomerGradeFindResponse;
 import com.example.woowa.customer.customer.dto.CustomerGradeUpdateRequest;
-import com.example.woowa.customer.customer.repository.CustomerGradeRepository;
+import com.example.woowa.customer.customer.service.CustomerGradeService;
+import com.example.woowa.security.configuration.SecurityConfig;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.FilterType;
+import org.springframework.context.annotation.Import;
+import org.springframework.data.jpa.mapping.JpaMetamodelMappingContext;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.payload.JsonFieldType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
-@SpringBootTest
-@AutoConfigureMockMvc
 @AutoConfigureRestDocs
+@WebMvcTest(value = CustomerGradeController.class, excludeFilters = {
+    @ComponentScan.Filter(
+        type = FilterType.ASSIGNABLE_TYPE,
+        classes = SecurityConfig.class
+    ),
+})
+@Import(RestDocsConfiguration.class)
+@MockBean(JpaMetamodelMappingContext.class)
+@WithMockUser
 class CustomerGradeControllerTest {
   @Autowired
   MockMvc mockMvc;
@@ -39,27 +55,21 @@ class CustomerGradeControllerTest {
   @Autowired
   private ObjectMapper objectMapper;
 
-  @Autowired
-  private CustomerGradeRepository customerGradeRepository;
-
-  @BeforeEach
-  void setting() {
-    customerGradeRepository.deleteAll();
-  }
-
-  @AfterAll
-  void setting1() {
-    customerGradeRepository.deleteAll();
-  }
+  @MockBean
+  private CustomerGradeService customerGradeService;
 
   @Test
   void createCustomerGrade() throws Exception {
-    CustomerGradeCreateRequest customerGradeCreateRequest = new CustomerGradeCreateRequest(5, "일반", 3000, 2);
+    CustomerGradeFindResponse customerGradeFindResponse = new CustomerGradeFindResponse(1l, 5, "일반", 1000, 2);
+
+    given(customerGradeService.createCustomerGrade(any())).willReturn(customerGradeFindResponse);
+    CustomerGradeCreateRequest customerGradeCreateRequest = new CustomerGradeCreateRequest(5, "일반", 1000, 2);
 
     mockMvc.perform(
             post("/api/v1/customers/grades")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(customerGradeCreateRequest))
+                .with(csrf().asHeader())
         )
         .andExpect(status().isOk())
         .andDo(print())
@@ -82,15 +92,9 @@ class CustomerGradeControllerTest {
 
   @Test
   void readCustomerGrade() throws Exception {
-    CustomerGradeCreateRequest customerGradeCreateRequest = new CustomerGradeCreateRequest(5, "일반", 3000, 2);
+    CustomerGradeFindResponse customerGradeFindResponse = new CustomerGradeFindResponse(1l, 5, "일반", 1000, 2);
 
-    String body = mockMvc.perform(
-            post("/api/v1/customers/grades")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(customerGradeCreateRequest))
-        ).andReturn().getResponse().getContentAsString();
-
-    CustomerGradeFindResponse customerGradeFindResponse = objectMapper.readValue(body, CustomerGradeFindResponse.class);
+    given(customerGradeService.findCustomerGrade(anyLong())).willReturn(customerGradeFindResponse);
 
     mockMvc.perform(
             get("/api/v1/customers/grades/{id}", customerGradeFindResponse.getId())
@@ -98,6 +102,9 @@ class CustomerGradeControllerTest {
         .andExpect(status().isOk())
         .andDo(print())
         .andDo(document("customers-grades-find",
+            pathParameters(
+                parameterWithName("id").description("조회할 고객 등급 ID")
+            ),
             responseFields(
                 fieldWithPath("id").type(JsonFieldType.NUMBER).description("생성된 고객 등급 아이디"),
                 fieldWithPath("orderCount").type(JsonFieldType.NUMBER).description("최소 주문 횟수"),
@@ -110,23 +117,23 @@ class CustomerGradeControllerTest {
 
   @Test
   void updateCustomerGrade() throws Exception {
-    CustomerGradeCreateRequest customerGradeCreateRequest = new CustomerGradeCreateRequest(5, "일반", 3000, 2);
-    String body = mockMvc.perform(
-        post("/api/v1/customers/grades")
-            .contentType(MediaType.APPLICATION_JSON)
-            .content(objectMapper.writeValueAsString(customerGradeCreateRequest))
-    ).andReturn().getResponse().getContentAsString();
-    CustomerGradeFindResponse customerGradeFindResponse = objectMapper.readValue(body, CustomerGradeFindResponse.class);
+    CustomerGradeFindResponse customerGradeFindResponse = new CustomerGradeFindResponse(1l, 10, "실버", 2000, 2);
+
+    given(customerGradeService.updateCustomerGrade(anyLong(), any())).willReturn(customerGradeFindResponse);
     CustomerGradeUpdateRequest updateCustomerGradeDto = new CustomerGradeUpdateRequest(10, "실버", 2000, 2);
 
     mockMvc.perform(
             put("/api/v1/customers/grades/{id}", customerGradeFindResponse.getId())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(updateCustomerGradeDto))
+                .with(csrf().asHeader())
         )
         .andExpect(status().isOk())
         .andDo(print())
         .andDo(document("customers-grades-update",
+            pathParameters(
+                parameterWithName("id").description("수정할 고객 등급 ID")
+            ),
             requestFields(
                 fieldWithPath("orderCount").type(JsonFieldType.NUMBER).description("최소 주문 횟수"),
                 fieldWithPath("title").type(JsonFieldType.STRING).description("등급 이름"),
@@ -145,23 +152,16 @@ class CustomerGradeControllerTest {
 
   @Test
   void deleteCustomerGrade() throws Exception {
-    CustomerGradeCreateRequest customerGradeCreateRequest = new CustomerGradeCreateRequest(5, "일반", 3000, 2);
-
-    String body = mockMvc.perform(
-        post("/api/v1/customers/grades")
-            .contentType(MediaType.APPLICATION_JSON)
-            .content(objectMapper.writeValueAsString(customerGradeCreateRequest))
-    ).andReturn().getResponse().getContentAsString();
-
-    CustomerGradeFindResponse customerGradeFindResponse = objectMapper.readValue(body, CustomerGradeFindResponse.class);
-
     mockMvc.perform(
-            delete("/api/v1/customers/grades/{id}", customerGradeFindResponse.getId())
+            delete("/api/v1/customers/grades/{id}", 1)
+                .with(csrf().asHeader())
         )
         .andExpect(status().isOk())
         .andDo(print())
         .andDo(document("customers-grades-delete",
-            responseBody()
+            pathParameters(
+                parameterWithName("id").description("삭제할 고객 등급 ID")
+            )
         ));
   }
 }

@@ -1,65 +1,79 @@
 package com.example.woowa.admin.controller;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.BDDMockito.given;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.delete;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.post;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.put;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
-import static org.springframework.restdocs.payload.PayloadDocumentation.responseBody;
 import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
+import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import com.example.woowa.RestDocsConfiguration;
+import com.example.woowa.admin.converter.AdminMapper;
 import com.example.woowa.admin.dto.AdminCreateRequest;
 import com.example.woowa.admin.dto.AdminUpdateRequest;
-import com.example.woowa.admin.repository.AdminRepository;
 import com.example.woowa.admin.service.AdminService;
+import com.example.woowa.security.configuration.SecurityConfig;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mapstruct.factory.Mappers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.FilterType;
+import org.springframework.context.annotation.Import;
+import org.springframework.data.jpa.mapping.JpaMetamodelMappingContext;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.payload.JsonFieldType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
-@SpringBootTest
-@AutoConfigureMockMvc
 @AutoConfigureRestDocs
+@WebMvcTest(value = AdminController.class, excludeFilters = {
+    @ComponentScan.Filter(
+        type = FilterType.ASSIGNABLE_TYPE,
+        classes = SecurityConfig.class
+    ),
+})
+@Import(RestDocsConfiguration.class)
+@MockBean(JpaMetamodelMappingContext.class)
+@WithMockUser
 class AdminControllerTest {
+
   @Autowired
   MockMvc mockMvc;
 
   @Autowired
   private ObjectMapper objectMapper;
 
-  @Autowired
-  private AdminRepository adminRepository;
+  AdminMapper adminMapper = Mappers.getMapper(AdminMapper.class);
 
-  @BeforeEach
-  void setting() {
-    adminRepository.deleteAll();
-  }
-
-  @AfterAll
-  void settingafter() {
-    adminRepository.deleteAll();
-  }
+  @MockBean
+  private AdminService adminService;
 
   @Test
   void createAdmin() throws Exception {
-    AdminCreateRequest  adminCreateRequest = new AdminCreateRequest("dev12", "Programmers12!");
+    AdminCreateRequest adminCreateRequest = new AdminCreateRequest("dev12", "Programmers12!");
+
+    given(adminService.createAdmin(any())).willReturn(adminMapper.toAdminDto(adminMapper.toAdmin(adminCreateRequest)));
 
     mockMvc.perform(
             post("/api/v1/admins")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(adminCreateRequest))
+                .with(csrf().asHeader())
         )
         .andExpect(status().isOk())
         .andDo(print())
@@ -78,18 +92,19 @@ class AdminControllerTest {
   void findAdmin() throws Exception {
     AdminCreateRequest adminCreateRequest = new AdminCreateRequest("dev12", "Programmers12!");
 
-    mockMvc.perform(
-            post("/api/v1/admins")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(adminCreateRequest))
-        );
+    given(adminService.findAdmin(any())).willReturn(adminMapper.toAdminDto(adminMapper.toAdmin(adminCreateRequest)));
 
     mockMvc.perform(
             get("/api/v1/admins/{loginId}",adminCreateRequest.getLoginId())
+                .contentType(MediaType.APPLICATION_JSON)
+                .with(csrf().asHeader())
         )
         .andExpect(status().isOk())
         .andDo(print())
         .andDo(document("admins-find",
+            pathParameters(
+                parameterWithName("loginId").description("조회할 관리자 로그인 ID")
+            ),
             responseFields(
                 fieldWithPath("loginId").type(JsonFieldType.STRING).description("생성된 아이디")
             )
@@ -100,22 +115,21 @@ class AdminControllerTest {
   void updateAdmin() throws Exception {
     AdminCreateRequest adminCreateRequest = new AdminCreateRequest("dev12", "Programmers12!");
 
-    mockMvc.perform(
-        post("/api/v1/admins")
-            .contentType(MediaType.APPLICATION_JSON)
-            .content(objectMapper.writeValueAsString(adminCreateRequest))
-    );
+    given(adminService.updateAdmin(anyString(), any())).willReturn(adminMapper.toAdminDto(adminMapper.toAdmin(adminCreateRequest)));
 
     AdminUpdateRequest adminUpdateRequest = new AdminUpdateRequest("Programmers123!");
-
     mockMvc.perform(
             put("/api/v1/admins/{loginId}", adminCreateRequest.getLoginId())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(adminUpdateRequest))
+                .with(csrf().asHeader())
         )
         .andExpect(status().isOk())
         .andDo(print())
         .andDo(document("admins-update",
+            pathParameters(
+                parameterWithName("loginId").description("수정할 관리자 로그인 ID")
+            ),
             requestFields(
                 fieldWithPath("loginPassword").type(JsonFieldType.STRING).description("수정하려는 비밀 번호")
             ),
@@ -127,21 +141,17 @@ class AdminControllerTest {
 
   @Test
   void deleteAdmin() throws Exception {
-    AdminCreateRequest adminCreateRequest = new AdminCreateRequest("dev12", "Programmers12!");
-
     mockMvc.perform(
-        post("/api/v1/admins")
-            .contentType(MediaType.TEXT_PLAIN)
-            .content(objectMapper.writeValueAsString(adminCreateRequest))
-    );
-
-    mockMvc.perform(
-            delete("/api/v1/admins/{loginId}",adminCreateRequest.getLoginId())
+            delete("/api/v1/admins/{loginId}", "dev12")
+                .contentType(MediaType.APPLICATION_JSON)
+                .with(csrf().asHeader())
         )
         .andExpect(status().isOk())
         .andDo(print())
         .andDo(document("admins-delete",
-            responseBody()
+            pathParameters(
+                parameterWithName("loginId").description("삭제할 관리자 로그인 ID")
+            )
         ));
   }
 }

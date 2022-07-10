@@ -54,7 +54,7 @@ class CategoryServiceTest {
     @Autowired
     UserRepository userRepository;
 
-    private CategoryMapper categoryMapper = Mappers.getMapper(CategoryMapper.class);
+    private final CategoryMapper categoryMapper = Mappers.getMapper(CategoryMapper.class);
 
     @Test
     @DisplayName("새로운 카테고리를 생성한다.")
@@ -62,6 +62,7 @@ class CategoryServiceTest {
         // Mocked
         CategoryRepository mockedCategoryRepository = mock(CategoryRepository.class);
         CategoryService categoryService = new CategoryService(mockedCategoryRepository, categoryMapper);
+
 
         // Given
         CategoryCreateRequest categoryCreateRequest = new CategoryCreateRequest("한식");
@@ -85,6 +86,7 @@ class CategoryServiceTest {
         CategoryRepository mockedCategoryRepository = mock(CategoryRepository.class);
         CategoryService categoryService = new CategoryService(mockedCategoryRepository, categoryMapper);
 
+
         // Given
         List<Category> testers = makeCategories("한식", "중식");
         List<CategoryFindResponse> manualConversion = testers.stream()
@@ -101,6 +103,7 @@ class CategoryServiceTest {
         verify(mockedCategoryRepository, times(1)).findAll();
         for (int i = 0; i < result.size(); i++)
             assertThat(result.get(i)).usingRecursiveComparison().isEqualTo(manualConversion.get(i));
+
     }
 
     @Test
@@ -122,6 +125,7 @@ class CategoryServiceTest {
         // Then
         verify(mockedCategoryRepository, times(1)).findById(anyLong());
         assertThat(result).usingRecursiveComparison().isEqualTo(manualConversion);
+
     }
 
     @Test
@@ -142,7 +146,7 @@ class CategoryServiceTest {
         assertThat(afterUpdating.getId()).isEqualTo(beforeUpdating.getId());
         assertThat(afterUpdating.getName()).isEqualTo(categoryUpdateRequest.getName());
     }
-
+    
     public static List<Category> makeCategories(String... name) {
         return Arrays.stream(name).map(Category::new).collect(Collectors.toList());
     }
