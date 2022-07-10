@@ -6,8 +6,8 @@ import com.example.woowa.restaurant.restaurant.dto.response.RestaurantCreateResp
 import com.example.woowa.restaurant.restaurant.dto.response.RestaurantFindResponse;
 import com.example.woowa.restaurant.restaurant.service.RestaurantService;
 import java.util.List;
+import java.util.Objects;
 import javax.validation.Valid;
-import javax.websocket.server.PathParam;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -71,7 +71,10 @@ public class RestaurantRestController {
     }
 
     @GetMapping(value = "restaurants", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<RestaurantFindResponse>> findAllRestaurants() {
+    public ResponseEntity<List<RestaurantFindResponse>> findAllRestaurants(@RequestParam(required = false) Long areaCodeId) {
+        if (Objects.nonNull(areaCodeId)) {
+            return ResponseEntity.ok(restaurantService.findRestaurantByAreaCode(areaCodeId));
+        }
         List<RestaurantFindResponse> restaurants = restaurantService.findRestaurants();
         return new ResponseEntity<>(restaurants, HttpStatus.OK);
     }
