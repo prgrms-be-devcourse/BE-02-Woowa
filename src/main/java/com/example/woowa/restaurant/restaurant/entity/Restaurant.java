@@ -37,12 +37,14 @@ public class Restaurant extends BaseTimeEntity {
     @OneToMany(mappedBy = "restaurant", cascade = CascadeType.ALL, orphanRemoval = true)
     private final List<RestaurantCategory> restaurantCategories = new ArrayList<>();
     @OneToMany(mappedBy = "restaurant", cascade = CascadeType.ALL, orphanRemoval = true)
+
     private final List<RestaurantAdvertisement> restaurantAdvertisements = new ArrayList<>();
     @OneToMany(mappedBy = "restaurant", cascade = CascadeType.ALL, orphanRemoval = true)
     private final List<DeliveryArea> deliveryAreas = new ArrayList<>();
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "owner_id")
     private Owner owner;
@@ -105,13 +107,6 @@ public class Restaurant extends BaseTimeEntity {
             description, address);
     }
 
-    private static void validateBusinessHours(LocalTime openingTime, LocalTime closingTime)
-        throws IllegalArgumentException {
-        if (closingTime.equals(openingTime)) {
-            throw new IllegalArgumentException("openingTime 과 closingTime 은 같을 수 없습니다.");
-        }
-    }
-
     public void updateBusinessHours(LocalTime openingTime, LocalTime closingTime)
         throws IllegalArgumentException {
         validateBusinessHours(openingTime, closingTime);
@@ -164,4 +159,10 @@ public class Restaurant extends BaseTimeEntity {
         this.owner.getRestaurants().add(this);
     }
 
+    private static void validateBusinessHours(LocalTime openingTime, LocalTime closingTime)
+        throws IllegalArgumentException {
+        if (closingTime.equals(openingTime)) {
+            throw new IllegalArgumentException("openingTime 과 closingTime 은 같을 수 없습니다.");
+        }
+    }
 }
