@@ -1,49 +1,50 @@
 package com.example.woowa.admin.service;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.verify;
+
 import com.example.woowa.admin.dto.AdminCreateRequest;
 import com.example.woowa.admin.dto.AdminFindResponse;
 import com.example.woowa.admin.dto.AdminUpdateRequest;
+import com.example.woowa.admin.entity.Admin;
 import com.example.woowa.admin.repository.AdminRepository;
+import java.util.Optional;
 import org.assertj.core.api.Assertions;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 
 @SpringBootTest
 class AdminServiceTest {
   @Autowired
   private AdminService adminService;
 
-  @Autowired
+  @MockBean
   private AdminRepository adminRepository;
-
-  public String getAdminId() {
-    AdminCreateRequest  adminCreateRequest = new AdminCreateRequest("dev12", "Programmers12!");
-    return adminService.createAdmin(adminCreateRequest).getLoginId();
-  }
-
-  @AfterEach
-  void afterTest() {
-    adminRepository.deleteAll();
-  }
 
   @Test
   @DisplayName("관리자 생성")
   void createAdmin() {
-    AdminCreateRequest  adminCreateRequest = new AdminCreateRequest("dev12", "Programmers12!");
-    adminService.createAdmin(adminCreateRequest);
+    given(adminRepository.save(any())).willReturn(new Admin("dev12", "Programmers12!"));
 
-    Assertions.assertThat(adminRepository.count()).isEqualTo(1l);
+    AdminCreateRequest adminCreateRequest = new AdminCreateRequest("dev12", "Programmers12!");
+    AdminFindResponse adminFindResponse = adminService.createAdmin(adminCreateRequest);
+
+    Assertions.assertThat(adminFindResponse.getLoginId()).isEqualTo("dev12");
   }
 
   @Test
   @DisplayName("관리자 조회")
   void findAdmin() {
-    String loginId = getAdminId();
+    given(adminRepository.findByLoginId(anyString())).willReturn(
+        Optional.of(new Admin("dev12", "Programmers12!"))
+    );
 
-    AdminFindResponse adminFindResponse = adminService.findAdmin(loginId);
+    AdminFindResponse adminFindResponse = adminService.findAdmin("dev12");
 
     Assertions.assertThat(adminFindResponse.getLoginId()).isEqualTo("dev12");
   }
@@ -51,22 +52,27 @@ class AdminServiceTest {
   @Test
   @DisplayName("관리자 업데이트")
   void updateAdmin() {
-    String loginId = getAdminId();
+    given(adminRepository.findByLoginId(anyString())).willReturn(
+        Optional.of(new Admin("dev12", "Programmers12!"))
+    );
     AdminUpdateRequest adminUpdateRequest = new AdminUpdateRequest("Programmers123$");
 
-    adminService.updateAdmin(loginId, adminUpdateRequest);
+    AdminFindResponse adminFindResponse = adminService.updateAdmin("dev12", adminUpdateRequest);
 
-    Assertions.assertThat(adminRepository.count()).isEqualTo(1l);
+    Assertions.assertThat(adminFindResponse.getLoginId()).isEqualTo("dev12");
   }
 
   @Test
   @DisplayName("관리자 삭제")
   void deleteAdmin() {
-    String loginId = getAdminId();
+    Admin admin = new Admin("dev12", "Programmers12!");
+    given(adminRepository.findByLoginId(anyString())).willReturn(
+        Optional.of(admin)
+    );
 
-    adminService.deleteAdmin(loginId);
+    adminService.deleteAdmin("dev12");
 
-    Assertions.assertThat(adminRepository.count()).isEqualTo(0l);
+    verify(adminRepository).delete(admin);
   }
 
 }

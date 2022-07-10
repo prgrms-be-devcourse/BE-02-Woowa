@@ -1,84 +1,56 @@
 package com.example.woowa.customer.voucher.service;
 
-import com.example.woowa.customer.customer.dto.CustomerAddressCreateRequest;
-import com.example.woowa.customer.customer.dto.CustomerCreateRequest;
-import com.example.woowa.customer.customer.dto.CustomerFindResponse;
-import com.example.woowa.customer.customer.dto.CustomerGradeCreateRequest;
-import com.example.woowa.customer.customer.repository.CustomerGradeRepository;
-import com.example.woowa.customer.customer.repository.CustomerRepository;
-import com.example.woowa.customer.customer.service.CustomerGradeService;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.verify;
+
+import com.example.woowa.customer.customer.entity.Customer;
+import com.example.woowa.customer.customer.entity.CustomerGrade;
 import com.example.woowa.customer.customer.service.CustomerService;
 import com.example.woowa.customer.voucher.dto.VoucherCreateRequest;
 import com.example.woowa.customer.voucher.dto.VoucherFindResponse;
+import com.example.woowa.customer.voucher.entity.Voucher;
 import com.example.woowa.customer.voucher.enums.EventType;
 import com.example.woowa.customer.voucher.enums.VoucherType;
 import com.example.woowa.customer.voucher.repository.VoucherRepository;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 import org.assertj.core.api.Assertions;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 
 @SpringBootTest
+@ExtendWith(MockitoExtension.class)
 class VoucherServiceTest {
   @Autowired
   private VoucherService voucherService;
 
-  @Autowired
-  private VoucherRepository voucherRepository;
-
-  @Autowired
+  @MockBean
   private CustomerService customerService;
 
-  @Autowired
-  private CustomerRepository customerRepository;
-
-  @Autowired
-  private CustomerGradeService customerGradeService;
-
-  @Autowired
-  private CustomerGradeRepository customerGradeRepository;
-
-  public void makeDefaultCustomerGrade() {
-    CustomerGradeCreateRequest customerGradeCreateRequest = new CustomerGradeCreateRequest(5, "일반", 3000, 2);
-    customerGradeService.createCustomerGrade(customerGradeCreateRequest);
-  }
-
-  public String getCustomerLoginId() {
-    CustomerAddressCreateRequest customerAddressCreateRequest = new CustomerAddressCreateRequest("서울특별시 동작구 상도동","아파트 101호","집");
-    CustomerCreateRequest customerCreateRequest = new CustomerCreateRequest("dev12","Programmers123!", "2000-01-01", customerAddressCreateRequest);
-    CustomerFindResponse customerFindResponse = customerService.createCustomer(
-        customerCreateRequest);
-    return customerFindResponse.getLoginId();
-  }
-
-  @BeforeEach
-  void settingBeforeTest() {
-    makeDefaultCustomerGrade();
-  }
-
-  @AfterEach
-  void settingAfterTest() {
-    customerRepository.deleteAll();
-    voucherRepository.deleteAll();
-    customerGradeRepository.deleteAll();
-  }
+  @MockBean
+  private VoucherRepository voucherRepository;
 
   @Test
   @DisplayName("정기 쿠폰 등록")
   void registerMonthlyVoucher() throws Exception {
-    VoucherCreateRequest voucherCreateRequest = new VoucherCreateRequest(VoucherType.FiXED.toString(),
-        EventType.SPECIAL.toString(), 3000, "2022-12-01 12:00");
-    voucherService.createVoucher(voucherCreateRequest);
-    String customerLoginId = getCustomerLoginId();
+    CustomerGrade customerGrade = new CustomerGrade(5, "일반", 3000, 2);
+    Customer customer = new Customer("dev12","Programmers123!", LocalDate.of(2000,1,1), customerGrade);
+    given(customerService.findCustomerEntity(anyString())).willReturn(customer);
 
-    voucherService.registerMonthlyVoucher(customerLoginId);
-    List<VoucherFindResponse> vouchers = voucherService.findUserVoucher(customerLoginId);
+    List<VoucherFindResponse> vouchers = voucherService.registerMonthlyVoucher("dev12");
 
+    Assertions.assertThat(vouchers.size()).isEqualTo(2);
     Assertions.assertThat(vouchers.get(0).getVoucherType()).isEqualTo(VoucherType.FiXED.toString());
     Assertions.assertThat(vouchers.get(0).getEventType()).isEqualTo(EventType.MONTH.toString());
     Assertions.assertThat(vouchers.get(0).getDiscountValue()).isEqualTo(3000);
@@ -87,58 +59,55 @@ class VoucherServiceTest {
   @Test
   @DisplayName("이벤트 쿠폰 등록")
   void registerVoucher() throws Exception {
-    VoucherCreateRequest voucherCreateRequest = new VoucherCreateRequest(VoucherType.FiXED.toString(),
-        EventType.SPECIAL.toString(), 3000, "2022-12-01 12:00");
-    VoucherFindResponse voucherFindResponse = voucherService.createVoucher(voucherCreateRequest);
-    String customerId = getCustomerLoginId();
-    voucherService.registerVoucher(customerId, voucherFindResponse.getCode());
+    CustomerGrade customerGrade = new CustomerGrade(5, "일반", 3000, 2);
+    Customer customer = new Customer("dev12","Programmers123!", LocalDate.of(2000,1,1), customerGrade);
+    given(customerService.findCustomerEntity(anyString())).willReturn(customer);
+    given(voucherRepository.findByCode(anyString())).willReturn(Optional.of(new Voucher(VoucherType.FiXED, EventType.SPECIAL, 3000, LocalDateTime.now().plusDays(10))));
 
-    List<VoucherFindResponse> vouchers  = voucherService.findUserVoucher(customerId);
+    VoucherFindResponse voucherFindResponse = voucherService.registerVoucher("dev12", UUID.randomUUID().toString());
 
-    Assertions.assertThat(vouchers.get(0).getVoucherType()).isEqualTo(VoucherType.FiXED.toString());
-    Assertions.assertThat(vouchers.get(0).getEventType()).isEqualTo(EventType.SPECIAL.toString());
-    Assertions.assertThat(vouchers.get(0).getDiscountValue()).isEqualTo(3000);
+    Assertions.assertThat(voucherFindResponse.getVoucherType()).isEqualTo(VoucherType.FiXED.toString());
+    Assertions.assertThat(voucherFindResponse.getEventType()).isEqualTo(EventType.SPECIAL.toString());
+    Assertions.assertThat(voucherFindResponse.getDiscountValue()).isEqualTo(3000);
   }
 
   @Test
   @DisplayName("쿠폰 발행")
   void createVoucher() throws Exception {
+    Voucher voucher = new Voucher(VoucherType.FiXED, EventType.SPECIAL, 3000, LocalDateTime.now().plusDays(10));
+    given(voucherRepository.save(any())).willReturn(voucher);
+
     VoucherCreateRequest voucherCreateRequest = new VoucherCreateRequest(VoucherType.FiXED.toString(),
         EventType.SPECIAL.toString(), 3000, "2022-12-01 12:00");
-
     VoucherFindResponse voucherFindResponse = voucherService.createVoucher(voucherCreateRequest);
 
     Assertions.assertThat(voucherFindResponse.getVoucherType()).isEqualTo(VoucherType.FiXED.toString());
     Assertions.assertThat(voucherFindResponse.getEventType()).isEqualTo(EventType.SPECIAL.toString());
     Assertions.assertThat(voucherFindResponse.getDiscountValue()).isEqualTo(3000);
-    Assertions.assertThat(voucherFindResponse.getExpirationDate()).isEqualTo(LocalDateTime.of(2022, 12, 1, 12, 0));
   }
 
   @Test
   @DisplayName("쿠폰 조회")
   void findVoucher() throws Exception {
-    VoucherCreateRequest voucherCreateRequest = new VoucherCreateRequest(VoucherType.FiXED.toString(),
-        EventType.SPECIAL.toString(), 3000, "2022-12-01 12:00");
-    VoucherFindResponse voucherFindResponse = voucherService.createVoucher(voucherCreateRequest);
+    given(voucherRepository.findById(anyLong())).willReturn(Optional.of(new Voucher(VoucherType.FiXED, EventType.SPECIAL, 3000, LocalDateTime.now().plusDays(10))));
 
-    VoucherFindResponse voucherFindResponse1 = voucherService.findVoucher(voucherFindResponse.getId());
+    VoucherFindResponse voucherFindResponse = voucherService.findVoucher(1l);
 
-    Assertions.assertThat(voucherFindResponse1.getVoucherType()).isEqualTo(VoucherType.FiXED.toString());
-    Assertions.assertThat(voucherFindResponse1.getEventType()).isEqualTo(EventType.SPECIAL.toString());
-    Assertions.assertThat(voucherFindResponse1.getDiscountValue()).isEqualTo(3000);
-    Assertions.assertThat(voucherFindResponse1.getExpirationDate()).isEqualTo(LocalDateTime.of(2022, 12, 1, 12, 0));
+    Assertions.assertThat(voucherFindResponse.getVoucherType()).isEqualTo(VoucherType.FiXED.toString());
+    Assertions.assertThat(voucherFindResponse.getEventType()).isEqualTo(EventType.SPECIAL.toString());
+    Assertions.assertThat(voucherFindResponse.getDiscountValue()).isEqualTo(3000);
   }
 
   @Test
   @DisplayName("유저 보유 쿠폰 목록 조회")
   void findUserVoucher() throws Exception {
-    VoucherCreateRequest voucherCreateRequest = new VoucherCreateRequest(VoucherType.FiXED.toString(),
-        EventType.SPECIAL.toString(), 3000, "2022-12-01 12:00");
-    VoucherFindResponse voucherFindResponse = voucherService.createVoucher(voucherCreateRequest);
-    String customerId = getCustomerLoginId();
-    voucherService.registerVoucher(customerId, voucherFindResponse.getCode());
+    CustomerGrade customerGrade = new CustomerGrade(5, "일반", 3000, 2);
+    Customer customer = new Customer("dev12","Programmers123!", LocalDate.of(2000,1,1), customerGrade);
+    customer.addVoucher(new Voucher(VoucherType.FiXED, EventType.SPECIAL, 3000, LocalDateTime.now().plusDays(10)));
+    customer.addVoucher(new Voucher(VoucherType.FiXED, EventType.SPECIAL, 3000, LocalDateTime.now().plusDays(10)));
+    given(customerService.findCustomerEntity(anyString())).willReturn(customer);
 
-    List<VoucherFindResponse> vouchers  = voucherService.findUserVoucher(customerId);
+    List<VoucherFindResponse> vouchers  = voucherService.findUserVoucher("dev12");
 
     Assertions.assertThat(vouchers.get(0).getVoucherType()).isEqualTo(VoucherType.FiXED.toString());
     Assertions.assertThat(vouchers.get(0).getEventType()).isEqualTo(EventType.SPECIAL.toString());
@@ -148,15 +117,15 @@ class VoucherServiceTest {
   @Test
   @DisplayName("쿠폰 삭제")
   void deleteVoucher() throws Exception {
-    VoucherCreateRequest voucherCreateRequest = new VoucherCreateRequest(VoucherType.FiXED.toString(),
-        EventType.SPECIAL.toString(), 3000, "2022-12-01 12:00");
-    VoucherFindResponse voucherFindResponse = voucherService.createVoucher(voucherCreateRequest);
-    String customerId = getCustomerLoginId();
+    CustomerGrade customerGrade = new CustomerGrade(5, "일반", 3000, 2);
+    Customer customer = new Customer("dev12","Programmers123!", LocalDate.of(2000,1,1), customerGrade);
+    Voucher voucher = new Voucher(VoucherType.FiXED, EventType.SPECIAL, 3000, LocalDateTime.now().plusDays(10));
+    customer.addVoucher(voucher);
+    given(voucherRepository.findById(anyLong())).willReturn(Optional.of(voucher));
+    given(customerService.findCustomerEntity(anyString())).willReturn(customer);
 
-    voucherService.registerVoucher(customerId, voucherFindResponse.getCode());
-    voucherService.deleteVoucher(customerId, voucherFindResponse.getId());
-    List<VoucherFindResponse> vouchers  = voucherService.findUserVoucher(customerId);
+    voucherService.deleteVoucher("dev12", 1l);
 
-    Assertions.assertThat(vouchers.size()).isEqualTo(0);
+    verify(voucherRepository).delete(voucher);
   }
 }

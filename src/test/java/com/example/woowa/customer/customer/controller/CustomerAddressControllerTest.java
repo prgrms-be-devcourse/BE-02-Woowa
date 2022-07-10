@@ -119,7 +119,7 @@ class CustomerAddressControllerTest {
 
   @Test
   void updateCustomerAddress() throws Exception {
-    CustomerAddressFindResponse customerAddressFindResponse = new CustomerAddressFindResponse(1l, "서울특별시 서초구 서초동 1000-1 101호", "집");
+    CustomerAddressFindResponse customerAddressFindResponse = new CustomerAddressFindResponse(1l, "서울특별시 서초구 서초동 아파트 101호", "집");
     given(customerAddressService.updateCustomerAddress(anyLong(), any())).willReturn(customerAddressFindResponse);
 
     CustomerAddressUpdateRequest customerAddressUpdateRequest = new CustomerAddressUpdateRequest("서울특별시 서초구 서초동", "아파트 101호","집");
@@ -151,14 +151,15 @@ class CustomerAddressControllerTest {
   @Test
   void deleteCustomerAddress() throws Exception {
     mockMvc.perform(
-            delete("/api/v1/customers/addresses/{id}", 1)
+            delete("/api/v1/customers/addresses/{loginId}/{id}", " dev12", 1)
                 .with(csrf().asHeader())
         )
         .andExpect(status().isOk())
         .andDo(print())
         .andDo(document("customers-addresses-delete",
             pathParameters(
-                parameterWithName("id").description("삭제할 고객 로그인 ID")
+                parameterWithName("loginId").description("삭제할 주소를 가진 고객 로그인 ID"),
+                parameterWithName("id").description("삭제할 주소 ID")
             )
         ));
   }

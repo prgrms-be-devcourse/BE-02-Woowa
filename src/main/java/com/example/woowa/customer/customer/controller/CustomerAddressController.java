@@ -41,9 +41,9 @@ public class CustomerAddressController {
         return customerAddressService.updateCustomerAddress(id, customerAddressUpdateRequest);
     }
 
-    @DeleteMapping("/{id}")
-    public String deleteCustomerAddress(@PathVariable Long id) {
-        customerAddressService.deleteCustomerAddress(id);
+    @DeleteMapping("/{loginId}/{id}")
+    public String deleteCustomerAddress(@PathVariable String loginId, @PathVariable Long id) {
+        customerAddressService.deleteCustomerAddress(loginId, id);
         return "delete id - " + id;
     }
 }

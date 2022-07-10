@@ -66,9 +66,10 @@ public class ReviewService {
     }
 
     @Transactional
-    public void deleteReview(Long id) {
+    public void deleteReview(String loginId, Long id) {
+        Customer customer = customerService.findCustomerEntity(loginId);
         Review review = findReviewEntity(id);
-        review.getCustomer().removeReview(review);
+        customer.removeReview(review);
         reviewRepository.delete(review);
     }
 
