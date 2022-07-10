@@ -45,7 +45,7 @@ public class AdvertisementRestController {
     @GetMapping(value = "/{advertisementId}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<AdvertisementFindResponse> findAdvertisementById(final @PathVariable Long advertisementId) {
         AdvertisementFindResponse advertisement = advertisementService.findAdvertisementById(advertisementId);
-        return new ResponseEntity<>(advertisement, HttpStatus.CREATED);
+        return new ResponseEntity<>(advertisement, HttpStatus.OK);
     }
 
     @PutMapping(value = "/{advertisementId}", consumes = MediaType.APPLICATION_JSON_VALUE)
