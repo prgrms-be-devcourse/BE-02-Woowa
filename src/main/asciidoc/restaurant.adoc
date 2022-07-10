@@ -1,0 +1,73 @@
+== 가게
+
+=== 가게 생성
+
+새로운 가게를 생성할 수 있습니다.
+
+operation::restaurant-create[snippets='http-request,path-parameters,request-fields,http-response,response-fields']
+
+=== 가게 삭제
+
+가게 엔티티를 삭제할 수 있습니다.
+
+operation::restaurant-delete[snippets='http-request,path-parameters']
+
+=== 가게 전체 조회
+
+저장된 모든 가게 정보를 조회할 수 있습니다.
+
+operation::restaurant-findAll[snippets='http-request,http-response,response-fields']
+
+=== 사장님 아이디로 가게 전체 조회
+
+사장님 아이디로 저장된 모든 가게 정보를 조회할 수 있습니다.
+
+operation::restaurant-findAllByOwnerId[snippets='http-request,path-parameters,http-response,response-fields']
+
+=== 광고 아이디로 가게 전체 조회
+
+광고 아이디로 저장된 모든 가게 정보를 조회할 수 있습니다.
+
+operation::restaurant-findAllByAdvertisementId[snippets='http-request,path-parameters,http-response,response-fields']
+
+=== 카테고리 아이디로 가게 전체 조회
+
+카테고리 아이디로 저장된 모든 가게 정보를 조회할 수 있습니다.
+
+operation::restaurant-findAllByCategoryId[snippets='http-request,path-parameters,http-response,response-fields']
+
+=== 가게 단건 조회
+
+저장된 하나의 가게 정보를 조회할 수 있습니다.
+
+operation::restaurant-findById[snippets='http-request,path-parameters,http-response,response-fields']
+
+=== 가게 변경
+
+저장된 하나의 가게 정보를 변경할 수 있습니다.
+
+operation::restaurant-update[snippets='http-request,path-parameters,request-body,request-fields']
+
+=== 가게 문 열기/닫기
+
+가게 문을 열고 닫을 수 있습니다(영업 상태 변경).
+
+operation::restaurant-open-close[snippets='http-request,path-parameters,request-parameters']
+
+=== 가게에 카테고리 추가
+
+가게에 카테고리를 추가할 수 있습니다.
+
+operation::restaurant-add-category[snippets='http-request,path-parameters,request-parameters']
+
+=== 가게에 카테고리 삭제
+
+가게에 카테고리를 삭제할 수 있습니다.
+
+operation::restaurant-remove-category[snippets='http-request,path-parameters,request-parameters']
+
+=== 가게에 배달지역 추가
+
+가게에 배달지역을 추가할 수 있습니다.
+
+operation::restaurant-add-delivery[snippets='http-request,path-parameters,request-parameters']
