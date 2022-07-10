@@ -178,13 +178,14 @@ class ReviewControllerTest {
   @Test
   void deleteReview() throws Exception {
     mockMvc.perform(
-            delete("/api/v1/reviews/{id}", 1)
+            delete("/api/v1/reviews/{loginId}/{id}","dev12", 1)
                 .with(csrf().asHeader())
         )
         .andExpect(status().isOk())
         .andDo(print())
         .andDo(document("reviews-delete",
             pathParameters(
+                parameterWithName("loginId").description("삭제할 리뷰를 가진 고객의 로그인 ID"),
                 parameterWithName("id").description("삭제할 리뷰 ID")
             )
         ));

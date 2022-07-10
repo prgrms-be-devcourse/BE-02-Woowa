@@ -10,8 +10,9 @@ import java.time.format.DateTimeFormatter;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Mappings;
+import org.mapstruct.NullValuePropertyMappingStrategy;
 
-@Mapper(componentModel = "spring", imports = {EnumFindable.class, VoucherType.class,
+@Mapper(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.SET_TO_NULL, componentModel = "spring", imports = {EnumFindable.class, VoucherType.class,
     EventType.class,
     DateTimeFormatter.class})
 public interface VoucherMapper {

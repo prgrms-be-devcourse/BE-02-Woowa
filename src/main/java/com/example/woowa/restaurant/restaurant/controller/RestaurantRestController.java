@@ -47,15 +47,15 @@ public class RestaurantRestController {
     @PutMapping(value = "owners/{ownerId}/restaurants/{restaurantId}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Void> updateRestaurantByOwnerIdAndRestaurantId(final @PathVariable Long ownerId, final @PathVariable Long restaurantId,
         final @Valid @RequestBody RestaurantUpdateRequest restaurantUpdateRequest) {
-        restaurantService.updateRestaurantByOwnerIdAndRestaurantId(ownerId, restaurantId, restaurantUpdateRequest);
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        restaurantService.updateRestaurantById(ownerId, restaurantId, restaurantUpdateRequest);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @DeleteMapping(value = "owners/{ownerId}/restaurants/{restaurantId}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Void> deleteRestaurantByOwnerIdAndRestaurantId(final @PathVariable Long ownerId,
         final @PathVariable Long restaurantId) {
         restaurantService.deleteRestaurantByOwnerIdAndRestaurantId(ownerId, restaurantId);
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @GetMapping(value = "advertisements/{advertisementId}/restaurants", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -94,28 +94,21 @@ public class RestaurantRestController {
         else {
             restaurantService.closeRestaurant(ownerId, restaurantId);
         }
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-    }
-
-    @PatchMapping(value = "owners/{ownerId}/restaurants/{restaurantId}/delivery/add")
-    public ResponseEntity<Void> setDeliveryArea(final @PathVariable Long ownerId, final @PathVariable Long restaurantId,
-        final @RequestParam Long areaCodeId, final @RequestParam Integer deliveryFee) {
-        restaurantService.setDeliveryArea(ownerId, restaurantId, areaCodeId, deliveryFee);
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @PatchMapping(value = "owners/{ownerId}/restaurants/{restaurantId}/categories/add")
     public ResponseEntity<Void> addCategory(final @PathVariable Long ownerId, final @PathVariable Long restaurantId,
-        final @RequestParam Long categoryId) {
-        restaurantService.addCategory(ownerId, restaurantId, categoryId);
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        final @RequestParam String categoryId) {
+        restaurantService.addCategory(ownerId, restaurantId, Long.parseLong(categoryId));
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @PatchMapping(value = "owners/{ownerId}/restaurants/{restaurantId}/categories/remove")
     public ResponseEntity<Void> removeCategory(final @PathVariable Long ownerId, final @PathVariable Long restaurantId,
-        final @RequestParam Long categoryId) {
-        restaurantService.removeCategory(ownerId, restaurantId, categoryId);
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        final @RequestParam String cateogoryId) {
+        restaurantService.removeCategory(ownerId, restaurantId, Long.parseLong(cateogoryId));
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
 }

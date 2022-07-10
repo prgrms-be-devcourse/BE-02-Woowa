@@ -48,14 +48,14 @@ public class OwnerRestController {
     @DeleteMapping(value = "/{ownerId}")
     public ResponseEntity<Void> deleteOwnerById(final @PathVariable Long ownerId) {
         ownerService.deleteOwnerById(ownerId);
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @PutMapping(value = "/{ownerId}")
     public ResponseEntity<Void> updateOwnerById(final @PathVariable Long ownerId,
         final @Valid @RequestBody OwnerUpdateRequest ownerUpdateRequest) {
         ownerService.updateOwnerById(ownerId, ownerUpdateRequest);
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
 }

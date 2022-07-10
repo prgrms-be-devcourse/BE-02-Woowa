@@ -65,8 +65,9 @@ class VoucherControllerTest {
   @Test
   void registerMonthlyVoucher() throws Exception {
     List<VoucherFindResponse> result = new ArrayList<>();
-    result.add(new VoucherFindResponse(1l, "fixed", "month", 1000, LocalDateTime.now(), UUID.randomUUID().toString()));
-    result.add(new VoucherFindResponse(1l, "fixed", "month", 1000, LocalDateTime.now(), UUID.randomUUID().toString()));
+    String code = UUID.randomUUID().toString();
+    result.add(new VoucherFindResponse(1l, "fixed", "month", 1000, LocalDateTime.now(), code));
+    result.add(new VoucherFindResponse(1l, "fixed", "month", 1000, LocalDateTime.now(), code));
 
     given(voucherService.registerMonthlyVoucher(anyString())).willReturn(result);
 
@@ -118,7 +119,7 @@ class VoucherControllerTest {
 
   @Test
   void createVoucher() throws Exception {
-    VoucherFindResponse voucherFindResponse = new VoucherFindResponse(1l, "fixed", "special", 1000, LocalDateTime.now(), UUID.randomUUID().toString());
+    VoucherFindResponse voucherFindResponse = new VoucherFindResponse(1l, "fixed", "special", 1000, LocalDateTime.of(2022, 1, 1, 12, 0), UUID.randomUUID().toString());
     VoucherCreateRequest voucherCreateRequest = new VoucherCreateRequest(VoucherType.FiXED.toString(),
         EventType.SPECIAL.toString(), 1000, "2022-01-01 12:00");
 

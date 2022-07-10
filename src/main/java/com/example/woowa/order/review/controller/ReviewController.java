@@ -44,9 +44,9 @@ public class ReviewController {
         return reviewService.updateReview(id, reviewUpdateRequest);
     }
 
-    @DeleteMapping("/{id}")
-    public String deleteReview(@PathVariable Long id) {
-        reviewService.deleteReview(id);
+    @DeleteMapping("/{loginId}/{id}")
+    public String deleteReview(@PathVariable String loginId, @PathVariable Long id) {
+        reviewService.deleteReview(loginId, id);
         return "delete id - " + id;
     }
 }

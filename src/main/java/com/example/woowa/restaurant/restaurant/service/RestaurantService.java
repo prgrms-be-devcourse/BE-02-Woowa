@@ -93,7 +93,7 @@ public class RestaurantService {
     }
 
     @Transactional
-    public void updateRestaurantByOwnerIdAndRestaurantId(Long ownerId, Long restaurantId,
+    public void updateRestaurantById(Long ownerId, Long restaurantId,
         RestaurantUpdateRequest restaurantUpdateRequest) {
         Restaurant restaurant = findRestaurantEntityByOwnerIdAndRestaurantId(ownerId, restaurantId);
         restaurantMapper.updateEntity(restaurantUpdateRequest, restaurant);
@@ -109,6 +109,12 @@ public class RestaurantService {
     public void closeRestaurant(Long ownerId, Long restaurantId) {
         Restaurant restaurant = findRestaurantEntityByOwnerIdAndRestaurantId(ownerId, restaurantId);
         restaurant.closeRestaurant();
+    }
+
+    @Transactional
+    public void setPermitted(Long restaurantId) {
+        Restaurant restaurant = findRestaurantEntityById(restaurantId);
+        restaurant.setPermitted();
     }
 
     @Transactional
@@ -141,12 +147,8 @@ public class RestaurantService {
     }
 
     @Transactional
-    public void setDeliveryArea(Long ownerId, Long restaurantId, Long areaCodeId, Integer deleiveryFee) {
+    public void setDeliveryArea(Long restaurantId, Long areaCodeId, Integer deleiveryFee) {
         Restaurant restaurant = findRestaurantEntityById(restaurantId);
-
-        if (restaurant.getOwner().getId() != ownerId)
-            throw new RuntimeException("사장님 아이디가 다릅니다.");
-
         AreaCode areaCode = areaCodeService.findEntityById(areaCodeId);
 
         DeliveryArea deliveryArea = new DeliveryArea(areaCode, restaurant, deleiveryFee);

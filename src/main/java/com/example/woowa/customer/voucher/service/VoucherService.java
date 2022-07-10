@@ -88,7 +88,7 @@ public class VoucherService {
         Voucher voucher = findVoucherById(id);
         Customer customer = customerService.findCustomerEntity(customerLoginId);
         customer.removeVoucher(voucher);
-        voucherRepository.deleteById(id);
+        voucherRepository.delete(voucher);
     }
 
     public Voucher findVoucherById(Long voucherId) {

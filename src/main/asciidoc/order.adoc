@@ -10,7 +10,7 @@ operation::create-order[snippets='http-request,request-headers,request-fields,ht
 
 주문을 취소할 수 있습니다.
 
-operation::cancel-order[snippets='http-request,path-parameters,http-response']
+operation::cancel-order[snippets='http-request,request-headers,path-parameters,http-response']
 
 === 주문 수락
 

@@ -125,7 +125,6 @@ public class BDDTest {
     Long menuGroupId;
     Long menuId;
     CustomerFindResponse customer;
-    Long ownerId;
     Long orderId;
     Long areaCodeId;
     Long riderId;
@@ -161,7 +160,7 @@ public class BDDTest {
     void _2() {
         OwnerCreateRequest ownerCreateRequest = new OwnerCreateRequest("tTest@12341234",
             "tT@1234567890", "사장님", "010-1234-1234");
-        ownerId = ownerService.createOwner(ownerCreateRequest).getId();
+        ownerService.createOwner(ownerCreateRequest);
     }
 
     @Test
@@ -259,7 +258,7 @@ public class BDDTest {
     @DisplayName("사장은 배달 지역을 추가할 수 있다.")
     @Order(12)
     void _12() {
-        restaurantService.setDeliveryArea(ownerId, restaurant.getId(), areaCodeId, 3000);
+        restaurantService.setDeliveryArea(restaurant.getId(), areaCodeId, 3000);
     }
 
     @Test

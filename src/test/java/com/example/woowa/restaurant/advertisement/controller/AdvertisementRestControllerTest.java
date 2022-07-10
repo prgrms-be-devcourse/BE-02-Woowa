@@ -134,10 +134,11 @@ class AdvertisementRestControllerTest {
         // When, Then
         MvcResult mvcResult = mockMvc.perform(
                 get(BASE_URL_TEMPLATE.concat("advertisements"))
-                    .accept(MediaType.APPLICATION_JSON_VALUE))
+                    .accept(MediaType.APPLICATION_JSON_VALUE)
+                    .characterEncoding(StandardCharsets.UTF_8))
             .andExpect(status().isOk())
             .andDo(print())
-            .andDo(document("advertisement-findAll",
+            .andDo(document("advertisements-findAll",
                 responseFields(
                     fieldWithPath("[].id").type(JsonFieldType.NUMBER).description("아이디"),
                     fieldWithPath("[].title").type(JsonFieldType.STRING).description("광고명"),
@@ -169,10 +170,11 @@ class AdvertisementRestControllerTest {
         // When, Then
         MvcResult mvcResult = mockMvc.perform(
                 get(BASE_URL_TEMPLATE.concat("advertisements/{advertisementId}"), mockedId)
-                    .accept(MediaType.APPLICATION_JSON_VALUE))
+                    .accept(MediaType.APPLICATION_JSON_VALUE)
+                    .characterEncoding(StandardCharsets.UTF_8))
             .andExpect(status().isOk())
             .andDo(print())
-            .andDo(document("advertisement-findById",
+            .andDo(document("advertisements-findById",
                 pathParameters(
                     parameterWithName("advertisementId").description("아이디")
                 ),
@@ -215,7 +217,7 @@ class AdvertisementRestControllerTest {
                     .with(csrf().asHeader()))
             .andExpect(status().isNoContent())
             .andDo(print())
-            .andDo(document("advertisement-update",
+            .andDo(document("advertisements-update",
                 pathParameters(
                     parameterWithName("advertisementId").description("아이디")
                 ),
@@ -248,7 +250,7 @@ class AdvertisementRestControllerTest {
                     .with(csrf().asHeader()))
             .andExpect(status().isNoContent())
             .andDo(print())
-            .andDo(document("advertisement-delete",
+            .andDo(document("advertisements-delete",
                 pathParameters(
                     parameterWithName("advertisementId").description("아이디")
                 )));
@@ -272,7 +274,7 @@ class AdvertisementRestControllerTest {
                     .with(csrf().asHeader()))
             .andExpect(status().isNoContent())
             .andDo(print())
-            .andDo(document("advertisement-include-restaurant",
+            .andDo(document("advertisements-include-restaurant",
                 pathParameters(
                     parameterWithName("advertisementId").description("광고 아이디"),
                     parameterWithName("restaurantId").description("가게 아이디")
@@ -299,7 +301,7 @@ class AdvertisementRestControllerTest {
                     .with(csrf().asHeader()))
             .andExpect(status().isNoContent())
             .andDo(print())
-            .andDo(document("advertisement-exclude-restaurant",
+            .andDo(document("advertisements-exclude-restaurant",
                 pathParameters(
                     parameterWithName("advertisementId").description("광고 아이디"),
                     parameterWithName("restaurantId").description("가게 아이디")

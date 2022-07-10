@@ -46,8 +46,7 @@ public class CustomerAddressService {
 
     @Transactional
     public CustomerAddressFindResponse updateCustomerAddress(Long id, CustomerAddressUpdateRequest customerAddressUpdateRequest) {
-        Customer customer = findCustomerAddressEntity(id).getCustomer();
-        CustomerAddress customerAddress = customer.getCustomerAddresses().stream().filter((e) -> e.getId().equals(id)).findFirst().orElseThrow(() -> new RuntimeException("customer address not existed"));
+        CustomerAddress customerAddress = findCustomerAddressEntity(id);
         if ((customerAddressUpdateRequest.getDefaultAddress() != null) && (customerAddressUpdateRequest.getDetailAddress() != null)) {
             AreaCode areaCode = areaCodeService.findByAddress(customerAddressUpdateRequest.getDefaultAddress());
             customerAddress.setAddress(areaCode, customerAddressUpdateRequest.getDetailAddress());
@@ -59,9 +58,9 @@ public class CustomerAddressService {
     }
 
     @Transactional
-    public void deleteCustomerAddress(Long id) {
-        Customer customer = findCustomerAddressEntity(id).getCustomer();
-        CustomerAddress customerAddress = customer.getCustomerAddresses().stream().filter((e) -> e.getId().equals(id)).findFirst().orElseThrow(() -> new RuntimeException("customer address not existed"));
+    public void deleteCustomerAddress(String loginId, Long id) {
+        Customer customer = customerService.findCustomerEntity(loginId);
+        CustomerAddress customerAddress = findCustomerAddressEntity(id);
         customer.removeCustomerAddress(customerAddress);
         customerAddressRepository.delete(customerAddress);
     }
